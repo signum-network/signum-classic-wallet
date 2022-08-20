@@ -1,5 +1,0 @@
-{
-  "type": "string",
-  "description": "The name and symbol of this token. You can only use up to ten alphanumeric characters and no special chars",
-  "pattern": "^a-zA-Z0-9{1,10}$"
-}

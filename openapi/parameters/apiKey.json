@@ -1,9 +1,0 @@
-{
-  "name": "apiKey",
-  "in": "query",
-  "allowEmptyValue": false,
-  "description": "Any arbitrary string.<br/>\uD83D\uDD13 __Security Advice: Use a very strong and truly random key, or even disable admin operation entirely in your node config. Exposing admin operations is a security risk.__",
-  "schema": {
-    "type": "string"
-  }
-}

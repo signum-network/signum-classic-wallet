@@ -1,9 +1,0 @@
-{
-  "type": "integer",
-  "format": "int64",
-  "description": "The block identifier",
-  "required": true,
-  "example": [
-    "11398460215168332532"
-  ]
-}

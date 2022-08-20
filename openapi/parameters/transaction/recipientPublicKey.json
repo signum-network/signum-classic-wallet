@@ -1,9 +1,0 @@
-{
-  "name": "recipientPublicKey",
-  "in": "query",
-  "allowEmptyValue": false,
-  "description": "If you send a the recipients public key with a transaction you can automatically register (and activate) an account within the blockchain.",
-  "schema": {
-    "$ref": "../../schemas/hash.json"
-  }
-}

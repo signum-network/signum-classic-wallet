@@ -1,9 +1,0 @@
-{
-  "type": "integer",
-  "format": "int64",
-  "description": "The transaction identifier",
-  "required": true,
-  "example": [
-    "6954612694592252012"
-  ]
-}

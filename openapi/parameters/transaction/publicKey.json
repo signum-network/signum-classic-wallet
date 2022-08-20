@@ -1,9 +1,0 @@
-{
-  "name": "publicKey",
-  "in": "query",
-  "allowEmptyValue": false,
-  "description": "The public key of the sending account.<br/>If you send this key instead of the `secretPhrase`, you get the _unsigned_ transaction back, which can then be signed locally. In that case the transaction is not being published.",
-  "schema": {
-    "$ref": "../../schemas/hash.json"
-  }
-}

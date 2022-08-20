@@ -1,8 +1,0 @@
-{
-  "name": "lastIndex",
-  "in": "query",
-  "description": "The last index to be returned. Use this for pagination. If not set, at maximum 500 items beginning at `firstIndex` will be returned",
-  "schema": {
-    "type": "integer"
-  }
-}

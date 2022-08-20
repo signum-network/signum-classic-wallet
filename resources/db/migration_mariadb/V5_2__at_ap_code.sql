@@ -1,1 +1,0 @@
-ALTER TABLE at MODIFY COLUMN ap_code blob NULL;

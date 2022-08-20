@@ -1,8 +1,0 @@
-{
-  "type": "integer",
-  "format": "int64",
-  "description": "The quantity is a tokens amount. It depends on the decimals a token supports, e.g. the quantity=100 of a token with 2 decimals is expressed as 10000",
-  "example": [
-    "10000"
-  ]
-}
