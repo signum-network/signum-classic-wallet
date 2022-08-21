@@ -4,7 +4,8 @@
   "description": "Keeping the legacy code alive",
   "main": "src/index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx light-server -s src -p 1221 --no-reload"
   },
   "repository": {
     "type": "git",

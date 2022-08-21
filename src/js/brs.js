@@ -24,6 +24,8 @@
 var BRS = (function(BRS, $, undefined) {
     "use strict";
 
+    // http://127.0.0.1:8125 or http://127.0.0.1:6876
+    // https://europe.signum.network or https://europe3.testnet.signum.network
     BRS.server = "http://127.0.0.1:8125";
     BRS.state = {};
     BRS.blocks = [];
