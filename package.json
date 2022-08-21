@@ -1,0 +1,27 @@
+{
+  "name": "signum-classic-wallet",
+  "version": "1.0.0",
+  "description": "Keeping the legacy code alive",
+  "main": "src/index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deleterium/signum-classic-wallet.git"
+  },
+  "keywords": [
+    "signum",
+    "classic",
+    "wallet"
+  ],
+  "author": "",
+  "license": "SEE LICENSE IN src/LICENSES",
+  "bugs": {
+    "url": "https://github.com/deleterium/signum-classic-wallet/issues"
+  },
+  "homepage": "https://github.com/deleterium/signum-classic-wallet#readme",
+  "dependencies": {
+    "light-server": "^2.9.1"
+  }
+}

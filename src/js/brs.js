@@ -24,7 +24,7 @@
 var BRS = (function(BRS, $, undefined) {
     "use strict";
 
-    BRS.server = "";
+    BRS.server = "http://127.0.0.1:8125";
     BRS.state = {};
     BRS.blocks = [];
     BRS.genesis = "0";
