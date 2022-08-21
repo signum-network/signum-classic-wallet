@@ -38,26 +38,19 @@ var BRS = (function(BRS, $, undefined) {
 
                     //add to bookmarked assets
                     if (newAssetIds.length) {
-                        var qs = [];
-
-                        for (var i = 0; i < newAssetIds.length; i++) {
-                            qs.push("assets=" + encodeURIComponent(newAssetIds[i]));
-                        }
-
-                        qs = qs.join("&");
-                        //first get the assets info
-                        BRS.sendRequest("getAssets+", {
-                            //special request.. ugly hack.. also does POST due to URL max length
-                            "querystring": qs
-                        }, function(response) {
-                            if (response.assets && response.assets.length) {
-                                BRS.saveAssetBookmarks(response.assets, function() {
+                        for (const eachAsset of newAssetIds) {
+                            BRS.sendRequest("getAsset+", [{
+                                "asset": encodeURIComponent(eachAsset)
+                            }], function(response) {
+                                if (response.assets && response.assets.length) {
+                                    BRS.saveAssetBookmarks(response.assets, function() {
+                                        BRS.loadAssetExchangeSidebar(callback);
+                                    });
+                                } else {
                                     BRS.loadAssetExchangeSidebar(callback);
-                                });
-                            } else {
-                                BRS.loadAssetExchangeSidebar(callback);
-                            }
-                        });
+                                }
+                            });
+                        }
                     } else {
                         BRS.loadAssetExchangeSidebar(callback);
                     }
@@ -72,23 +65,23 @@ var BRS = (function(BRS, $, undefined) {
 
                 $.each(BRS.accountInfo.unconfirmedAssetBalances, function(key, assetBalance) {
                     if (BRS.assetIds.indexOf(assetBalance.asset) == -1) {
-                        qs.push("assets=" + encodeURIComponent(assetBalance.asset));
+                        qs.push(encodeURIComponent(assetBalance.asset));
                     }
                 });
 
-                qs = qs.join("&");
-
-                if (qs) {
-                    BRS.sendRequest("getAssets+", {
-                        "querystring": qs
-                    }, function(response) {
-                        if (response.assets && response.assets.length) {
-                            $.each(response.assets, function(key, asset) {
-                                BRS.cacheAsset(asset);
-                            });
-                        }
-                        BRS.loadAssetExchangeSidebar(callback);
-                    });
+                if (qs.length) {
+                    for (const eachAsset of qs) {
+                        BRS.sendRequest("getAsset+", [{
+                            "asset": eachAsset
+                        }], function(response) {
+                            if (response.assets && response.assets.length) {
+                                $.each(response.assets, function(key, asset) {
+                                    BRS.cacheAsset(asset);
+                                });
+                            }
+                            BRS.loadAssetExchangeSidebar(callback);
+                        });
+                    }
                 } else {
                     BRS.loadAssetExchangeSidebar(callback);
                 }
@@ -405,6 +398,7 @@ var BRS = (function(BRS, $, undefined) {
                 });
             }
 
+            const accountAsset = BRS.accountInfo.assetBalances.find((Obj) => Obj.asset === asset.asset)
             rows += "<a href='#' class='list-group-item list-group-item-"
                 + (ungrouped ? "ungrouped" : "grouped")
                 + (ownsAsset ? " owns_asset" : " not_owns_asset")
@@ -414,7 +408,7 @@ var BRS = (function(BRS, $, undefined) {
                 + (isClosedGroup ? " style='display:none'" : "")
                 + " data-closed='" + isClosedGroup
                 + "'><h4 class='list-group-item-heading'>" + asset.name.escapeHTML()
-                + "</h4><p class='list-group-item-text'>qty: " + BRS.formatQuantity(asset.quantityQNT, asset.decimals) + "</p></a>";
+                + "</h4><p class='list-group-item-text'>qty: " + BRS.formatQuantity(accountAsset.balanceQNT, asset.decimals) + "</p></a>";
         }
 
         var active = $("#asset_exchange_sidebar a.active");
@@ -1669,8 +1663,6 @@ var BRS = (function(BRS, $, undefined) {
             var lowestAskOrder = result.ask_orders[asset.asset];
             var highestBidOrder = result.bid_orders[asset.asset];
 
-            var percentageAsset = BRS.calculatePercentage(asset.balanceQNT, asset.quantityQNT);
-
             if (highestBidOrder != -1) {
                 total = new BigInteger(BRS.calculateOrderTotalNQT(asset.balanceQNT, highestBidOrder, asset.decimals));
             } else {
@@ -1712,7 +1704,7 @@ var BRS = (function(BRS, $, undefined) {
                 sign = "-";
             }
 
-            rows += "<tr" + (tentative != -1 ? " class='tentative tentative-allow-links'" : "") + " data-asset='" + String(asset.asset).escapeHTML() + "'><td><a href='#' data-goto-asset='" + String(asset.asset).escapeHTML() + "'>" + String(asset.name).escapeHTML() + "</a></td><td class='quantity'>" + BRS.formatQuantity(asset.balanceQNT, asset.decimals) + (tentative != -1 ? " " + sign + " <span class='added_quantity'>" + BRS.formatQuantity(tentative, asset.decimals) + "</span>" : "") + "</td><td>" + BRS.formatQuantity(asset.quantityQNT, asset.decimals) + "</td><td>" + percentageAsset + "%</td><td>" + (lowestAskOrder != -1 ? BRS.formatOrderPricePerWholeQNT(lowestAskOrder, asset.decimals) : "/") + "</td><td>" + (highestBidOrder != -1 ? BRS.formatOrderPricePerWholeQNT(highestBidOrder, asset.decimals) : "/") + "</td><td>" + (highestBidOrder != -1 ? BRS.formatAmount(totalNQT) : "/") + "</td><td><a href='#' data-toggle='modal' data-target='#transfer_asset_modal' data-asset='" + String(asset.asset).escapeHTML() + "' data-name='" + String(asset.name).escapeHTML() + "' data-decimals='" + String(asset.decimals).escapeHTML() + "'>" + $.t("transfer") + "</a></td></tr>";
+            rows += "<tr" + (tentative != -1 ? " class='tentative tentative-allow-links'" : "") + " data-asset='" + String(asset.asset).escapeHTML() + "'><td><a href='#' data-goto-asset='" + String(asset.asset).escapeHTML() + "'>" + String(asset.name).escapeHTML() + "</a></td><td class='quantity'>" + BRS.formatQuantity(asset.balanceQNT, asset.decimals) + (tentative != -1 ? " " + sign + " <span class='added_quantity'>" + BRS.formatQuantity(tentative, asset.decimals) + "</span>" : "") + "</td><td>" + BRS.formatQuantity(asset.quantityQNT, asset.decimals) + "</td><td>" + (lowestAskOrder != -1 ? BRS.formatOrderPricePerWholeQNT(lowestAskOrder, asset.decimals) : "/") + "</td><td>" + (highestBidOrder != -1 ? BRS.formatOrderPricePerWholeQNT(highestBidOrder, asset.decimals) : "/") + "</td><td>" + (highestBidOrder != -1 ? BRS.formatAmount(totalNQT) : "/") + "</td><td><a href='#' data-toggle='modal' data-target='#transfer_asset_modal' data-asset='" + String(asset.asset).escapeHTML() + "' data-name='" + String(asset.name).escapeHTML() + "' data-decimals='" + String(asset.decimals).escapeHTML() + "'>" + $.t("transfer") + "</a></td></tr>";
         }
 
         BRS.dataLoaded(rows);
