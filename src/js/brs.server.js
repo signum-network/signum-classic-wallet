@@ -526,6 +526,8 @@ var BRS = (function(BRS, $, undefined) {
             //has empty attachment, so no attachmentVersion byte...
             if (requestType == "sendMoney" || requestType == "sendMessage") {
                 pos = 176;
+            } else if (requestType == "transferAsset") {
+                pos = 185;
             } else {
                 pos = 177;
             }
