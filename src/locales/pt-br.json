@@ -529,6 +529,7 @@
    "next_block" : "Bloco seguinte",
    "next_page" : "Página seguinte",
    "no" : "Não",
+   "node_to_connect_text": "Conectar ao nó:",
    "none" : "Nenhum",
    "note" : "Nota",
    "note_is_encrypted" : "Esta nota é criptografada.",

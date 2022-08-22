@@ -125,6 +125,9 @@ var BRS = (function(BRS, $, undefined) {
     });
 
     BRS.login = function(password, callback) {
+
+        BRS.checkSelectedNode();
+
         if (!password.length) {
             $.notify($.t("error_passphrase_required_login"), {
                 type: 'danger',

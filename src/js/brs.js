@@ -24,9 +24,7 @@
 var BRS = (function(BRS, $, undefined) {
     "use strict";
 
-    // http://127.0.0.1:8125 or http://127.0.0.1:6876
-    // https://europe.signum.network or https://europe3.testnet.signum.network
-    BRS.server = "http://127.0.0.1:8125";
+    BRS.server = "";
     BRS.state = {};
     BRS.blocks = [];
     BRS.genesis = "0";
@@ -70,14 +68,6 @@ var BRS = (function(BRS, $, undefined) {
     var isScanning = false;
 
     BRS.init = function() {
-        if ( window.location.port === null || window.location.port.length === 0 || window.location.port !== "6876") {
-            $(".testnet_only").hide();
-        }
-        else {
-            BRS.isTestNet = true;
-            $(".testnet_only, #testnet_login, #testnet_warning").show();
-        }
-
         try {
             window.localStorage;
         } catch (err) {
@@ -87,6 +77,13 @@ var BRS = (function(BRS, $, undefined) {
         BRS.createDatabase(function() {
             BRS.getSettings();
         });
+
+        if (BRS.hasLocalStorage) {
+            const preferedNode = localStorage.getItem("burst.node");
+            if ( preferedNode !== null && preferedNode.length) {
+                $("#node_to_connect").val(preferedNode);
+            }
+        }
 
         BRS.getState(null);
         BRS.showLockscreen();
@@ -217,7 +214,29 @@ var BRS = (function(BRS, $, undefined) {
         }, 1000 * seconds);
     };
 
+    BRS.checkSelectedNode = function() {
+        const selectedNode = $("#node_to_connect").val();
+        if (selectedNode.length === 0) {
+            return
+        }
+        BRS.server = selectedNode;
+        if (BRS.hasLocalStorage) {
+            localStorage.setItem("burst.node", selectedNode);
+        }
+        if (selectedNode.includes("testnet") || selectedNode.includes("6876")) {
+            BRS.isTestNet = true;
+            $(".testnet_only, #testnet_login, #testnet_warning").show();
+            $(".testnet_only").show();
+        } else {
+            BRS.isTestNet = false;
+            $(".testnet_only, #testnet_login, #testnet_warning").hide();
+            $(".testnet_only").hide();
+        }
+    }
+
     BRS.getState = function(callback) {
+        BRS.checkSelectedNode();
+
         BRS.sendRequest("getBlockchainStatus", function(response) {
             if (response.errorCode) {
                 //todo

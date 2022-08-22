@@ -41,6 +41,16 @@
                 </div>
               </div>
             </div>
+            <div class="lockscreen-item">
+                <label for="node_to_connect" data-i18n="node_to_connect_text" style="color: #c4c4c4;">Connect to node:</label><br />
+                <input type="text" class="form-control" oninput="BRS.checkSelectedNode();" list="nodes" name="node_to_connect" id="node_to_connect" /> 
+                <datalist id="nodes">
+                  <option>http://localhost:8125</option>
+                  <option>http://localhost:6876</option>
+                  <option>https://europe.signum.network</option>
+                  <option>https://europe3.testnet.signum.network</option>
+                </datalist>
+            </div>
             <div id="remember_password_container">
               <input type="checkbox" name="remember_password" id="remember_password" /> <label for="remember_password" data-i18n="remember_passphrase_during_session">Remember passphrase on local computer</label>
             </div>
