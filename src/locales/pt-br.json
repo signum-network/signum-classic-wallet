@@ -188,6 +188,7 @@
    "dgs_table_seller" : "Seller",
    "difficulty" : "Dificuldade",
    "discount" : "Desconto",
+   "distribute_to_holders": "Distribuição",
    "downloaded" : "Baixado",
    "downloaded_hash" : "Hash Baixado",
    "downloaded_volume" : "Volume Baixado",
