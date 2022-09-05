@@ -399,6 +399,7 @@ var BRS = (function(BRS, $, undefined) {
             }
 
             const accountAsset = BRS.accountInfo.assetBalances.find((Obj) => Obj.asset === asset.asset)
+            const userAssetQuantity = accountAsset === undefined ? "0" : BRS.formatQuantity(accountAsset.balanceQNT, asset.decimals)
             rows += "<a href='#' class='list-group-item list-group-item-"
                 + (ungrouped ? "ungrouped" : "grouped")
                 + (ownsAsset ? " owns_asset" : " not_owns_asset")
@@ -408,7 +409,7 @@ var BRS = (function(BRS, $, undefined) {
                 + (isClosedGroup ? " style='display:none'" : "")
                 + " data-closed='" + isClosedGroup
                 + "'><h4 class='list-group-item-heading'>" + asset.name.escapeHTML()
-                + "</h4><p class='list-group-item-text'>qty: " + BRS.formatQuantity(accountAsset.balanceQNT, asset.decimals) + "</p></a>";
+                + "</h4><p class='list-group-item-text'>qty: " + userAssetQuantity + "</p></a>";
         }
 
         var active = $("#asset_exchange_sidebar a.active");
