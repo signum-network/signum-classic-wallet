@@ -111,7 +111,7 @@ var BRS = (function(BRS, $, undefined) {
             var accountRS;
 
             if (nxtAddress.set(accountId)) {
-                accountRS = nxtAddress.toString();
+                accountRS = nxtAddress.toString(BRS.prefix);
             } else {
                 accountRS = "";
             }

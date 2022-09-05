@@ -254,16 +254,15 @@ function NxtAddress() {
 		return true;
 	} //__________________________
 
-	this.toString = function() {
-		var out = 'S-';
+	this.toString = function(out) {
 
-		for (var i = 0; i < 17; i++) {
+        for (var i = 0; i < 17; i++) {
 			out += alphabet[codeword[cwmap[i]]];
 
 			if ((i & 3) == 3 && i < 13) out += '-';
 		}
 
-		return out;
+        return out;
 	}; //__________________________
 
 	this.account_id = function() {

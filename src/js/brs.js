@@ -42,6 +42,7 @@ var BRS = (function(BRS, $, undefined) {
     BRS.contacts = {};
 
     BRS.isTestNet = false;
+    BRS.prefix = "S-"
 
     BRS.lastBlockHeight = 0;
     BRS.downloadingBlockchain = false;
@@ -225,10 +226,12 @@ var BRS = (function(BRS, $, undefined) {
         }
         if (selectedNode.includes("testnet") || selectedNode.includes("6876")) {
             BRS.isTestNet = true;
+            BRS.prefix = "TS-"
             $(".testnet_only, #testnet_login, #testnet_warning").show();
             $(".testnet_only").show();
         } else {
             BRS.isTestNet = false;
+            BRS.prefix = "S-"
             $(".testnet_only, #testnet_login, #testnet_warning").hide();
             $(".testnet_only").hide();
         }
