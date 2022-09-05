@@ -394,175 +394,210 @@ var BRS = (function(BRS, $, undefined) {
 		break;
 	    }
 	}
-        else if (transaction.type == 2) {
+    else if (transaction.type == 2) {
 	    switch (transaction.subtype) {
 	    case 0:
-		data = {
-		    "type": $.t("asset_issuance"),
-		    "name": transaction.attachment.name,
-		    "quantity": [transaction.attachment.quantityQNT, transaction.attachment.decimals],
-		    "decimals": transaction.attachment.decimals,
-		    "description": transaction.attachment.description
-		};
+            data = {
+                "type": $.t("asset_issuance"),
+                "name": transaction.attachment.name,
+                "quantity": [transaction.attachment.quantityQNT, transaction.attachment.decimals],
+                "decimals": transaction.attachment.decimals,
+                "description": transaction.attachment.description
+            };
 
-		if (transaction.sender != BRS.account) {
-		    data.sender = BRS.getAccountTitle(transaction, "sender");
-		}
+            if (transaction.sender != BRS.account) {
+                data.sender = BRS.getAccountTitle(transaction, "sender");
+            }
 
-		$("#transaction_info_callout").html("<a href='#' data-goto-asset='" + String(transaction.transaction).escapeHTML() + "'>Click here</a> to view this asset in the Asset Exchange.").show();
+            $("#transaction_info_callout").html("<a href='#' data-goto-asset='" + String(transaction.transaction).escapeHTML() + "'>Click here</a> to view this asset in the Asset Exchange.").show();
 
-		$("#transaction_info_table tbody").append(BRS.createInfoTable(data));
-		$("#transaction_info_table").show();
-
-		break;
+            $("#transaction_info_table tbody").append(BRS.createInfoTable(data));
+            $("#transaction_info_table").show();
+    		break;
 	    case 1:
-		async = true;
+            async = true;
 
-		BRS.sendRequest("getAsset", {
-		    "asset": transaction.attachment.asset
-		}, function(asset, input) {
-		    var data = {
-			"type": $.t("asset_transfer"),
-			"asset_name": asset.name,
-			"quantity": [transaction.attachment.quantityQNT, asset.decimals]
-		    };
+            BRS.sendRequest("getAsset", {
+                "asset": transaction.attachment.asset
+            }, function(asset, input) {
+                var data = {
+                "type": $.t("asset_transfer"),
+                "asset_name": asset.name,
+                "quantity": [transaction.attachment.quantityQNT, asset.decimals]
+                };
 
-		    data.sender = BRS.getAccountTitle(transaction, "sender");
-		    data.recipient = BRS.getAccountTitle(transaction, "recipient");
+                data.sender = BRS.getAccountTitle(transaction, "sender");
+                data.recipient = BRS.getAccountTitle(transaction, "recipient");
 
-		    $("#transaction_info_table tbody").append(BRS.createInfoTable(data));
-		    $("#transaction_info_table").show();
+                $("#transaction_info_table tbody").append(BRS.createInfoTable(data));
+                $("#transaction_info_table").show();
 
-		    $("#transaction_info_modal").modal("show");
-		    BRS.fetchingModalData = false;
-		});
+                $("#transaction_info_modal").modal("show");
+                BRS.fetchingModalData = false;
+            });
 
-		break;
+            break;
 	    case 2:
-		async = true;
+            async = true;
 
-		BRS.sendRequest("getAsset", {
-		    "asset": transaction.attachment.asset
-		}, function(asset, input) {
-		    var data = {
-			"type": $.t("ask_order_placement"),
-			"asset_name": asset.name,
-			"quantity": [transaction.attachment.quantityQNT, asset.decimals],
-			"price_formatted_html": BRS.formatOrderPricePerWholeQNT(transaction.attachment.priceNQT, asset.decimals) + " SIGNA",
-			"total_formatted_html": BRS.formatAmount(BRS.calculateOrderTotalNQT(transaction.attachment.quantityQNT, transaction.attachment.priceNQT)) + " SIGNA"
-		    };
+            BRS.sendRequest("getAsset", {
+                "asset": transaction.attachment.asset
+            }, function(asset, input) {
+                var data = {
+                "type": $.t("ask_order_placement"),
+                "asset_name": asset.name,
+                "quantity": [transaction.attachment.quantityQNT, asset.decimals],
+                "price_formatted_html": BRS.formatOrderPricePerWholeQNT(transaction.attachment.priceNQT, asset.decimals) + " SIGNA",
+                "total_formatted_html": BRS.formatAmount(BRS.calculateOrderTotalNQT(transaction.attachment.quantityQNT, transaction.attachment.priceNQT)) + " SIGNA"
+                };
 
-		    if (transaction.sender != BRS.account) {
-			data.sender = BRS.getAccountTitle(transaction, "sender");
-		    }
+                if (transaction.sender != BRS.account) {
+                data.sender = BRS.getAccountTitle(transaction, "sender");
+                }
 
-		    $("#transaction_info_table tbody").append(BRS.createInfoTable(data));
-		    $("#transaction_info_table").show();
+                $("#transaction_info_table tbody").append(BRS.createInfoTable(data));
+                $("#transaction_info_table").show();
 
-		    $("#transaction_info_modal").modal("show");
-		    BRS.fetchingModalData = false;
-		});
+                $("#transaction_info_modal").modal("show");
+                BRS.fetchingModalData = false;
+            });
 
-		break;
+            break;
 	    case 3:
-		async = true;
+            async = true;
 
-		BRS.sendRequest("getAsset", {
-		    "asset": transaction.attachment.asset
-		}, function(asset, input) {
-		    var data = {
-			"type": $.t("bid_order_placement"),
-			"asset_name": asset.name,
-			"quantity": [transaction.attachment.quantityQNT, asset.decimals],
-			"price_formatted_html": BRS.formatOrderPricePerWholeQNT(transaction.attachment.priceNQT, asset.decimals) + " SIGNA",
-			"total_formatted_html": BRS.formatAmount(BRS.calculateOrderTotalNQT(transaction.attachment.quantityQNT, transaction.attachment.priceNQT)) + " SIGNA"
-		    };
+            BRS.sendRequest("getAsset", {
+                "asset": transaction.attachment.asset
+            }, function(asset, input) {
+                var data = {
+                "type": $.t("bid_order_placement"),
+                "asset_name": asset.name,
+                "quantity": [transaction.attachment.quantityQNT, asset.decimals],
+                "price_formatted_html": BRS.formatOrderPricePerWholeQNT(transaction.attachment.priceNQT, asset.decimals) + " SIGNA",
+                "total_formatted_html": BRS.formatAmount(BRS.calculateOrderTotalNQT(transaction.attachment.quantityQNT, transaction.attachment.priceNQT)) + " SIGNA"
+                };
 
-		    if (transaction.sender != BRS.account) {
-			data.sender = BRS.getAccountTitle(transaction, "sender");
-		    }
+                if (transaction.sender != BRS.account) {
+                data.sender = BRS.getAccountTitle(transaction, "sender");
+                }
 
-		    $("#transaction_info_table tbody").append(BRS.createInfoTable(data));
-		    $("#transaction_info_table").show();
+                $("#transaction_info_table tbody").append(BRS.createInfoTable(data));
+                $("#transaction_info_table").show();
 
-		    $("#transaction_info_modal").modal("show");
-		    BRS.fetchingModalData = false;
-		});
+                $("#transaction_info_modal").modal("show");
+                BRS.fetchingModalData = false;
+            });
 
-		break;
+            break;
 	    case 4:
-		async = true;
+            async = true;
 
-		BRS.sendRequest("getTransaction", {
-		    "transaction": transaction.attachment.order
-		}, function(transaction, input) {
-		    if (transaction.attachment.asset) {
-			BRS.sendRequest("getAsset", {
-			    "asset": transaction.attachment.asset
-			}, function(asset) {
-			    var data = {
-				"type": $.t("ask_order_cancellation"),
-				"asset_name": asset.name,
-				"quantity": [transaction.attachment.quantityQNT, asset.decimals],
-				"price_formatted_html": BRS.formatOrderPricePerWholeQNT(transaction.attachment.priceNQT, asset.decimals) + " SIGNA",
-				"total_formatted_html": BRS.formatAmount(BRS.calculateOrderTotalNQT(transaction.attachment.quantityQNT, transaction.attachment.priceNQT)) + " SIGNA"
-			    };
+            BRS.sendRequest("getTransaction", {
+                "transaction": transaction.attachment.order
+            }, function(transaction, input) {
+                if (transaction.attachment.asset) {
+                BRS.sendRequest("getAsset", {
+                    "asset": transaction.attachment.asset
+                }, function(asset) {
+                    var data = {
+                    "type": $.t("ask_order_cancellation"),
+                    "asset_name": asset.name,
+                    "quantity": [transaction.attachment.quantityQNT, asset.decimals],
+                    "price_formatted_html": BRS.formatOrderPricePerWholeQNT(transaction.attachment.priceNQT, asset.decimals) + " SIGNA",
+                    "total_formatted_html": BRS.formatAmount(BRS.calculateOrderTotalNQT(transaction.attachment.quantityQNT, transaction.attachment.priceNQT)) + " SIGNA"
+                    };
 
-			    if (transaction.sender != BRS.account) {
-				data.sender = BRS.getAccountTitle(transaction, "sender");
-			    }
+                    if (transaction.sender != BRS.account) {
+                    data.sender = BRS.getAccountTitle(transaction, "sender");
+                    }
 
-			    $("#transaction_info_table tbody").append(BRS.createInfoTable(data));
-			    $("#transaction_info_table").show();
+                    $("#transaction_info_table tbody").append(BRS.createInfoTable(data));
+                    $("#transaction_info_table").show();
 
-			    $("#transaction_info_modal").modal("show");
-			    BRS.fetchingModalData = false;
-			});
-		    }
-                    else {
-			BRS.fetchingModalData = false;
-		    }
-		});
+                    $("#transaction_info_modal").modal("show");
+                    BRS.fetchingModalData = false;
+                });
+                }
+                        else {
+                BRS.fetchingModalData = false;
+                }
+            });
 
-		break;
+            break;
 	    case 5:
-		async = true;
+            async = true;
 
-		BRS.sendRequest("getTransaction", {
-		    "transaction": transaction.attachment.order
-		}, function(transaction) {
-		    if (transaction.attachment.asset) {
-			BRS.sendRequest("getAsset", {
-			    "asset": transaction.attachment.asset
-			}, function(asset) {
-			    var data = {
-				"type": $.t("bid_order_cancellation"),
-				"asset_name": asset.name,
-				"quantity": [transaction.attachment.quantityQNT, asset.decimals],
-				"price_formatted_html": BRS.formatOrderPricePerWholeQNT(transaction.attachment.priceNQT, asset.decimals) + " SIGNA",
-				"total_formatted_html": BRS.formatAmount(BRS.calculateOrderTotalNQT(transaction.attachment.quantityQNT, transaction.attachment.priceNQT)) + " SIGNA"
-			    };
+            BRS.sendRequest("getTransaction", {
+                "transaction": transaction.attachment.order
+            }, function(transaction) {
+                if (transaction.attachment.asset) {
+                BRS.sendRequest("getAsset", {
+                    "asset": transaction.attachment.asset
+                }, function(asset) {
+                    var data = {
+                    "type": $.t("bid_order_cancellation"),
+                    "asset_name": asset.name,
+                    "quantity": [transaction.attachment.quantityQNT, asset.decimals],
+                    "price_formatted_html": BRS.formatOrderPricePerWholeQNT(transaction.attachment.priceNQT, asset.decimals) + " SIGNA",
+                    "total_formatted_html": BRS.formatAmount(BRS.calculateOrderTotalNQT(transaction.attachment.quantityQNT, transaction.attachment.priceNQT)) + " SIGNA"
+                    };
 
-			    if (transaction.sender != BRS.account) {
-				data.sender = BRS.getAccountTitle(transaction, "sender");
-			    }
+                    if (transaction.sender != BRS.account) {
+                    data.sender = BRS.getAccountTitle(transaction, "sender");
+                    }
 
-			    $("#transaction_info_table tbody").append(BRS.createInfoTable(data));
-			    $("#transaction_info_table").show();
+                    $("#transaction_info_table tbody").append(BRS.createInfoTable(data));
+                    $("#transaction_info_table").show();
 
-			    $("#transaction_info_modal").modal("show");
-			    BRS.fetchingModalData = false;
-			});
-		    }
-                    else {
-			BRS.fetchingModalData = false;
-		    }
-		});
+                    $("#transaction_info_modal").modal("show");
+                    BRS.fetchingModalData = false;
+                });
+                }
+                        else {
+                BRS.fetchingModalData = false;
+                }
+            });
 
-		break;
+            break;
+        case 8:
+            async = true;
+
+            BRS.sendRequest("getIndirectIncoming", {
+                "transaction": transaction.transaction,
+                "account": BRS.account
+            }, function(transactionII, input) {
+                if (transactionII.errorCode === undefined) {
+                BRS.sendRequest("getAsset", {
+                    "asset": transaction.attachment.assetToDistribute === "0" ? transaction.attachment.asset : transaction.attachment.assetToDistribute
+                }, function(asset) {
+                    var data = {
+                    "type": $.t("distribute_to_holders"),
+                    "asset_name": asset.name,
+                    "quantity": [transactionII.quantityQNT, asset.decimals],
+                    "amount": transactionII.amountNQT,
+                    };
+
+                    if (transaction.sender != BRS.account) {
+                        data.sender = BRS.getAccountTitle(transaction, "sender");
+                    }
+
+                    $("#transaction_info_table tbody").append(BRS.createInfoTable(data));
+                    $("#transaction_info_table").show();
+
+                    $("#transaction_info_modal").modal("show");
+                    BRS.fetchingModalData = false;
+                });
+                }
+                        else {
+                BRS.fetchingModalData = false;
+                }
+            });
+
+            break;
+
 	    default:
-		incorrect = true;
-		break;
+		    incorrect = true;
+		    break;
 	    }
 	}
         else if (transaction.type == 3) {
