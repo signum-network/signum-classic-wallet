@@ -1,0 +1,9 @@
+{
+  "type": "integer",
+  "format": "int64",
+  "description": "The alias identifier",
+  "required": true,
+  "example": [
+    "4498738268646491227"
+  ]
+}

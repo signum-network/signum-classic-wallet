@@ -1,0 +1,168 @@
+{
+  "type": "object",
+  "required": [
+    "balanceNQT",
+    "unconfirmedBalanceNQT",
+    "forgedBalanceNQT",
+    "guaranteedBalanceNQT",
+    "account",
+    "accountRS"
+  ],
+  "properties": {
+    "balanceNQT": {
+      "description": "Your total balance, including commitment and reserved orders",
+      "type": "integer",
+      "format": "int64",
+      "example": [
+        "100000000",
+        "1000000"
+      ]
+    },
+    "unconfirmedBalanceNQT": {
+      "description": "The currently available balance.<br/>The amount is always returned in Planck, that is Signa multiplied by 10E8",
+      "type": "integer",
+      "format": "int64",
+      "example": [
+        "100000000",
+        "1000000"
+      ]
+    },
+    "committedBalanceNQT": {
+      "description": "Your committed balance.<br/>The amount is always returned in Planck, that is Signa multiplied by 10E8",
+      "type": "integer",
+      "format": "int64",
+      "example": [
+        "100000000",
+        "1000000"
+      ]
+    },
+    "forgedBalanceNQT": {
+      "description": "The balance forged by you (Solo-Mining only).<br/>The amount is always returned in Planck, that is Signa multiplied by 10E8",
+      "type": "integer",
+      "format": "int64",
+      "example": [
+        "100000000",
+        "1000000"
+      ]
+    },
+    "guaranteedBalanceNQT": {
+      "description": "Your total balance, including commitment and reserved orders.<br/>The amount is always returned in Planck, that is Signa multiplied by 10E8",
+      "type": "integer",
+      "format": "int64",
+      "example": [
+        "100000000",
+        "1000000"
+      ]
+    },
+    "commitmentNQT": {
+      "description": "The current network commitment estimate per TiB.<br/>The amount is always returned in Planck, that is Signa multiplied by 10E8",
+      "type": "integer",
+      "format": "int64",
+      "example": [
+        "100000000",
+        "1000000"
+      ]
+    },
+    "account": {
+      "$ref": "../schemas/numericId.json"
+    },
+    "accountRS": {
+      "$ref": "../schemas/rsAddress.json"
+    },
+    "accountRSExtended": {
+      "description": "The extended address carries the public key base36 encoded",
+      "type": "string",
+      "example": ["TS-QAJA-QW5Y-SWVP-4RVP4-4U4ZCOBGZ9UPEQZQH4TSPXADMT7VHPPI53ZTWNUK9NZLXSDRNU"]
+    },
+    "publicKey": {
+      "$ref": "../schemas/hash.json"
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the account, if it was set with [Set Account Info](#post-/api-requestType-setAccountInfo)"
+    },
+    "description": {
+      "type": "string",
+      "description": "The description of the account, if it was set with [Set Account Info](#post-/api-requestType-setAccountInfo)"
+    },
+    "assetBalances": {
+      "description": "The total token balances (in _quantity_) which this account owns, including reserved ones",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "asset": {
+            "$ref": "../schemas/numericId.json"
+          },
+          "balanceQNT": {
+            "$ref": "../schemas/quantity.json"
+          }
+        }
+      }
+    },
+    "unconfirmedAssetBalances": {
+      "description": "The __available__ token balances (in _quantity_) which this account owns, excluding reserved ones",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "asset": {
+            "$ref": "../schemas/numericId.json"
+          },
+          "unconfirmedBalanceQNT": {
+            "$ref": "../schemas/quantity.json"
+          }
+        }
+      }
+    }
+  },
+  "example": {
+    "balanceNQT": "6175175744000",
+    "unconfirmedBalanceNQT": "6175175744000",
+    "forgedBalanceNQT": "0",
+    "guaranteedBalanceNQT": "6175175744000",
+    "account": "2402520554221019656",
+    "accountRS": "TS-QAJA-QW5Y-SWVP-4RVP4",
+    "accountRSExtended": "TS-QAJA-QW5Y-SWVP-4RVP4-4U4ZCOBGZ9UPEQZQH4TSPXADMT7VHPPI53ZTWNUK9NZLXSDRNU",
+    "publicKey": "c213e4144ba84af94aae2458308fae1f0cb083870c8f3012eea58147f3b09d4a",
+    "name": "ohager",
+    "description": "{\"nm\":\"ohager\",\"ds\":\"Just a simple dev... or not?\",\"av\":{\"QmbbjnCFd8jELVZkVtokChaYAxFMjoGsuwhNeiPrgZGgo3\":\"image/png\"},\"bg\":{\"Qmd45gVYNvz5LPuNfrx8zDH571kz4h8vTRHdZhSFRZx3Hz\":\"image/jpeg\"},\"hp\":\"https://signum.network\",\"tw\":\"https://twitter.com/ohager5\",\"sc\":[]}",
+    "assetBalances": [
+      {
+        "asset": "6874634292089191957",
+        "balanceQNT": "100000000"
+      },
+      {
+        "asset": "10743546598959382439",
+        "balanceQNT": "100000"
+      },
+      {
+        "asset": "11919272490103489319",
+        "balanceQNT": "100000"
+      },
+      {
+        "asset": "3245640698634046189",
+        "balanceQNT": "1000"
+      }
+    ],
+    "unconfirmedAssetBalances": [
+      {
+        "asset": "6874634292089191957",
+        "unconfirmedBalanceQNT": "100000000"
+      },
+      {
+        "asset": "10743546598959382439",
+        "unconfirmedBalanceQNT": "100000"
+      },
+      {
+        "asset": "11919272490103489319",
+        "unconfirmedBalanceQNT": "100000"
+      },
+      {
+        "asset": "3245640698634046189",
+        "unconfirmedBalanceQNT": "1000"
+      }
+    ],
+    "requestProcessingTime": 12
+  }
+}

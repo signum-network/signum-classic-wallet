@@ -1,0 +1,69 @@
+{
+  "get": {
+    "summary": "Get Known Peers/Nodes",
+    "description": "Get a list of known peers/nodes. See also [Get Node/Peer](#get-/api-requestType-getPeer)",
+    "tags": [
+      "network"
+    ],
+    "parameters": [
+      {
+        "name": "active",
+        "in": "query",
+        "description": "Select whether active or inactive, i.e. `NON_CONNECTED` peers should be listed.",
+        "example": [
+          true,
+          false
+        ],
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "state",
+        "in": "query",
+        "description": "Query peers by one of the states",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "NON_CONNECTED",
+            "CONNECTED",
+            "DISCONNECTED"
+          ]
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Peer IP List",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "peers"
+              ],
+              "properties": {
+                "peers": {
+                  "description": "The IPs of registered nodes",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "peers": [
+                  "138.2.137.23",
+                  "71.87.114.2",
+                  "91.9.186.216",
+                  "78.142.26.26"
+                ],
+                "requestProcessingTime": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

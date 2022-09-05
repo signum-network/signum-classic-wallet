@@ -1,0 +1,43 @@
+{
+  "get": {
+    "summary": "Get Open Bid Orders",
+    "description": "Gets all open bid orders",
+    "tags": [
+      "token"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/firstIndex.json"
+      },
+      {
+        "$ref": "../../parameters/lastIndex.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "List of __Bid Orders__",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "bidOrders"
+              ],
+              "properties": {
+                "bidOrders": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "../../schemas/order.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

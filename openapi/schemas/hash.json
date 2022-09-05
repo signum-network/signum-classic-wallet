@@ -1,0 +1,6 @@
+{
+  "type": "string",
+  "pattern": "^[a-fA-F0-9]{64}$",
+  "description": "A hexadecimal string of fixed size representing 256 Bit Hashes (SHA-256)",
+  "example": "c213e4144ba84af94aae2458308fae1f0cb083870c8f3012eea58147f3b09d4a"
+}

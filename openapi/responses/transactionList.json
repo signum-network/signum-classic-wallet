@@ -1,0 +1,23 @@
+{
+  "description": "Transaction List Response",
+  "content": {
+    "application/json": {
+      "schema": {
+        "type": "object",
+        "description": "A list of transactions.<br/>__Note__: For performance/stability reasons a node returns at maximum 500 items. All transaction query methods offer `firstIndex` and `lastIndex` to paginate through the transaction.",
+        "required": [
+          "transactions"
+        ],
+        "properties": {
+          "transactions" : {
+            "type":"array",
+            "items": {
+              "$ref": "../schemas/signedTransaction.json"
+            },
+            "maxLength": 500
+          }
+        }
+      }
+    }
+  }
+}

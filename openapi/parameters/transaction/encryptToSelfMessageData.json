@@ -1,0 +1,10 @@
+{
+  "name": "encryptToSelfMessageData",
+  "in": "query",
+  "allowEmptyValue": false,
+  "description": "It's possible to encrypt the data locally and send the encrypted data for maximum security. Together with this field you need to send `encryptToSelfMessageNonce` also.",
+  "schema": {
+    "type": "string",
+    "maxLength": 1000
+  }
+}

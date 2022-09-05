@@ -1,0 +1,80 @@
+{
+  "type": "object",
+  "example":
+    {
+      "broadcasted": true,
+      "transaction": "6954612694592252012",
+      "fullHash": "6ce8970b66bf8360108df8d4675c275ab2acd549219928c4d0ae4a62a284b1c7",
+      "transactionBytes": "01207daef60e1800c213e4144ba84af94aae2458308fae1f0cb083870c8f3012eea58147f3b09d4aa98438cc3e273c5a000000000000000040420f000000000000000000000000000000000000000000000000000000000000000000000000009204b3eca152b72141cdfebbdbfad14c4c79a7f68f04eb5daf7f04a817495f09cca5cf85566ea2b28178702fba7aedae29728af7cd640f5b1e02b8facb21134c0100000084bf060078948b159669656904cfe1531b543c7c010400008074657374",
+      "signatureHash": "78c4b094c0b8b1d35c23738a5fabdcabbafd1e73a99a90e3280abf98452d783a",
+      "numberPeersSentTo": 14,
+      "unsignedTransactionBytes": "01207daef60e1800c213e4144ba84af94aae2458308fae1f0cb083870c8f3012eea58147f3b09d4aa98438cc3e273c5a000000000000000040420f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000084bf060078948b159669656904cfe1531b543c7c010400008074657374",
+      "transactionJSON": {
+        "type": 1,
+        "subtype": 0,
+        "timestamp": 251047549,
+        "deadline": 24,
+        "senderPublicKey": "c213e4144ba84af94aae2458308fae1f0cb083870c8f3012eea58147f3b09d4a",
+        "recipient": "6502115112683865257",
+        "recipientRS": "TS-K37B-9V85-FB95-793HN",
+        "amountNQT": "0",
+        "feeNQT": "1000000",
+        "signature": "9204b3eca152b72141cdfebbdbfad14c4c79a7f68f04eb5daf7f04a817495f09cca5cf85566ea2b28178702fba7aedae29728af7cd640f5b1e02b8facb21134c",
+        "signatureHash": "78c4b094c0b8b1d35c23738a5fabdcabbafd1e73a99a90e3280abf98452d783a",
+        "fullHash": "6ce8970b66bf8360108df8d4675c275ab2acd549219928c4d0ae4a62a284b1c7",
+        "transaction": "6954612694592252012",
+        "attachment": {
+          "version.Message": 1,
+          "message": "test",
+          "messageIsText": true
+        },
+        "attachmentBytes": "010400008074657374",
+        "sender": "2402520554221019656",
+        "senderRS": "TS-QAJA-QW5Y-SWVP-4RVP4",
+        "height": 2147483647,
+        "version": 2,
+        "ecBlockId": "7594592439957689464",
+        "ecBlockHeight": 442244,
+        "cashBackId": "8952122635653861124"
+      }
+    }
+  ,
+  "required": [
+    "transaction",
+    "fullHash"
+  ],
+  "properties": {
+    "transaction": {
+      "$ref": "../schemas/transactionId.json"
+    },
+    "fullHash": {
+      "$ref": "../schemas/hash.json"
+    },
+    "transactionBytes": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]+$",
+      "description": "The binary representation of the entire transaction. This can be parsed with (parseTransactionBytes)[#post-/api-requestType-parseTransaction]"
+    },
+    "signatureHash": {
+      "$ref": "../schemas/hash.json"
+    },
+    "numberPeersSentTo": {
+      "type": "integer",
+      "format": "int32"
+    },
+    "broadcasted": {
+      "type": "boolean"
+    },
+    "unsignedTransactionBytes": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]+$",
+      "description": "The binary representation of the entire _unsigned_ transaction. This can be parsed with (parseTransactionBytes)[#post-/api-requestType-parseTransaction]"
+    },
+    "transactionJSON": {
+      "$ref": "../schemas/transaction.json"
+    },
+    "requestProcessingTime": {
+      "type": "integer"
+    }
+  }
+}

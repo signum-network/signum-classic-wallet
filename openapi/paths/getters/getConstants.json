@@ -1,0 +1,14 @@
+{
+  "get": {
+    "summary": "Get Blockchain Parameters",
+    "description": "Get this blockchains constant parameters ",
+    "tags": [
+      "network"
+    ],
+    "responses": {
+      "200": {
+        "$ref": "../../responses/constants.json"
+      }
+    }
+  }
+}

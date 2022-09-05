@@ -1,0 +1,10 @@
+{
+  "name": "order",
+  "in": "query",
+  "allowEmptyValue": false,
+  "required": true,
+  "description": "An order identifier",
+  "schema": {
+    "$ref": "../../schemas/orderId.json"
+  }
+}

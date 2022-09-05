@@ -1,0 +1,69 @@
+{
+  "post": {
+    "summary": "Buy Alias",
+    "description": "Buy an alias that is [on sale](#post-/api-requestType-sellAlias).",
+    "tags": [
+      "alias"
+    ],
+    "parameters": [
+      {
+        "$ref" : "../../parameters/alias/alias.json"
+      },
+      {
+        "name": "aliasName",
+        "in": "query",
+        "allowEmptyValue": true,
+        "description": "Instead of `alias` you can use the alias' name also.",
+        "schema": {
+          "type": "string",
+          "maxLength": 100
+        }
+      },
+      {
+        "name": "recipient",
+        "in": "query",
+        "allowEmptyValue": false,
+        "description": "You can specify a single buyer. This buyer will get a notification, that you are willing to sell this alias exclusively to him/her. Otherwise, your alias can be bought by everyone",
+        "schema": {
+          "$ref": "../../schemas/address.json"
+        }
+      },
+      {
+        "name": "amountNQT",
+        "in": "query",
+        "allowEmptyValue": false,
+        "required": true,
+        "description": "The amount you want to pay for the alias, but must be at least the minimum price asked for.",
+        "schema": {
+          "$ref": "../../schemas/amount.json"
+        }
+      },
+      {
+        "$ref": "../../parameters/transaction/feeNQT.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/secretPhrase.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/publicKey.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/deadline.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/broadcast.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/referencedTransactionFullHash.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "$ref": "../../responses/transaction.json"
+      },
+      "500" : {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

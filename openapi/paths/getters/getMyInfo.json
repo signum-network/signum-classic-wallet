@@ -1,0 +1,45 @@
+{
+  "get": {
+    "summary": "Get Self Info",
+    "description": "Get the information of this node/peer.",
+    "tags": [
+      "network"
+    ],
+    "responses": {
+      "200": {
+        "description": "Info response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "host",
+                "address",
+                "UUID"
+              ],
+              "properties": {
+                "host": {
+                  "description": "The host IP",
+                  "type": "string"
+                },
+                "address": {
+                  "description": "The host IP",
+                  "type": "string"
+                },
+                "UUID": {
+                  "description": "The UUID",
+                  "type": "string"
+                }
+              },
+              "example": {
+                "host": "127.0.0.1",
+                "address": "127.0.0.1",
+                "UUID": "11e1784d-5157-433d-b729-49295ea51eb6"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

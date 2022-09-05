@@ -1,0 +1,50 @@
+{
+  "get": {
+    "summary": "Get Accounts Ask Orders",
+    "description": "Gets the current ask orders of an account",
+    "tags": [
+      "account",
+      "token"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/account/account.json"
+      },
+      {
+        "$ref": "../../parameters/token/asset.json"
+      },
+      {
+        "$ref": "../../parameters/firstIndex.json"
+      },
+      {
+        "$ref": "../../parameters/lastIndex.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "List of __Ask Orders__",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "askOrders"
+              ],
+              "properties": {
+                "askOrders": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "../../schemas/order.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

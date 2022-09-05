@@ -1,0 +1,79 @@
+{
+  "post": {
+    "summary": "Issue Token",
+    "description": "Issues a new token. Tokens can be issued as _mintable_ that is they have no fixed supply and the supply can be [increased by the creator](#post-/api-requestType-mintAsset) of this token<br/>Mind, that issuing a token has [elevated fees involved](https://github.com/signum-network/SIPs/blob/master/SIP/sip-31.md#specification), i.e. 150 Signa.",
+    "tags": [
+      "token"
+    ],
+    "parameters": [
+      {
+        "name": "name",
+        "in": "query",
+        "required": true,
+        "allowEmptyValue": false,
+        "description": "The tokens name and also its ticker symbol. You can only use up to ten alphanumeric characters and no special chars",
+        "schema": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9]{1,10}$"
+        }
+      },
+      {
+        "name": "description",
+        "in": "query",
+        "description": "Any arbitrary description up to 1000 characters length.",
+        "schema": {
+          "type": "string",
+          "maxLength": 1000
+        }
+      },
+      {
+        "$ref": "../../parameters/token/quantityQNT.json"
+      },
+      {
+        "name": "decimals",
+        "in": "query",
+        "description": "The number of decimals for this token.<br/>If you issue a token with 2 decimals, then it can be fractioned in per hundreds, i.e. 0.01. To have an integral token you need to consider the decimals. So, one token is a quantity of 100",
+        "schema": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8
+        }
+      },
+      {
+        "name": "mintable",
+        "in": "query",
+        "description": "Set the token mintable, i.e. allow a dynamic supply (potentially inflationary), or define a fixed supply (deflationary)",
+        "schema": {
+          "type": "boolean"
+        },
+        "example" : [true, false]
+      },
+      {
+        "$ref": "../../parameters/transaction/feeNQT.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/secretPhrase.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/publicKey.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/deadline.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/broadcast.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/referencedTransactionFullHash.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "$ref": "../../responses/transaction.json"
+      },
+      "500" : {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

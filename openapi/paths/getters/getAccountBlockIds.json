@@ -1,0 +1,48 @@
+{
+  "get": {
+    "summary": "Get Accounts Forged Block Ids",
+    "description": "Gets the blocks an account forged.",
+    "tags": [
+      "account",
+      "mining"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/account/account.json"
+      },
+      {
+        "$ref": "../../parameters/timestamp.json"
+      },
+      {
+        "$ref": "../../parameters/firstIndex.json"
+      },
+      {
+        "$ref": "../../parameters/lastIndex.json"
+     }
+    ],
+    "responses": {
+      "200": {
+        "description": "List of forged block ids",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "blockId"
+              ],
+              "properties": {
+                "blockIds": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

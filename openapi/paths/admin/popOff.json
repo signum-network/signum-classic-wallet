@@ -1,0 +1,41 @@
+{
+  "post": {
+    "summary": "⚠️ Pop off Transactions",
+    "description": "This allows to remove up to 1440 most recent transactions in the nodes database. Use this to get your database in sync with network when you are on a fork. __Attention: This operation can take some minutes__",
+    "tags": [
+      "admin"
+    ],
+    "parameters": [
+      {
+        "name": "numBlocks",
+        "description": "The amount of blocks to be removed",
+        "in": "query",
+        "schema" : {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1440
+        }
+      },
+      {
+        "name": "height",
+        "description": "The block height to which it should be reset. Only block heights which are at maximum 1440 blocks in the past",
+        "in": "query",
+        "schema" : {
+          "type": "integer",
+          "format" : "int32"
+        }
+      },
+      {
+        "$ref": "../../parameters/apiKey.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "$ref": "../../responses/empty.json"
+      },
+      "500" : {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

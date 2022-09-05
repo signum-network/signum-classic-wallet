@@ -1,0 +1,55 @@
+{
+  "type": "object",
+  "required": [
+    "account",
+    "accountRS",
+    "aliasName",
+    "timestamp",
+    "alias"
+  ],
+  "properties": {
+    "account": {
+      "$ref": "./numericId.json"
+    },
+    "accountRS": {
+      "$ref": "./rsAddress.json"
+    },
+    "aliasName": {
+      "description": "The name of the alias",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9]{30}$"
+    },
+    "aliasURI": {
+      "description": "The content of the alias",
+      "type": "string",
+      "maxLength": 1000
+    },
+    "priceNQT": {
+      "description": "The price in Planck wanted for the alias.When an alias has this field is it available for buying, i.e. it is On Sale.",
+      "type": "integer",
+      "format": "int64",
+      "example": [
+        "100000000",
+        "1000000"
+      ]
+    },
+    "buyer": {
+      "description": "The potential buyer of this alias. When this field is given, only that account can buy the alias",
+      "type": "integer",
+      "format": "int64"
+    },
+    "timestamp": {
+      "$ref": "./timestamp.json"
+    }
+  },
+  "example": {
+    "account": "2402520554221019656",
+    "accountRS": "TS-QAJA-QW5Y-SWVP-4RVP4",
+    "aliasName": "superduperalias",
+    "aliasURI": "Contentchange....",
+    "timestamp": 251224892,
+    "alias": "8468600040485258181",
+    "priceNQT": "500000000",
+    "buyer": "6502115112683865257"
+  }
+}

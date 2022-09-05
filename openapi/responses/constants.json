@@ -1,0 +1,318 @@
+{
+  "description": "The constants of this blockchain chain instance - This information are the constant attributes of this blockchain",
+  "content": {
+    "application/json": {
+      "schema": {
+        "type": "object",
+        "example": {
+          "networkName": "Signum",
+          "genesisBlockId": "3444294670862540038",
+          "genesisAccountId": "0",
+          "maxBlockPayloadLength": 375360,
+          "maxArbitraryMessageLength": 1000,
+          "ordinaryTransactionLength": 176,
+          "addressPrefix": "S",
+          "valueSuffix": "SIGNA",
+          "blockTime": 240,
+          "decimalPlaces": 8,
+          "feeQuantNQT": 1000000,
+          "cashBackId": "8952122635653861124",
+          "cashBackFactor": 4,
+          "transactionTypes": [
+            {
+              "value": 21,
+              "description": "Advanced Payment",
+              "subtypes": [
+                {
+                  "value": 0,
+                  "description": "Escrow Creation",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 1,
+                  "description": "Escrow Sign",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 2,
+                  "description": "Escrow Result",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 3,
+                  "description": "Subscription Subscribe",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 4,
+                  "description": "Subscription Cancel",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 5,
+                  "description": "Subscription Payment",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                }
+              ]
+            },
+            {
+              "value": 2,
+              "description": "Colored coins",
+              "subtypes": [
+                {
+                  "value": 0,
+                  "description": "Asset Issuance",
+                  "minimumFeeConstantNQT": 15000000000,
+                  "minimumFeeAppendagesNQT": 0
+                },
+                {
+                  "value": 1,
+                  "description": "Asset Transfer",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 2,
+                  "description": "Ask Order Placement",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 3,
+                  "description": "Bid Order Placement",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 4,
+                  "description": "Ask Order Cancellation",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 5,
+                  "description": "Bid Order Cancellation",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 6,
+                  "description": "Asset Mint",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 7,
+                  "description": "Asset Add Treasury Account",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 8,
+                  "description": "Asset Distribute to Holders",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 9,
+                  "description": "Asset Multi-Transfer",
+                  "minimumFeeConstantNQT": 2000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                }
+              ]
+            },
+            {
+              "value": 3,
+              "description": "Digital Goods",
+              "subtypes": [
+                {
+                  "value": 0,
+                  "description": "Listing",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 1,
+                  "description": "Delisting",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 2,
+                  "description": "Price Change",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 3,
+                  "description": "Quantity Change",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 4,
+                  "description": "Purchase",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 5,
+                  "description": "Delivery",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 6,
+                  "description": "Feedback",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 7,
+                  "description": "Refund",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                }
+              ]
+            },
+            {
+              "value": 4,
+              "description": "Account Control",
+              "subtypes": [
+                {
+                  "value": 0,
+                  "description": "Effective Balance Leasing",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "Payment",
+              "subtypes": [
+                {
+                  "value": 0,
+                  "description": "Ordinary Payment",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 1,
+                  "description": "Multi-out payment",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 2,
+                  "description": "Multi-out Same Payment",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                }
+              ]
+            },
+            {
+              "value": 22,
+              "description": "Automated Transactions",
+              "subtypes": [
+                {
+                  "value": 0,
+                  "description": "AT Creation",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 1,
+                  "description": "AT Payment",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                }
+              ]
+            },
+            {
+              "value": 20,
+              "description": "Mining",
+              "subtypes": [
+                {
+                  "value": 0,
+                  "description": "Reward Recipient Assignment",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 1,
+                  "description": "Add Commitment",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 2,
+                  "description": "Remove Commitment",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                }
+              ]
+            },
+            {
+              "value": 1,
+              "description": "Messaging",
+              "subtypes": [
+                {
+                  "value": 0,
+                  "description": "Arbitrary Message",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 1,
+                  "description": "Alias Assignment",
+                  "minimumFeeConstantNQT": 20000000,
+                  "minimumFeeAppendagesNQT": 0
+                },
+                {
+                  "value": 5,
+                  "description": "Account Info",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 6,
+                  "description": "Alias Sell",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                },
+                {
+                  "value": 7,
+                  "description": "Alias Buy",
+                  "minimumFeeConstantNQT": 1000000,
+                  "minimumFeeAppendagesNQT": 1000000
+                }
+              ]
+            }
+          ],
+          "peerStates": [
+            {
+              "value": 0,
+              "description": "Non-connected"
+            },
+            {
+              "value": 1,
+              "description": "Connected"
+            },
+            {
+              "value": 2,
+              "description": "Disconnected"
+            }
+          ],
+          "requestProcessingTime": 0
+        }
+      }
+    }
+  }
+}

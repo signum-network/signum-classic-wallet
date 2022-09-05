@@ -1,0 +1,8 @@
+{
+  "name": "firstIndex",
+  "in": "query",
+  "description": "The first index to be returned. Use this for pagination.",
+  "schema": {
+    "type": "integer"
+  }
+}

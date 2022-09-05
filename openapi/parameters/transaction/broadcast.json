@@ -1,0 +1,10 @@
+{
+  "name": "broadcast",
+  "in": "query",
+  "allowEmptyValue": false,
+  "description": "If set `false` the transaction will not be broadcast to the network",
+  "schema": {
+    "type": "boolean",
+    "example": [true, false]
+  }
+}

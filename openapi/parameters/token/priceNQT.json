@@ -1,0 +1,10 @@
+{
+  "name": "priceNQT",
+  "in": "query",
+  "allowEmptyValue": false,
+  "required": true,
+  "description": "The price in Planck",
+  "schema": {
+    "$ref": "../../schemas/amount.json"
+  }
+}

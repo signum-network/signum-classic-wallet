@@ -1,0 +1,103 @@
+{
+  "get": {
+    "summary": "Get Node/Peer Info",
+    "description": "Get information about a specific Peer. See also [Get Node/Peer Id List]()",
+    "tags": [
+      "network"
+    ],
+    "parameters": [
+      {
+        "name": "peer",
+        "in": "query",
+        "description": "The nodes IP. You can get it from [Get Connected Nodes/Peers]()",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Node/Peer Info response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "state",
+                "announcedAddress",
+                "shareAddress",
+                "downloadedVolume",
+                "uploadedVolume",
+                "application",
+                "version",
+                "platform",
+                "blacklisted",
+                "lastUpdated"
+              ],
+              "properties": {
+                "application": {
+                  "description": "The configured name of the node, usually 'BRS'. But can be different for other chains/networks",
+                  "type": "string"
+                },
+                "platform": {
+                  "description": "The platform name. Can be any name, but must be a receiver address for the [Signum Network Reward Program](https://signum.community/signum-snr-awards/)",
+                  "type": "string"
+                },
+                "version": {
+                  "description": "The [_semantic_](https://semver.org/) version of this node.",
+                  "type": "string"
+                },
+                "state": {
+                  "description": "The state of the node,<br/><ul><li>0 - Not Connected</li><li>1 - Connected</li><li>2 - Disconnected</li></ul>",
+                  "type": "integer",
+                  "enum": [0,1,2]
+                },
+                "announcedAddress": {
+                  "description": "The announce address of this node, if public",
+                  "type": "string"
+                },
+                "shareAddress": {
+                  "description": "Indicator if the address is shared publicly. This is relevant for the [Signum Network Reward Program](https://signum.community/signum-snr-awards/)",
+                  "type": "boolean"
+                },
+                "downloadedVolume": {
+                  "description": "The downloaded volume in bytes",
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "uploadedVolume": {
+                  "description": "The uploaded volume in bytes",
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "lastUpdated": {
+                  "description": "The last know update in block timestamp, i.e. seconds since block 0 (Genesis Block)",
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "blacklisted": {
+                  "description": "Indicator if the node is blacklisted.",
+                  "type": "boolean"
+                }
+              },
+              "example": {
+                "state": 0,
+                "announcedAddress": null,
+                "shareAddress": true,
+                "downloadedVolume": 23845866,
+                "uploadedVolume": 51546404,
+                "application": "BRS",
+                "version": "v3.4.1",
+                "platform": "PC",
+                "blacklisted": false,
+                "lastUpdated": 251548859,
+                "requestProcessingTime": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

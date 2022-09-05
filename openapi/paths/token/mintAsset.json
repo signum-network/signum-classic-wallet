@@ -1,0 +1,43 @@
+{
+  "post": {
+    "summary": "Mint Token",
+    "description": "Adds more supply to a token (called minting). The fees for minting are as low as for any common transaction. To burn tokens simply [send tokens](#post-/api-requestType-transferAsset) to the Burn Address `0` (`S-2222-2222-2222-22222`)",
+    "tags": [
+      "token"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/token/asset.json"
+      },
+      {
+        "$ref": "../../parameters/token/quantityQNT.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/feeNQT.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/secretPhrase.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/publicKey.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/deadline.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/broadcast.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/referencedTransactionFullHash.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "$ref": "../../responses/transaction.json"
+      },
+      "500" : {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

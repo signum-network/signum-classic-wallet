@@ -1,0 +1,75 @@
+{
+  "get": {
+    "summary": "Get Distribution Amount",
+    "description": "Get the paid amount per account of a mass distribution or multi out payments.<br/><br/>Due to the nature of how multiple payouts or distribution works, an accounts received payout does not appear in the common transaction amount field. The common transaction carries the total distributed/paid amount. So, one need this method to get the individually paid amount.",
+    "tags": [
+      "payment",
+      "token",
+      "account"
+    ],
+    "parameters": [
+      {
+        "name": "transaction",
+        "in": "query",
+        "description": "The id of a [distribution transaction](#post-/api-requestType-distributeToAssetHolders) or [multiple payout](#post-/api-requestType-sendMoneyMulti)",
+        "schema": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The transaction identifier",
+          "required": true,
+          "example": [
+            "18383595669062938305",
+            "6410546525214667156"
+          ]
+        }
+      },
+      {
+        "$ref": "../../parameters/account/account.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Individual Payout Response.<br/> __Note__: The response does not carry the related asset information. You need to pull this from the related `transaction`",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "amountNQT",
+                "confirmations",
+                "height",
+                "quantityQNT"
+              ],
+              "example": {
+                "amountNQT": "45600",
+                "quantityQNT": "0",
+                "height": 369509,
+                "confirmations": 73793,
+                "requestProcessingTime": 1
+              },
+              "properties": {
+                "amountNQT": {
+                  "$ref": "../../schemas/amount.json"
+                },
+                "quantityQNT": {
+                  "$ref": "../../schemas/quantity.json"
+                },
+                "height": {
+                  "description": "The block height number of occurred payment.",
+                  "type": "integer"
+                },
+                "confirmations": {
+                  "description": "Number of confirmations",
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

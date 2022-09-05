@@ -1,0 +1,58 @@
+{
+  "get": {
+    "summary": "Get All Trades",
+    "description": "Get trades within a given range.",
+    "tags": [
+      "token"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/firstIndex.json"
+      },
+      {
+        "$ref": "../../parameters/lastIndex.json"
+      },
+      {
+        "$ref": "../../parameters/timestamp.json"
+      },
+      {
+        "name": "includeAssetInfo",
+        "in": "query",
+        "description": "If set `true` (default), the tokens `name` and `decimals` is included in the response",
+        "schema": {
+          "type": "boolean",
+          "example": [
+            true,
+            false
+          ]
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "The Trade List",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "trades"
+              ],
+              "properties": {
+                "trades": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "../../schemas/trade.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

@@ -1,0 +1,171 @@
+:root {
+  --light: #d8dbe0;
+  --dark: #28292c;
+  --dark-grey: #666
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#nav-logo-section {
+  padding: 1rem;
+}
+
+.toggle-wrapper{
+  display: flex;
+  align-items: baseline;
+  justify-content: start;
+}
+
+.toggle-switch {
+  position: relative;
+  padding: 1rem 0;
+  width: 48px;
+  top: -2px;
+  margin: 0 1rem 0 0.25rem;
+;
+}
+
+.toggle-switch > label {
+  position: absolute;
+  width: 100%;
+  height: 24px;
+  background-color: var(--dark);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.toggle-switch input {
+  position: absolute;
+  display: none;
+}
+
+.toggle-switch .slider {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  transition: 0.3s;
+}
+
+.toggle-switch input:checked ~ .slider {
+  background-color: var(--light);
+}
+
+.toggle-switch .slider::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  box-shadow: inset 8px -4px 0 0 var(--light);
+  background-color: var(--dark);
+  transition: 0.3s;
+}
+
+.toggle-switch input:checked ~ .slider::before {
+  transform: translateX(24px);
+  background-color: var(--dark);
+  box-shadow: none;
+}
+
+.section-divider {
+  margin-top: 1.75rem;
+  border: none;
+  border-top: 1px solid var(--dark-grey);
+}
+
+.converter-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.75rem;
+}
+
+.converter-wrapper header {
+  cursor: pointer;
+}
+
+.converter-wrapper header:hover {
+  color: var(--nav-hover-text-color) !important;
+}
+
+.converter-wrapper h3 {
+  font-size: var(--font-size-regular);
+  font-weight: bold;
+}
+
+.converter-wrapper p {
+  margin: 0.5rem 0;
+  font-size: smaller;
+}
+
+.converter-wrapper .input-component {
+  font-size: small;
+  position: relative;
+  margin: 0.25rem 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.converter-wrapper .input-component label {
+  font-size: small;
+  margin-bottom: 0.25rem;
+}
+
+.converter-wrapper .input-component input {
+  border-radius:2px;
+  border: 1px solid var(--nav-accent-color);
+  background-color: var(--dark);
+  color: var(--light);
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--font-size-small);
+  transition: border 0.2s ease 0s;
+  padding: 6px 5px;
+}
+
+input:focus, input:focus-visible {
+  border-radius:2px;
+  border: 1px solid var(--nav-accent-color);
+  background-color: var(--dark);
+  color: var(--light);
+}
+
+.inline {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#expander {
+  height: 0;
+  transition: height ease-in-out 250ms;
+  position: relative;
+  overflow: hidden;
+}
+
+#expander.expanded {
+  height: 168px;
+}
+
+#expander-btn::before {
+  content: "▼";
+}
+#expander-btn {
+  background-color: transparent;
+  color: var(--light);
+  border: none;
+  transform: rotate(0);
+  transition: transform ease-in-out 250ms;
+  cursor: pointer;
+}
+
+#expander-btn.expanded {
+  transform: rotate(180deg);
+}

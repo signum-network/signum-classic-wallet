@@ -1,0 +1,44 @@
+{
+  "name": "signum-node-openapi",
+  "version": "1.0.0",
+  "description": "The OpenAPI description of the Signum Node API",
+  "private": "true",
+  "scripts": {
+    "build:prod": "swagger-cli bundle signum-api.json | mjson.js > ../html/api-doc/signum-api.json",
+    "build": "swagger-cli bundle signum-api.json --outfile ../html/api-doc/signum-api.json",
+    "dev": "npm-watch",
+    "dist": "npm run build:prod"
+  },
+  "watch": {
+    "build": {
+      "patterns": [
+        "paths",
+        "schemas",
+        "responses",
+        "parameters",
+        "./signum-api.json"
+      ],
+      "extensions": "json",
+      "ignore": [
+        "package.json",
+        "package-lock.json"
+      ]
+    }
+  },
+  "keywords": [
+    "oas",
+    "openapi",
+    "swagger",
+    "documentation"
+  ],
+  "author": "ohager",
+  "license": "MIT",
+  "devDependencies": {
+    "mjson": "^0.4.2",
+    "npm-watch": "^0.11.0",
+    "swagger-cli": "^4.0.4"
+  },
+  "dependencies": {
+    "openapi-types": "^7.2.3"
+  }
+}

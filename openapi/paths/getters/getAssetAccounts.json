@@ -1,0 +1,98 @@
+{
+  "get": {
+    "summary": "Get Token Holders",
+    "description": "Get a list of token holder.",
+    "tags": [
+      "token"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/token/asset.json"
+      },
+      {
+        "name": "ignoreTreasury",
+        "in": "query",
+        "description": "If set `true`, [Treasury Accounts](#post-/api-requestType-addAssetTreasuryAccount) won't be returned. Default is false",
+        "schema": {
+          "type": "boolean",
+          "example": [
+            true,
+            false
+          ]
+        }
+      },
+      {
+        "name": "quantityMinimumQNT",
+        "in": "query",
+        "description": "Returns only accounts with given minimum quantity.",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "$ref": "../../parameters/firstIndex.json"
+      },
+      {
+        "$ref": "../../parameters/lastIndex.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Token Id List",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "accountAssets"
+              ],
+              "properties": {
+                "accountAssets": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "account",
+                      "accountRS",
+                      "asset",
+                      "quantityQNT",
+                      "unconfirmedQuantityQNT"
+                    ],
+                    "properties": {
+                      "account": {
+                        "$ref": "../../schemas/numericId.json"
+                      },
+                      "accountRS": {
+                        "$ref": "../../schemas/rsAddress.json"
+                      },
+                      "asset": {
+                        "$ref": "../../schemas/assetId.json"
+                      },
+                      "quantityQNT": {
+                        "$ref": "../../schemas/quantity.json"
+                      },
+                      "unconfirmedQuantityQNT": {
+                        "$ref": "../../schemas/quantity.json"
+                      }
+                    },
+                    "example": {
+                      "account": "16655635797853184825",
+                      "accountRS": "S-5ATT-JF5P-Q4H2-GN7BG",
+                      "asset": "12402415494995249540",
+                      "quantityQNT": "104510429825",
+                      "unconfirmedQuantityQNT": "104510429825"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

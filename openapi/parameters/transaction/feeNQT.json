@@ -1,0 +1,10 @@
+{
+  "name": "feeNQT",
+  "in": "query",
+  "allowEmptyValue": false,
+  "required": true,
+  "description": "The fee for this transaction expressed in Planck, i.e. 0.01 Signa = 0.01 * 10E8 Planck = 1000000 Planck - The fee depends on the transaction type, but minimum fee is 0.01 Signa<br/>Read more about the fees [here](https://github.com/signum-network/SIPs/blob/master/SIP/sip-34.md)",
+  "schema": {
+    "$ref": "../../schemas/amount.json"
+  }
+}

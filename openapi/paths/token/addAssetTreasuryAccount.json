@@ -1,0 +1,53 @@
+{
+  "post": {
+    "summary": "Add Treasury Account",
+    "description": "Adds/Marks an account as treasury account.When marking an account as treasury account, the accounts token balance will not be considered for circulating supply and is also not eligible for token distribution.<br/>This operation is not revertible!<br/>See also [the specification](https://github.com/signum-network/SIPs/blob/master/SIP/sip-33.md#define-treasury-accounts)",
+    "tags": [
+      "token"
+    ],
+    "parameters": [
+      {
+        "name": "recipient",
+        "in": "query",
+        "allowEmptyValue": false,
+        "required": true,
+        "description": "The accounts address that should be marked as treasury account.",
+        "schema": {
+          "$ref": "../../schemas/address.json"
+        }
+      },
+      {
+        "name": "referencedTransactionFullHash",
+        "in": "query",
+        "allowEmptyValue": false,
+        "description": "Use this field to reference to the tokens issue transaction hash. This is the way to link to the asset!<br/>Mind, that Smart Contracts cannot be marked as treasury accounts and only the creator can mark accounts as treasury accounts.",
+        "schema": {
+          "$ref": "../../schemas/hash.json"
+        }
+      },
+      {
+        "$ref": "../../parameters/transaction/feeNQT.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/secretPhrase.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/publicKey.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/deadline.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/broadcast.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "$ref": "../../responses/transaction.json"
+      },
+      "500" : {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "get": {
+    "summary": "Get Alias",
+    "description": "Get an alias by its id or unique name",
+    "tags": [
+      "alias"
+    ],
+    "parameters": [
+      {
+        "name": "alias",
+        "in": "query",
+        "description": "The alias Id",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "aliasName",
+        "in": "query",
+        "description": "The unique alias name",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "maxLength": "100",
+          "pattern": "^[a-zA-Z0-9]{1,100}$"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "The Alias",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../schemas/alias.json"
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

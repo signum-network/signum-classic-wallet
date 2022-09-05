@@ -1,0 +1,36 @@
+{
+  "get": {
+    "summary": "Get Recipient Subscriptions",
+    "description": "Get subscriptions sent to an account/recipient, incoming subscriptions. See [outgoing subscriptions](#get-/api-requestType-getAccountSubscriptions)",
+    "tags": [
+      "account",
+      "payment"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/account/account.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Subscription List response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "required": [
+                "subscriptions"
+              ],
+              "items": {
+                "$ref": "../../schemas/subscription.json"
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

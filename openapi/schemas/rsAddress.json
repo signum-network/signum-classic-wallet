@@ -1,0 +1,9 @@
+{
+  "type": "string",
+  "description": "The account identifier as Reed-Solomon encoded address, i.e. S-XXXX-XXXX-XXXX-XXXXX",
+  "pattern": "^S|TS-[0-9A-Z]{4}[0-9A-Z]{4}[0-9A-Z]{4}[0-9A-Z]{5}$",
+  "example": [
+    "S-5MS6-5FBY-74H4-9N4HS",
+    "TS-QAJA-QW5Y-SWVP-4RVP4"
+  ]
+}

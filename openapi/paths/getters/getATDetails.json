@@ -1,0 +1,38 @@
+{
+  "get": {
+    "summary": "Get Contract History",
+    "description": "Gets a specific contracts situation at a given moment in the past",
+    "tags": [
+      "contract"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/contract/at.json"
+      },
+      {
+        "name": "height",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "in": "query",
+        "description": "When set this block height the contracts situation at the given height will be returned"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Contract Response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../schemas/contract.json"
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

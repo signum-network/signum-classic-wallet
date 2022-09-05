@@ -1,0 +1,29 @@
+{
+  "get": {
+    "summary": "Get Contract",
+    "description": "Gets a specific smart contract",
+    "tags": [
+      "contract"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/contract/at.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Contract Response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../schemas/contract.json"
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

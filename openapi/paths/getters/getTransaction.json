@@ -1,0 +1,39 @@
+{
+  "get": {
+    "summary": "Get Transaction",
+    "description": "Get the transaction data of a specific transaction.<br/>Each Transaction may carry an additional attachment with a different structure. This structure depends on it's [`type` and `subtype`](https://docs.signum.network/signum/transaction-types)",
+    "tags": [
+      "payment",
+      "alias",
+      "contract",
+      "token",
+      "account",
+      "mining"
+    ],
+    "parameters": [
+      {
+        "name": "transaction",
+        "in": "query",
+        "schema": {
+          "$ref": "../../schemas/transactionId.json"
+        }
+      },
+      {
+        "name": "fullHash",
+        "description": "Alternatively, the transactions full hash can be used.",
+        "in": "query",
+        "schema": {
+          "$ref": "../../schemas/hash.json"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "$ref": "../../schemas/signedTransaction.json"
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

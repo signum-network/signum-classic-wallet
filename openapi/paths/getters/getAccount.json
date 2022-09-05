@@ -1,0 +1,69 @@
+{
+  "get": {
+    "summary": "Get Account",
+    "description": "Get account information, like balances, commitment and token balances of an account.",
+    "tags": [
+      "account"
+    ],
+    "parameters": [
+      {
+        "name": "account",
+        "in": "query",
+        "required": true,
+        "allowEmptyValue": false,
+        "description": "The account identifier",
+        "schema": {
+          "$ref": "../../schemas/address.json"
+        }
+      },
+      {
+        "name": "getCommittedAmount",
+        "schema": {
+          "type": "boolean",
+          "example": [
+            true,
+            false
+          ]
+        },
+        "in": "query",
+        "description": "Returns the entire commitment amount"
+      },
+      {
+        "name": "height",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "in": "query",
+        "description": "When set this blockheight the accounts situation at the given height will be returned"
+      },
+      {
+        "name": "estimateCommitment",
+        "in": "query",
+        "description": "If set `true` the estimated commitment per TiB will be returned",
+        "schema": {
+          "type": "boolean",
+          "example": [
+            true,
+            false
+          ]
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Account response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../../schemas/account.json"
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

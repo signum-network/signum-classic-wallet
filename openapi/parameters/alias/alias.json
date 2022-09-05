@@ -1,0 +1,9 @@
+{
+  "name": "alias",
+  "in": "query",
+  "allowEmptyValue": false,
+  "description": "The related alias identifier",
+  "schema": {
+    "$ref": "../../schemas/aliasId.json"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "type": "integer",
+  "format": "int64",
+  "description": "The token identifier",
+  "required": true,
+  "example": [
+    "12402415494995249540", "914948012239561046"
+  ]
+}

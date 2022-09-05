@@ -1,0 +1,115 @@
+<!doctype html> <!-- Important: must specify -->
+<html>
+<head>
+  <meta charset="utf-8"> <!-- Important: rapi-doc uses utf8 characters -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Roboto+Mono&display=swap"
+        rel="stylesheet">
+  <link href="main.css" rel="stylesheet">
+  <script type="module" src="./rapidoc-min.js"></script>
+  <script type="application/javascript" src="./converter.js"></script>
+  <script type="application/javascript">
+
+    function getCurrentTheme() {
+      return document.getElementById('signumdoc').getAttribute('theme')
+    }
+
+    function toggleTheme() {
+      const doc = document.getElementById('signumdoc')
+      const wasDark = getCurrentTheme() === 'dark'
+      doc.setAttribute('theme', wasDark ? 'light' : 'dark')
+
+      const label = document.getElementById('toggle-label')
+      label.innerText = `Switch to ${wasDark ? 'dark' : 'light'} theme`
+    }
+
+    function toggleExpand() {
+      document.getElementById('expander').classList.toggle('expanded')
+      document.getElementById('expander-btn').classList.toggle('expanded')
+    }
+  </script>
+
+</head>
+<body>
+<rapi-doc
+  id="signumdoc"
+  spec-url="./signum-api.json"
+  allow-spec-url-load="false"
+  allow-authentication="false"
+  show-header="false"
+  sort-tags="false"
+  schema-style="table"
+  theme="dark"
+  allow-advanced-search="true"
+  allow-server-selection="false"
+  fill-request-fields-with-example="false"
+  show-method-in-nav-bar="as-colored-text"
+  schema-description-expanded="true"
+>
+  <div id='nav-logo-section' slot="nav-logo">
+    <img src="./signum_logo.png"/>
+    <div class='toggle-wrapper'>
+      <small id="toggle-label"></small>
+      <div class='toggle-switch'>
+        <label>
+          <input id="toggle-input" type='checkbox' onclick="toggleTheme()">
+          <span class='slider'></span>
+        </label>
+      </div>
+    </div>
+    <hr class="section-divider">
+    <div class='converter-wrapper'>
+      <header onclick="toggleExpand()">
+        <div class="inline">
+          <h3>Quantity Converter</h3>
+          <button id="expander-btn" ></button>
+        </div>
+        <p><small>Convert Signa, Planck and Token Quantities</small></p>
+      </header>
+      <div id="expander">
+        <div class="input-component">
+          <label for="amount">Signa/Amount</label>
+          <input id="amount">
+        </div>
+        <div class="input-component">
+          <label for="quantity">Planck/Quantity</label>
+          <input id="quantity">
+        </div>
+        <div class="input-component">
+          <label for="decimals">Decimals</label>
+          <input id="decimals" type="number" value="8" max="8" min="0">
+        </div>
+      </div>
+    </div>
+    <hr class="section-divider">
+  </div>
+</rapi-doc>
+<script>
+  (() => {
+    const labelEl = document.getElementById('toggle-label')
+    labelEl.innerText = `Switch to ${getCurrentTheme() === 'dark' ? 'light' : 'dark'} theme`
+
+    const quantityEl = document.getElementById('quantity')
+    const valueEl = document.getElementById('amount')
+    const decimalsEl = document.getElementById('decimals')
+
+    quantityEl.addEventListener('keyup', ({target}) => {
+      window.converter.setQuantity(parseInt(target.value || '0'))
+    })
+    valueEl.addEventListener('change', ({target}) => {
+      window.converter.setValue(parseFloat(target.value || '0'))
+    })
+    decimalsEl.addEventListener('input', ({target}) => {
+      window.converter.setDecimals(parseInt(target.value || '0'))
+    })
+
+    document.addEventListener('convert', ({detail}) => {
+      quantityEl.value = detail.quantity
+      valueEl.value = detail.value.toFixed(detail.decimals)
+      decimalsEl.value = detail.decimals
+    })
+  })()
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+{
+  "get": {
+    "summary": "Get Account Balance",
+    "description": "Get an accounts balance information.",
+    "tags": [
+      "account"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/account/account.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Account Balance response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "balanceNQT",
+                "unconfirmedBalanceNQT",
+                "forgedBalanceNQT",
+                "guaranteedBalanceNQT"
+              ],
+              "properties": {
+                "balanceNQT": {
+                  "description": "Your total balance, including commitment and reserved orders",
+                  "type": "integer",
+                  "format": "int64",
+                  "example": [
+                    "100000000",
+                    "1000000"
+                  ]
+                },
+                "unconfirmedBalanceNQT": {
+                  "description": "The currently available balance.<br/>The amount is always returned in Planck, that is Signa multiplied by 10E8",
+                  "type": "integer",
+                  "format": "int64",
+                  "example": [
+                    "100000000",
+                    "1000000"
+                  ]
+                },
+                "forgedBalanceNQT": {
+                  "description": "The balance forged by you (Solo-Mining only).<br/>The amount is always returned in Planck, that is Signa multiplied by 10E8",
+                  "type": "integer",
+                  "format": "int64",
+                  "example": [
+                    "100000000",
+                    "1000000"
+                  ]
+                },
+                "guaranteedBalanceNQT": {
+                  "description": "Your total balance, including commitment and reserved orders.<br/>The amount is always returned in Planck, that is Signa multiplied by 10E8",
+                  "type": "integer",
+                  "format": "int64",
+                  "example": [
+                    "100000000",
+                    "1000000"
+                  ]
+                }
+              },
+              "example": {
+                "balanceNQT": "6175175744000",
+                "unconfirmedBalanceNQT": "6175175744000",
+                "forgedBalanceNQT": "0",
+                "guaranteedBalanceNQT": "6175175744000"
+              }
+            }
+
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "description": "Error Response - __IMPORTANT: Error Responses always come with a HTTP Status Code 200 \uD83E\uDD37__ ",
+  "content": {
+    "application/json": {
+      "schema": {
+        "type": "object",
+        "required": [
+          "errorCode",
+          "errorDescription"
+        ],
+        "example": {
+          "errorCode": 5,
+          "errorDescription": "Unknown account",
+          "requestProcessingTime": 2
+        },
+        "properties": {
+          "errorDescription": {
+            "type": "string",
+            "description": "The error message indicating what the issue is"
+          },
+          "errorCode": {
+            "type": "integer",
+            "description": "The internal error code"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "post": {
+    "summary": "Sign Transaction",
+    "description": "Signs a transaction, which can be [broadcast](#post-/api-requestType-broadcastTransaction) to the network then. This is merely a low-level API endpoint.<br/>To get an _unsigned_ transaction object you use your public key to post transactions instead of your passphrase.",
+    "tags": [
+      "utility"
+    ],
+    "parameters": [
+      {
+        "name": "unsignedTransactionBytes",
+        "description": "The _unsigned_ transaction bytes in hexadecimal representation.",
+        "required": true,
+        "in": "query",
+        "schema": {
+          "$ref": "../schemas/hexString.json"
+        }
+      },
+      {
+        "name": "unsignedTransactionJSON",
+        "description": "The _unsigned_ transaction and _stringified_ JSON object. It's recommended to use the `unsignedTransactionBytes` instead.",
+        "in": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "$ref": "../parameters/transaction/secretPhrase.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Signed Transaction Response. Use the returned `transactionBytes` with [broadcastTransaction](#post-/api-requestType-broadcastTransaction)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "description": "The signed transaction response",
+              "required": [
+                "transaction",
+                "transactionBytes",
+                "fullHash",
+                "signatureHash",
+                "verify"
+              ],
+              "example": {
+                "transaction": "17286979857310322585",
+                "fullHash": "998f500297b0e7ef9e4e1c18ac7921c74d76a1aabded8c36972896f8d444a2b5",
+                "transactionBytes": "00203c3af80e1800c213e4144ba84af94aae2458308fae1f0cb0838...",
+                "signatureHash": "a645cb3cc93176dda1b9bc172c53449dc42b2c27100b5754f70c1eb84b491230",
+                "verify": true
+              },
+              "properties": {
+                "transaction": {
+                  "$ref" : "../schemas/transactionId.json"
+                },
+                "fullHash": {
+                  "$ref" : "../schemas/hash.json"
+                },
+                "transactionBytes": {
+                  "$ref" : "../schemas/hexString.json"
+                },
+                "signatureHash": {
+                  "$ref" : "../schemas/hash.json"
+                },
+                "verify": {
+                  "type": "boolean",
+                  "description": "Indicates whether the transaction could be verified or not."
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../responses/error.json"
+      }
+    }
+  }
+}

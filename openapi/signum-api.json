@@ -1,0 +1,501 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Signum Node API",
+    "version": "3.4.4",
+    "description": "This is the API documentation of the Signum Node"
+  },
+  "paths": {
+    "/api?requestType=addCommitment": {
+      "$ref": "./paths/addCommitment.json"
+    },
+    "/api?requestType=removeCommitment": {
+      "$ref": "./paths/removeCommitment.json"
+    },
+    "/api?requestType=setRewardRecipient": {
+      "$ref": "./paths/setRewardRecipient.json"
+    },
+    "/api?requestType=sendMoney": {
+      "$ref": "./paths/sendMoney.json"
+    },
+    "/api?requestType=sendMoneyMulti": {
+      "$ref": "./paths/sendMoneyMulti.json"
+    },
+    "/api?requestType=sendMoneyMultiSame": {
+      "$ref": "./paths/sendMoneyMultiSame.json"
+    },
+    "/api?requestType=sendMoneySubscription": {
+      "$ref": "./paths/sendMoneySubscription.json"
+    },
+    "/api?requestType=sendMessage": {
+      "$ref": "./paths/sendMessage.json"
+    },
+    "/api?requestType=subscriptionCancel": {
+      "$ref": "./paths/subscriptionCancel.json"
+    },
+    "/api?requestType=setAccountInfo": {
+      "$ref": "./paths/setAccountInfo.json"
+    },
+    "/api?requestType=signTransaction": {
+      "$ref": "./paths/signTransaction.json"
+    },
+    "/api?requestType=broadcastTransaction": {
+      "$ref": "./paths/broadcastTransaction.json"
+    },
+    "/api?requestType=parseTransaction": {
+      "$ref": "./paths/parseTransaction.json"
+    },
+    "/api?requestType=backupDB": {
+      "$ref": "./paths/admin/backupDB.json"
+    },
+    "/api?requestType=popOff": {
+      "$ref": "./paths/admin/popOff.json"
+    },
+    "/api?requestType=clearUnconfirmedTransactions": {
+      "$ref": "./paths/admin/clearUnconfirmedTransactions.json"
+    },
+    "/api?requestType=fullReset": {
+      "$ref": "./paths/admin/fullReset.json"
+    },
+    "/api?requestType=issueAsset": {
+      "$ref": "./paths/token/issueAsset.json"
+    },
+    "/api?requestType=mintAsset": {
+      "$ref": "./paths/token/mintAsset.json"
+    },
+    "/api?requestType=addAssetTreasuryAccount": {
+      "$ref": "./paths/token/addAssetTreasuryAccount.json"
+    },
+    "/api?requestType=distributeToAssetHolders": {
+      "$ref": "./paths/token/distributeToAssetHolders.json"
+    },
+    "/api?requestType=transferAsset": {
+      "$ref": "./paths/token/transferAsset.json"
+    },
+    "/api?requestType=transferAssetMulti": {
+      "$ref": "./paths/token/transferAssetMulti.json"
+    },
+    "/api?requestType=placeAskOrder": {
+      "$ref": "./paths/token/placeAskOrder.json"
+    },
+    "/api?requestType=cancelAskOrder": {
+      "$ref": "./paths/token/cancelAskOrder.json"
+    },
+    "/api?requestType=placeBidOrder": {
+      "$ref": "./paths/token/placeBidOrder.json"
+    },
+    "/api?requestType=cancelBidOrder": {
+      "$ref": "./paths/token/cancelBidOrder.json"
+    },
+    "/api?requestType=setAlias": {
+      "$ref": "./paths/alias/setAlias.json"
+    },
+    "/api?requestType=sellAlias": {
+      "$ref": "./paths/alias/sellAlias.json"
+    },
+    "/api?requestType=buyAlias": {
+      "$ref": "./paths/alias/buyAlias.json"
+    },
+    "/api?requestType=submitNonce": {
+      "$ref": "./paths/submitNonce.json"
+    },
+    "/api?requestType=createATProgram": {
+      "$ref": "./paths/contract/createATProgram.json"
+    },
+    "/api?requestType=getAccount": {
+      "$ref": "./paths/getters/getAccount.json"
+    },
+    "/api?requestType=getAccountsWithRewardRecipient": {
+      "$ref": "./paths/getters/getAccountsWithRewardRecipient.json"
+    },
+    "/api?requestType=getRewardRecipient": {
+      "$ref": "./paths/getters/getRewardRecipient.json"
+    },
+    "/api?requestType=getAccountATs": {
+      "$ref": "./paths/getters/getAccountATs.json"
+    },
+    "/api?requestType=getAT": {
+      "$ref": "./paths/getters/getAT.json"
+    },
+    "/api?requestType=getATDetails": {
+      "$ref": "./paths/getters/getATDetails.json"
+    },
+    "/api?requestType=getATIds": {
+      "$ref": "./paths/getters/getATIds.json"
+    },
+    "/api?requestType=getATMapValue": {
+      "$ref": "./paths/getters/getATMapValue.json"
+    },
+    "/api?requestType=getAccountAssets": {
+      "$ref": "./paths/getters/getAccountAssets.json"
+    },
+    "/api?requestType=getTransaction": {
+      "$ref": "./paths/getters/getTransaction.json"
+    },
+    "/api?requestType=getMiningInfo": {
+      "$ref": "./paths/getters/getMiningInfo.json"
+    },
+    "/api?requestType=getUnconfirmedTransactions": {
+      "$ref": "./paths/getters/getUnconfirmedTransactions.json"
+    },
+    "/api?requestType=getIndirectIncoming": {
+      "$ref": "./paths/getters/getIndirectIncoming.json"
+    },
+    "/api?requestType=suggestFee": {
+      "$ref": "./paths/getters/suggestFee.json"
+    },
+    "/api?requestType=getConstants": {
+      "$ref": "./paths/getters/getConstants.json"
+    },
+    "/api?requestType=getMyInfo": {
+      "$ref": "./paths/getters/getMyInfo.json"
+    },
+    "/api?requestType=getBlockchainStatus": {
+      "$ref": "./paths/getters/getBlockchainStatus.json"
+    },
+    "/api?requestType=getPeer": {
+      "$ref": "./paths/getters/getPeer.json"
+    },
+    "/api?requestType=getPeers": {
+      "$ref": "./paths/getters/getPeers.json"
+    },
+    "/api?requestType=getTime": {
+      "$ref": "./paths/getters/getTime.json"
+    },
+    "/api?requestType=getState": {
+      "$ref": "./paths/getters/getState.json"
+    },
+    "/api?requestType=getAliases": {
+      "$ref": "./paths/getters/getAliases.json"
+    },
+    "/api?requestType=getAlias": {
+      "$ref": "./paths/getters/getAlias.json"
+    },
+    "/api?requestType=getBlock": {
+      "$ref": "./paths/getters/getBlock.json"
+    },
+    "/api?requestType=getBlocks": {
+      "$ref": "./paths/getters/getBlocks.json"
+    },
+    "/api?requestType=getAccountBlocks": {
+      "$ref": "./paths/getters/getAccountBlocks.json"
+    },
+    "/api?requestType=getAccountBlockIds": {
+      "$ref": "./paths/getters/getAccountBlockIds.json"
+    },
+    "/api?requestType=getAccountCurrentAskOrders": {
+      "$ref": "./paths/getters/getAccountCurrentAskOrders.json"
+    },
+    "/api?requestType=getAccountCurrentBidOrders": {
+      "$ref": "./paths/getters/getAccountCurrentBidOrders.json"
+    },
+    "/api?requestType=getAllOpenAskOrders": {
+      "$ref": "./paths/getters/getAllOpenAskOrders.json"
+    },
+    "/api?requestType=getAllOpenBidOrders": {
+      "$ref": "./paths/getters/getAllOpenBidOrders.json"
+    },
+    "/api?requestType=getAskOrder": {
+      "$ref": "./paths/getters/getAskOrder.json"
+    },
+    "/api?requestType=getAskOrders": {
+      "$ref": "./paths/getters/getAskOrders.json"
+    },
+    "/api?requestType=getBidOrder": {
+      "$ref": "./paths/getters/getBidOrder.json"
+    },
+    "/api?requestType=getBidOrders": {
+      "$ref": "./paths/getters/getBidOrders.json"
+    },
+    "/api?requestType=getAsset": {
+      "$ref": "./paths/getters/getAsset.json"
+    },
+    "/api?requestType=getAllAssets": {
+      "$ref": "./paths/getters/getAllAssets.json"
+    },
+    "/api?requestType=getAssetIds": {
+      "$ref": "./paths/getters/getAssetIds.json"
+    },
+    "/api?requestType=getAssetAccounts": {
+      "$ref": "./paths/getters/getAssetAccounts.json"
+    },
+    "/api?requestType=getAssetsByIssuer": {
+      "$ref": "./paths/getters/getAssetsByIssuer.json"
+    },
+    "/api?requestType=getAllTrades": {
+      "$ref": "./paths/getters/getAllTrades.json"
+    },
+    "/api?requestType=getAssetTransfers": {
+      "$ref": "./paths/getters/getAssetTransfers.json"
+    },
+    "/api?requestType=getAccountPublicKey": {
+      "$ref": "./paths/getters/getAccountPublicKey.json"
+    },
+    "/api?requestType=getAccountSubscriptions": {
+      "$ref": "./paths/getters/getAccountSubscriptions.json"
+    },
+    "/api?requestType=getSubscriptionsToAccount": {
+      "$ref": "./paths/getters/getSubscriptionsToAccount.json"
+    },
+    "/api?requestType=getSubscription": {
+      "$ref": "./paths/getters/getSubscription.json"
+    },
+    "/api?requestType=getUnconfirmedTransactionIds": {
+      "$ref": "./paths/getters/getUnconfirmedTransactionIds.json"
+    },
+    "/api?requestType=getAccountTransactions": {
+      "$ref": "./paths/getters/getAccountTransactions.json"
+    },
+    "/api?requestType=getAccountTransactionIds": {
+      "$ref": "./paths/getters/getAccountTransactionIds.json"
+    },
+    "/api?requestType=getAccountsWithName": {
+      "$ref": "./paths/getters/getAccountsWithName.json"
+    },
+    "/api?requestType=getBalance": {
+      "$ref": "./paths/getters/getBalance.json"
+    },
+    "/api?requestType=getTrades": {
+      "$ref": "./paths/getters/getTrades.json"
+    },
+    "/api?requestType=getAliasesOnSale": {
+      "$ref": "./paths/getters/getAliasesOnSale.json"
+    }
+  },
+  "components": {
+    "schemas": {
+      "account": {
+        "$ref": "./schemas/account.json"
+      },
+      "address": {
+        "$ref": "./schemas/address.json"
+      },
+      "alias": {
+        "$ref": "./schemas/alias.json"
+      },
+      "aliasId": {
+        "$ref": "./schemas/aliasId.json"
+      },
+      "amount": {
+        "$ref": "./schemas/amount.json"
+      },
+      "asset": {
+        "$ref": "./schemas/asset.json"
+      },
+      "assetId": {
+        "$ref": "./schemas/assetId.json"
+      },
+      "assetName": {
+        "$ref": "./schemas/assetName.json"
+      },
+      "blockId": {
+        "$ref": "./schemas/blockId.json"
+      },
+      "block": {
+        "$ref": "./schemas/block.json"
+      },
+      "contractAddress": {
+        "$ref": "./schemas/contractAddress.json"
+      },
+      "contractData": {
+        "$ref": "./schemas/contractData.json"
+      },
+      "contractId": {
+        "$ref": "./schemas/contractId.json"
+      },
+      "contract": {
+        "$ref": "./schemas/contract.json"
+      },
+      "hash": {
+        "$ref": "./schemas/hash.json"
+      },
+      "hexString": {
+        "$ref": "./schemas/hexString.json"
+      },
+      "numericId": {
+        "$ref": "./schemas/numericId.json"
+      },
+      "orderId": {
+        "$ref": "./schemas/orderId.json"
+      },
+      "order": {
+        "$ref": "./schemas/order.json"
+      },
+      "quantity": {
+        "$ref": "./schemas/quantity.json"
+      },
+      "rsAddress": {
+        "$ref": "./schemas/rsAddress.json"
+      },
+      "signedTransaction": {
+        "$ref": "./schemas/signedTransaction.json"
+      },
+      "subscription": {
+        "$ref": "./schemas/subscription.json"
+      },
+      "timestamp": {
+        "$ref": "./schemas/timestamp.json"
+      },
+      "trade": {
+        "$ref": "./schemas/trade.json"
+      },
+      "transaction": {
+        "$ref": "./schemas/transaction.json"
+      },
+      "transactionId": {
+        "$ref": "./schemas/transactionId.json"
+      },
+      "unsignedTransaction": {
+        "$ref": "./schemas/unsignedTransaction.json"
+      }
+    },
+    "headers": {},
+    "parameters": {
+      "alias": {
+        "$ref": "./parameters/alias/alias.json"
+      },
+      "quantityQNT": {
+        "$ref": "./parameters/token/quantityQNT.json"
+      },
+      "priceNQT": {
+        "$ref": "./parameters/token/priceNQT.json"
+      },
+      "order": {
+        "$ref": "./parameters/token/order.json"
+      },
+      "asset": {
+        "$ref": "./parameters/token/asset.json"
+      },
+      "apiKey": {
+        "$ref": "./parameters/apiKey.json"
+      },
+      "amountNQT": {
+        "$ref": "./parameters/transaction/amountNQT.json"
+      },
+      "feeNQT": {
+        "$ref": "./parameters/transaction/feeNQT.json"
+      },
+      "secretPhrase": {
+        "$ref": "./parameters/transaction/secretPhrase.json"
+      },
+      "publicKey": {
+        "$ref": "./parameters/transaction/publicKey.json"
+      },
+      "deadline": {
+        "$ref": "./parameters/transaction/deadline.json"
+      },
+      "broadcast": {
+        "$ref": "./parameters/transaction/broadcast.json"
+      },
+      "recipient": {
+        "$ref": "./parameters/transaction/recipient.json"
+      },
+      "recipientPublicKey": {
+        "$ref": "./parameters/transaction/recipientPublicKey.json"
+      },
+      "referencedTransactionFullHash": {
+        "$ref": "./parameters/transaction/referencedTransactionFullHash.json"
+      },
+      "message": {
+        "$ref": "./parameters/transaction/message.json"
+      },
+      "messageIsText": {
+        "$ref": "./parameters/transaction/messageIsText.json"
+      },
+      "messageToEncrypt": {
+        "$ref": "./parameters/transaction/messageToEncrypt.json"
+      },
+      "messageToEncryptIsText": {
+        "$ref": "./parameters/transaction/messageToEncryptIsText.json"
+      },
+      "encryptedMessageData": {
+        "$ref": "./parameters/transaction/encryptedMessageData.json"
+      },
+      "encryptedMessageNonce": {
+        "$ref": "./parameters/transaction/encryptedMessageNonce.json"
+      },
+      "messageToEncryptToSelf": {
+        "$ref": "./parameters/transaction/messageToEncryptToSelf.json"
+      },
+      "messageToEncryptToSelfIsText": {
+        "$ref": "./parameters/transaction/messageToEncryptToSelfIsText.json"
+      },
+      "encryptToSelfMessageData": {
+        "$ref": "./parameters/transaction/encryptToSelfMessageData.json"
+      },
+      "encryptToSelfMessageNonce": {
+        "$ref": "./parameters/transaction/encryptToSelfMessageNonce.json"
+      },
+      "timestamp": {
+        "$ref": "./parameters/timestamp.json"
+      },
+      "firstIndex": {
+        "$ref": "./parameters/firstIndex.json"
+      },
+      "lastIndex": {
+        "$ref": "./parameters/lastIndex.json"
+      },
+      "account": {
+        "$ref": "./parameters/account/account.json"
+      },
+      "at": {
+        "$ref": "./parameters/contract/at.json"
+      }
+    },
+    "responses": {
+      "constants": {
+        "$ref": "./responses/constants.json"
+      },
+      "empty": {
+        "$ref": "./responses/empty.json"
+      },
+      "error": {
+        "$ref": "./responses/error.json"
+      },
+      "transaction": {
+        "$ref": "./responses/transaction.json"
+      },
+      "transactionList": {
+        "$ref": "./responses/transactionList.json"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "account",
+      "description": "All Account related operations"
+    },
+    {
+      "name": "payment",
+      "description": "Functions which are related to value transfers of the base currency \"Signa\"<br/><br/>The platform offers different types of payments:<ul><li>Single Payments (with attached messages)</li><li>Multiple Payments within a single transaction</li><li>Recurring Payments a la Subscriptions</li><ul/>"
+    },
+    {
+      "name": "token",
+      "description": "All operations related to Tokens and Tokenomics.<br/><br/>The native fungible token engine is very versatile offering the following features: <ul><li>On-chain Decentralized Exchange</li><li>Mintable/Burnable Tokens</li><li>Single or Multiple Token Transfer within a single transaction</li><li>Ultra-Fast Distributions to Token Holders (up to 1.2M holders per block)</li><ul/>"
+    },
+    {
+      "name": "contract",
+      "description": "All operations related to Smart Contracts. <br/><br/>Signum was the first public block chain that introduced [turing complete](https://en.wikipedia.org/wiki/Turing_completeness) fully programmable Smart Contracts.<br/><br/>The engine comes with some very outstanding features, like <ul><li>Write contracts in [Java](https://github.com/signum-network/signum-smartj)- or [C](https://github.com/deleterium/SmartC/tree/stable/docs)-like Syntax</li><li>Re-usable code aka [Green Contracts](https://github.com/signum-network/SIPs/blob/master/SIP/sip-30.md)</li><li>Self-executing contracts (no external trigger, i.e. transaction required)</li><li>[Full Token Support](https://github.com/signum-network/SIPs/blob/master/SIP/sip-39.md)</li><li>Dynamic Data Storage in form of [Key-Value-Maps](https://github.com/signum-network/SIPs/blob/master/SIP/sip-38.md)</li></ul><br/>Read more about smart contracts on the [official Signum Site](https://signum.network/smartcontracts) and on the [community wiki](https://signum.community/signum-smart-contracts/)."
+    },
+    {
+      "name": "network",
+      "description": "All network, blockchain and or node related operations"
+    },
+    {
+      "name": "alias",
+      "description": "All Alias related operations.<br/><br/>The Alias feature allows to assign __mutable__ content to a fixed identifier. This makes it possible to have something like a Account Name Service (ANS) or other interesting use cases. It gets even more interesting, because Aliases are tradeable."
+    },
+    {
+      "name": "mining",
+      "description": "All mining related methods. Leran more about mining [here](https://signum.network/mining) and also in the [community wiki](https://signum.community/signum-mining/)"
+    },
+    {
+      "name": "utility",
+      "description": "Additional utility and/or low-level operations"
+    },
+    {
+      "name": "admin",
+      "description": "Administrative operations which requires an API Key to be configured in the node.</br>\uD83D\uDD13 __Security Advice: Use a very strong and truly random key, or even disable admin operation entirely in your node config. Exposing admin operations is a security risk.__"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "description",
+  "in": "query",
+  "allowEmptyValue": false,
+  "description": "This can be any arbitrary textual, json or even binary description. The maximum limit is 1000 characters, either text or binary (in hex form)",
+  "schema": {
+    "type": "string",
+    "maxLength": 1000
+  }
+}

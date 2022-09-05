@@ -1,0 +1,10 @@
+{
+  "name": "messageToEncryptIsText",
+  "in": "query",
+  "allowEmptyValue": false,
+  "description": "Determines if the attached `messageToEncrypt` is either text or binary data (hexadecimal string)",
+  "schema": {
+    "type": "boolean"
+  },
+  "example": [true,false]
+}

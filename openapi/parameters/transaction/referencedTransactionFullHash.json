@@ -1,0 +1,9 @@
+{
+  "name": "referencedTransactionFullHash",
+  "in": "query",
+  "allowEmptyValue": false,
+  "description": "Using this field allows to make a transaction dependent on other transactions. This field will also be used for referencing carbon contracts",
+  "schema": {
+    "$ref": "../../schemas/hash.json"
+  }
+}

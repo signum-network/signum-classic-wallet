@@ -1,0 +1,55 @@
+{
+  "type": "object",
+  "example":
+    {
+      "broadcasted": false,
+      "unsignedTransactionBytes": "0120f2bef60e18007210b8941929030324540238450e985899989a7ad0267e0c76f668fde3b1016ba98438cc3e273c5a000000000000000040420f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000096bf0600f1a6038feba76e9804cfe1531b543c7c0109000080536f6d652074657874",
+      "transactionJSON": {
+        "type": 1,
+        "subtype": 0,
+        "timestamp": 251051762,
+        "deadline": 24,
+        "senderPublicKey": "7210b8941929030324540238450e985899989a7ad0267e0c76f668fde3b1016b",
+        "recipient": "6502115112683865257",
+        "recipientRS": "TS-K37B-9V85-FB95-793HN",
+        "amountNQT": "0",
+        "feeNQT": "1000000",
+        "attachment": {
+          "version.Message": 1,
+          "message": "Some text",
+          "messageIsText": true
+        },
+        "attachmentBytes": "0109000080536f6d652074657874",
+        "sender": "6502115112683865257",
+        "senderRS": "TS-K37B-9V85-FB95-793HN",
+        "height": 2147483647,
+        "version": 2,
+        "ecBlockId": "10983901171361752817",
+        "ecBlockHeight": 442262,
+        "cashBackId": "8952122635653861124"
+      },
+      "requestProcessingTime": 11
+    }
+  ,
+  "required": [
+    "unsignedTransactionBytes",
+    "transactionJSON"
+  ],
+  "properties": {
+    "broadcasted": {
+      "type": "boolean",
+      "description": "This will be always false"
+    },
+    "unsignedTransactionBytes": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]+$",
+      "description": "The binary representation of the entire _unsigned_ transaction. This can be parsed with (parseTransactionBytes)[#post-/api-requestType-parseTransaction]"
+    },
+    "transactionJSON": {
+      "$ref": "../schemas/transaction.json"
+    },
+    "requestProcessingTime": {
+      "type": "integer"
+    }
+  }
+}

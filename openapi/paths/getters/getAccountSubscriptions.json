@@ -1,0 +1,36 @@
+{
+  "get": {
+    "summary": "Get Accounts Subscriptions",
+    "description": "Get accounts running subscriptions, i.e. recurring payments. These are outgoing subscriptions. See [incoming subscriptions](#get-/api-requestType-getSubscriptionsToAccount)",
+    "tags": [
+      "account",
+      "payment"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/account/account.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Subscription List response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "required": [
+                "subscriptions"
+              ],
+              "items": {
+                "$ref": "../../schemas/subscription.json"
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

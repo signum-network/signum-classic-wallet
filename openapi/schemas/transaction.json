@@ -1,0 +1,151 @@
+{
+  "type": "object",
+  "description": "The transaction object",
+  "example":
+    {
+      "type": 1,
+      "subtype": 0,
+      "timestamp": 251047549,
+      "deadline": 24,
+      "senderPublicKey": "c213e4144ba84af94aae2458308fae1f0cb083870c8f3012eea58147f3b09d4a",
+      "recipient": "6502115112683865257",
+      "recipientRS": "TS-K37B-9V85-FB95-793HN",
+      "amountNQT": "0",
+      "feeNQT": "1000000",
+      "signature": "9204b3eca152b72141cdfebbdbfad14c4c79a7f68f04eb5daf7f04a817495f09cca5cf85566ea2b28178702fba7aedae29728af7cd640f5b1e02b8facb21134c",
+      "signatureHash": "78c4b094c0b8b1d35c23738a5fabdcabbafd1e73a99a90e3280abf98452d783a",
+      "fullHash": "6ce8970b66bf8360108df8d4675c275ab2acd549219928c4d0ae4a62a284b1c7",
+      "transaction": "6954612694592252012",
+      "attachment": {
+        "version.Message": 1,
+        "message": "test",
+        "messageIsText": true
+      },
+      "attachmentBytes": "010400008074657374",
+      "sender": "2402520554221019656",
+      "senderRS": "TS-QAJA-QW5Y-SWVP-4RVP4",
+      "height": 2147483647,
+      "version": 2,
+      "ecBlockId": "7594592439957689464",
+      "ecBlockHeight": 442244,
+      "cashBackId": "8952122635653861124",
+      "block": "13680738303626126726",
+      "confirmations": 68148,
+      "blockTimestamp": 232452172
+    },
+  "required": [
+    "type",
+    "subtype",
+    "timestamp",
+    "deadline",
+    "senderPublicKey",
+    "recipient",
+    "recipientRS",
+    "amountNQT",
+    "feeNQT",
+    "signature",
+    "signatureHash",
+    "fullHash",
+    "transaction",
+    "sender",
+    "senderRS",
+    "height",
+    "version",
+    "ecBlockId",
+    "ecBlockHeight",
+    "cashBackId"
+  ],
+  "properties": {
+    "transaction": {
+      "$ref": "./transactionId.json"
+    },
+    "type": {
+      "type": "integer",
+      "description": "The transaction type. See also [getConstants]() and [here](https://docs.signum.network/signum/transaction-types)"
+    },
+    "subtype": {
+      "type": "integer",
+      "description": "The transaction subtype. See also [getConstants]() and [here](https://docs.signum.network/signum/transaction-types)"
+    },
+    "timestamp": {
+      "$ref": "./timestamp.json"
+    },
+    "deadline": {
+      "type": "integer",
+      "description": "The deadline in minutes "
+    },
+    "sender": {
+      "$ref": "./numericId.json"
+    },
+    "senderRS": {
+      "$ref": "./rsAddress.json"
+    },
+    "senderPublicKey": {
+      "$ref": "./hash.json"
+    },
+    "recipient": {
+      "$ref": "./numericId.json"
+    },
+    "recipientRS": {
+      "$ref": "./rsAddress.json"
+    },
+    "amountNQT": {
+      "$ref": "./amount.json"
+    },
+    "feeNQT": {
+      "$ref": "./amount.json"
+    },
+    "signature": {
+      "$ref": "./hexString.json"
+    },
+    "signatureHash": {
+      "$ref": "./hash.json"
+    },
+    "fullHash": {
+      "$ref": "./hash.json"
+    },
+    "attachment": {
+      "type": "object",
+      "description": "This is an arbitrary object carrying additional data, which depends mostly on the transaction type. It has no fixed structure. It always comes with a `version.<type>` field.",
+      "example": [
+        {
+          "version.Message": 1,
+          "message": "Some Message",
+          "messageIsText": true
+        }
+      ]
+    },
+    "attachmentBytes": {
+      "$ref": "./hexString.json"
+    },
+    "height": {
+      "type": "integer",
+      "description": "The block height"
+    },
+    "version": {
+      "type": "integer",
+      "description": "The version number of this structure"
+    },
+    "ecBlockId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "ecBlockHeight": {
+      "type": "integer",
+      "format": "int32"
+    },
+    "cashBackId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "The Account Id where part of the fees is being paid to.<br/>Read more about cashback [here](https://github.com/signum-network/SIPs/blob/master/SIP/sip-35.md)"
+    },
+    "block": {
+      "type": "integer",
+      "format": "int64",
+      "description": "The block Id of the transaction. This field is only available on forged/accepted transactions."
+    },
+    "blockTimestamp": {
+      "$ref": "./timestamp.json"
+    }
+  }
+}

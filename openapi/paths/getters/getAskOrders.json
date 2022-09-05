@@ -1,0 +1,46 @@
+{
+  "get": {
+    "summary": "Get Tokens Ask Orders",
+    "description": "Get a range of ask orders from a token",
+    "tags": [
+      "token"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/token/asset.json"
+      },
+      {
+        "$ref": "../../parameters/firstIndex.json"
+      },
+      {
+        "$ref": "../../parameters/lastIndex.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "List of __Ask Orders__",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "askOrders"
+              ],
+              "properties": {
+                "askOrders": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "../../schemas/order.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

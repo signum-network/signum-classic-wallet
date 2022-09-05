@@ -1,0 +1,43 @@
+{
+  "get": {
+    "summary": "Get Token Ids",
+    "description": "Get token ids.",
+    "tags": [
+      "token"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/firstIndex.json"
+      },
+      {
+        "$ref": "../../parameters/lastIndex.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Token Id List",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "assetIds"
+              ],
+              "properties": {
+                "assetIds": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "../../schemas/assetId.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

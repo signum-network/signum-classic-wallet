@@ -1,0 +1,76 @@
+{
+  "post": {
+    "summary": "Submit Nonce",
+    "description": "Submits a nonce trying to validate a block. This is _the_ endpoint for (solo) miners",
+    "tags": [
+      "mining"
+    ],
+    "parameters": [
+      {
+        "$ref": "../parameters/transaction/secretPhrase.json"
+      },
+      {
+        "name": "blockheight",
+        "in": "query",
+        "allowEmptyValue": false,
+        "required": true,
+        "description": "The block height for the submitted nonce.",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      {
+        "name": "nonce",
+        "in": "query",
+        "allowEmptyValue": false,
+        "required": true,
+        "description": "The nonce",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "accountId",
+        "in": "query",
+        "allowEmptyValue": false,
+        "description": "Instead of sending the passphrase you can send the accountId. The account id must be allowed in the configuration of the node.",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    ],
+    "responses": {
+      "default": {
+        "description": "This is the generic response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "result",
+                "deadline"
+              ],
+              "example": {
+                "result": "success",
+                "deadline": 12453
+              },
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "\"success\" in case of successful submission, otherwise a detailed message of what went wrong"
+                },
+                "errorCode": {
+                  "type": "integer",
+                  "description": "The calculated deadline for the submission"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

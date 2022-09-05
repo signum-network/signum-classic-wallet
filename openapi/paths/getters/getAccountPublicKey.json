@@ -1,0 +1,37 @@
+{
+  "get": {
+    "summary": "Get Accounts Public Key",
+    "description": "Get account public key. Useful to check if an account exists or is activated",
+    "tags": [
+      "account"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/account/account.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Account response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "publicKey"
+              ],
+              "properties": {
+                "publicKey": {
+                  "$ref": "../../schemas/hash.json"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

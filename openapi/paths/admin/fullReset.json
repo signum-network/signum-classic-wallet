@@ -1,0 +1,22 @@
+{
+  "post": {
+    "summary": "⚠️ Full Node Reset",
+    "description": "Resets the node and forces a resync.",
+    "tags": [
+      "admin"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/apiKey.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "$ref": "../../responses/empty.json"
+      },
+      "500" : {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

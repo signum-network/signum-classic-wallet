@@ -1,0 +1,43 @@
+{
+  "post": {
+    "summary": "Set Reward Recipient (Join Pool)",
+    "description": "Sets another account to receive your mining reward. This feature is necessary when you want mine in a pool. The recipient is the address of the pool. <br/>Read more about mining on the [official Signum Site](https://signum.network/mining) and on the [community wiki](https://signum.community/signum-mining)",
+    "tags": [
+      "account", "mining"
+    ],
+    "parameters": [
+      {
+        "$ref": "../parameters/transaction/amountNQT.json"
+      },
+      {
+        "$ref": "../parameters/transaction/feeNQT.json"
+      },
+      {
+        "$ref": "../parameters/transaction/secretPhrase.json"
+      },
+      {
+        "$ref": "../parameters/transaction/publicKey.json"
+      },
+      {
+        "$ref": "../parameters/transaction/deadline.json"
+      },
+      {
+        "$ref": "../parameters/transaction/broadcast.json"
+      },
+      {
+        "$ref": "../parameters/transaction/recipientPublicKey.json"
+      },
+      {
+        "$ref": "../parameters/transaction/referencedTransactionFullHash.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "$ref": "../responses/transaction.json"
+      },
+      "500" : {
+        "$ref": "../responses/error.json"
+      }
+    }
+  }
+}

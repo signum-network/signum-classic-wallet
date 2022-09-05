@@ -1,0 +1,48 @@
+{
+  "get": {
+    "summary": "Get Reward Recipient Accounts (Pool Accounts)",
+    "description": "Get all account identifiers with a specific reward recipient, i.e. the accounts of a pool",
+    "tags": [
+      "account", "mining"
+    ],
+    "parameters": [
+      {
+        "name": "account",
+        "in": "query",
+        "required": true,
+        "allowEmptyValue": false,
+        "description": "The reward recipient, i.e. the pool address",
+        "schema": {
+          "$ref": "../../schemas/numericId.json"
+        }
+      }
+    ],
+
+    "responses": {
+      "200": {
+        "description": "Account Id List response<br/>A list with one (mostly self) or more accounts. If the only account in the list is identical to the passed parameter, then the given account has no reward recipient set.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "accounts"
+              ],
+              "properties": {
+                "accounts": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "../../schemas/numericId.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

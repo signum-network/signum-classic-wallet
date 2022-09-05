@@ -1,0 +1,151 @@
+{
+  "type": "object",
+  "required": [
+    "block",
+    "height",
+    "generator",
+    "generatorRS",
+    "generatorPublicKey",
+    "nonce",
+    "scoopNum",
+    "timestamp",
+    "numberOfTransactions",
+    "totalAmountNQT",
+    "totalFeeNQT",
+    "totalFeeCashBackNQT",
+    "totalFeeBurntNQT",
+    "blockRewardNQT",
+    "blockReward",
+    "payloadLength",
+    "version",
+    "baseTarget",
+    "averageCommitmentNQT",
+    "previousBlock",
+    "payloadHash",
+    "generationSignature",
+    "previousBlockHash",
+    "blockSignature",
+    "transactions"
+  ],
+  "properties": {
+    "block": {
+      "$ref": "./blockId.json"
+    },
+    "height": {
+      "type": "integer",
+      "description": "The block height"
+    },
+    "generator": {
+      "$ref": "./numericId.json"
+    },
+    "generatorRS": {
+      "$ref": "./rsAddress.json"
+    },
+    "generatorPublicKey": {
+      "$ref": "./hash.json"
+    },
+    "nonce": {
+      "type": "integer",
+      "description": "The nonce"
+    },
+    "scoopNum": {
+      "type": "integer",
+      "description": "The scoop number"
+    },
+    "timestamp": {
+      "$ref": "./timestamp.json"
+    },
+    "numberOfTransactions": {
+      "type": "integer",
+      "description": "Amount of transaction in this block"
+    },
+    "totalAmountNQT": {
+      "$ref": "./amount.json"
+    },
+    "totalFeeNQT": {
+      "$ref": "./amount.json"
+    },
+    "totalFeeCashBackNQT": {
+      "$ref": "./amount.json"
+    },
+    "totalFeeBurntNQT": {
+      "$ref": "./amount.json"
+    },
+    "blockRewardNQT": {
+      "$ref": "./amount.json"
+    },
+    "averageCommitmentNQT": {
+      "$ref": "./amount.json"
+    },
+    "blockReward": {
+      "type": "number",
+      "description": "The block reward in Signa"
+    },
+    "payloadLength": {
+      "type": "integer",
+      "description": "The total payload length of this block in bytes"
+    },
+    "version": {
+      "type": "integer",
+      "description": "The version number"
+    },
+    "baseTarget": {
+      "type": "integer",
+      "description": "The base target"
+    },
+    "previousBlock": {
+      "$ref": "./blockId.json"
+    },
+    "nextBlockBlock": {
+      "$ref": "./blockId.json"
+    },
+    "payloadHash": {
+      "$ref": "./hash.json"
+    },
+    "previousBlockHash": {
+      "$ref": "./hash.json"
+    },
+    "generationSignature": {
+      "$ref": "./hash.json"
+    },
+    "blockSignature": {
+      "$ref": "./hash.json"
+    },
+    "transactions": {
+      "oneOf": [
+        {"$ref": "./transactionId.json"},
+        {"$ref": "./transaction.json"}
+      ]
+    }
+  },
+  "example": {
+    "block": "15665862983517409283",
+    "height": 440000,
+    "generator": "5812913123670292755",
+    "generatorRS": "TS-7YAM-Q2DB-UXXS-7XWC3",
+    "generatorPublicKey": "8fb6c5d4796456db486f13787556025d43ea45313e9700edb7235393927bb10b",
+    "nonce": "602132449",
+    "scoopNum": 3626,
+    "timestamp": 250505935,
+    "numberOfTransactions": 1,
+    "totalAmountNQT": "80928699501",
+    "totalFeeNQT": "2367500",
+    "totalFeeCashBackNQT": "500000",
+    "totalFeeBurntNQT": "367500",
+    "blockRewardNQT": "128500000000",
+    "blockReward": "1285",
+    "payloadLength": 306,
+    "version": 4,
+    "baseTarget": "77907000",
+    "averageCommitmentNQT": "64900286119936",
+    "previousBlock": "5842492053646632379",
+    "nextBlock": "148718892402808269",
+    "payloadHash": "f21fe20434e01844766b8e3ec5a026396f1242a3c6e85d55d7a049efbc0eb739",
+    "generationSignature": "a478945d1348fa27db4909e2ad682f228c24b6caf876abb3f3b3a859c679b969",
+    "previousBlockHash": "bb65a66491b3145176d80eeb9a3d79c43ee4197afa3dcd3c0f588bc25dd308e9",
+    "blockSignature": "dc9a26ca67f602d0f27afcde2f9a0e02c2089cab60f0cb58553db0b70736280610284676d146baac5e6a1edf990c12cde6bdf57999ba1f2ddf7805ccdc801c6a",
+    "transactions": [
+      "10353980237237387409"
+    ]
+  }
+}

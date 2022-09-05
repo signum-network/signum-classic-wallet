@@ -1,0 +1,22 @@
+{
+  "post": {
+    "summary": "⚠️ Clear Unconfirmed Transactions",
+    "description": "Prunes unconfirmed transactions.",
+    "tags": [
+      "admin"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/apiKey.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "$ref": "../../responses/empty.json"
+      },
+      "500" : {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

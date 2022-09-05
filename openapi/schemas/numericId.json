@@ -1,0 +1,8 @@
+{
+  "type": "integer",
+  "format": "int64",
+  "description": "The account identifier as numeric Id",
+  "example": [
+    "895212263565386112","2402520554221019656"
+  ]
+}

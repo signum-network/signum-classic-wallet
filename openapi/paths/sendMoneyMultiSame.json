@@ -1,0 +1,54 @@
+{
+  "post": {
+    "summary": "Send Same Signa To Many",
+    "description": "Sends the same amount of Signa to up to 128 account. As this operation occupies the attachment section no further attachments, like messages are possible",
+    "tags": [
+      "payment"
+    ],
+    "parameters": [
+      {
+        "name": "recipients",
+        "in": "query",
+        "allowEmptyValue": false,
+        "required": true,
+        "description": "A list of account Ids. You can have at maximum 128 entries. __Attention: Duplicated addresses make this transaction fail__",
+        "schema": {
+          "type": "string",
+          "pattern": "d+{1,128}$"
+        },
+        "example": [
+          "16107620026796983538;2402520554221019656"
+        ]
+      },
+      {
+        "$ref": "../parameters/transaction/amountNQT.json"
+      },
+      {
+        "$ref": "../parameters/transaction/feeNQT.json"
+      },
+      {
+        "$ref": "../parameters/transaction/secretPhrase.json"
+      },
+      {
+        "$ref": "../parameters/transaction/publicKey.json"
+      },
+      {
+        "$ref": "../parameters/transaction/deadline.json"
+      },
+      {
+        "$ref": "../parameters/transaction/broadcast.json"
+      },
+      {
+        "$ref": "../parameters/transaction/referencedTransactionFullHash.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "$ref": "../responses/transaction.json"
+      },
+      "500" : {
+        "$ref": "../responses/error.json"
+      }
+    }
+  }
+}

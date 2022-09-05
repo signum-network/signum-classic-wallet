@@ -1,0 +1,9 @@
+{
+  "name": "timestamp",
+  "in": "query",
+  "description": "The timestamp from which should be searched. Use this to get items only since that time. The time in seconds since first Block (Genesis) of the chain.",
+  "schema": {
+    "type": "integer",
+    "format": "int64"
+  }
+}

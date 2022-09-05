@@ -1,0 +1,9 @@
+{
+  "type": "string",
+  "description": "The contracts address as Reed-Solomon encoded address, i.e. S-XXXX-XXXX-XXXX-XXXXX",
+  "pattern": "^S|TS-[0-9A-Z]{4}[0-9A-Z]{4}[0-9A-Z]{4}[0-9A-Z]{5}$",
+  "example": [
+    "\tS-LJ5Q-XTHJ-MY9B-2UPKR",
+    "TS-DC2Q-C6GX-R56T-GHUN8"
+  ]
+}

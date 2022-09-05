@@ -1,0 +1,73 @@
+{
+  "post": {
+    "summary": "Remove Commitment",
+    "description": "Remove commitment. The commitment gets unblocked, and will be available for free use. Removing commitment is only possible after 1440 blocks after last mined block.<br/>Read more about mining on the [official Signum Site](https://signum.network/mining) and on the [community wiki](https://signum.community/signum-mining/#commitment).<br/>See also [addCommitment](#get-/api-requestType-addCommitment) ",
+    "tags": [
+      "account", "mining"
+    ],
+    "parameters": [
+      {
+        "$ref": "../parameters/transaction/amountNQT.json"
+      },
+      {
+        "$ref": "../parameters/transaction/feeNQT.json"
+      },
+      {
+        "$ref": "../parameters/transaction/secretPhrase.json"
+      },
+      {
+        "$ref": "../parameters/transaction/publicKey.json"
+      },
+      {
+        "$ref": "../parameters/transaction/deadline.json"
+      },
+      {
+        "$ref": "../parameters/transaction/broadcast.json"
+      },
+      {
+        "$ref": "../parameters/transaction/recipientPublicKey.json"
+      },
+      {
+        "$ref": "../parameters/transaction/referencedTransactionFullHash.json"
+      },
+      {
+        "$ref": "../parameters/transaction/message.json"
+      },
+      {
+        "$ref": "../parameters/transaction/messageIsText.json"
+      },
+      {
+        "$ref": "../parameters/transaction/messageToEncrypt.json"
+      },
+      {
+        "$ref": "../parameters/transaction/messageToEncryptIsText.json"
+      },
+      {
+        "$ref": "../parameters/transaction/encryptedMessageData.json"
+      },
+      {
+        "$ref": "../parameters/transaction/encryptedMessageNonce.json"
+      },
+      {
+        "$ref": "../parameters/transaction/messageToEncryptToSelf.json"
+      },
+      {
+        "$ref": "../parameters/transaction/messageToEncryptToSelfIsText.json"
+      },
+      {
+        "$ref": "../parameters/transaction/encryptToSelfMessageData.json"
+      },
+      {
+        "$ref": "../parameters/transaction/encryptToSelfMessageNonce.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "$ref": "../responses/transaction.json"
+      },
+      "500" : {
+        "$ref": "../responses/error.json"
+      }
+    }
+  }
+}

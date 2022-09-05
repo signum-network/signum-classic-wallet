@@ -1,0 +1,10 @@
+{
+  "name": "quantityQNT",
+  "in": "query",
+  "allowEmptyValue": false,
+  "required": true,
+  "description": "The quantity of tokens expressed as an integer value, considering the number of decimals of the related token. If a token has two decimals the quantity value for 100 token is 10000.",
+  "schema": {
+    "$ref": "../../schemas/quantity.json"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "at",
+  "in": "query",
+  "allowEmptyValue": false,
+  "required": true,
+  "description": "The contracts address.",
+  "schema": {
+    "$ref": "../../schemas/contractId.json"
+  }
+}

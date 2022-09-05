@@ -1,0 +1,50 @@
+{
+  "get": {
+    "summary": "Get Account Contracts",
+    "description": "Gets the contracts a given account created.",
+    "tags": [
+      "account",
+      "contract"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/account/account.json"
+      },
+      {
+        "name": "machineCodeHashId",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "in": "query",
+        "description": "This hash identifies a specific code. Using this parameter as additional filter to search only for a specific class of contracts, i.e. NFTSRC40.<br/>See also the [green contract specification](https://github.com/signum-network/SIPs/blob/master/SIP/sip-30.md)"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Contract List Response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "ats"
+              ],
+              "properties": {
+                "ats": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "../../schemas/contract.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

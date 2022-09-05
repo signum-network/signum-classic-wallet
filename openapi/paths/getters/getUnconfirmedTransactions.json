@@ -1,0 +1,63 @@
+{
+  "get": {
+    "summary": "Get Pending Transactions",
+    "description": "Get all pending transactions or of a specific account.<br/>Each Transaction may carry an additional attachment with a different structure. This structure depends on it's [`type` and `subtype`](https://docs.signum.network/signum/transaction-types)",
+    "tags": [
+      "payment",
+      "alias",
+      "contract",
+      "token",
+      "account",
+      "mining"
+    ],
+    "parameters": [
+      {
+        "name": "account",
+        "in": "query",
+        "description": "When given, only pending transactions of this account are returned. If not, _all_ pending transactions of the network are returned",
+        "schema": {
+          "$ref": "../../schemas/address.json"
+        }
+      },
+      {
+        "name": "includeIndirect",
+        "description": "When set true, multiple payment transactions are returned also. This option applies only when using `account`",
+        "in": "query",
+        "schema": {
+          "type": "boolean",
+          "example": [
+            true,
+            false
+          ]
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Pending Transaction List Response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "description": "A list of pending transactions.",
+              "required": [
+                "unconfirmedTransactions"
+              ],
+              "properties": {
+                "unconfirmedTransactions": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "../../schemas/transaction.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

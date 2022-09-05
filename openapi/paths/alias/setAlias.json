@@ -1,0 +1,60 @@
+{
+  "post": {
+    "summary": "Set Alias",
+    "description": "Create or edit an alias. An alias allows to have __mutable__ content (up to 1000 chars), i.e. you can use this as an on-chain Name Service, or other interesting things. Additionally, it's possible to trade aliases!",
+    "tags": [
+      "alias"
+    ],
+    "parameters": [
+      {
+        "name": "aliasName",
+        "in": "query",
+        "required": true,
+        "allowEmptyValue": true,
+        "description": "If not exists already, you create an alias with the given __unique__ name. If you are the owner of the alias, then you can update the content. - Like a database _upsert_ operation.",
+        "schema": {
+          "type": "string",
+          "maxLength": 100,
+          "pattern": "^[a-zA-Z0-9]{1,100}$"
+        }
+      },
+      {
+        "name": "aliasURI",
+        "in": "query",
+        "required": true,
+        "allowEmptyValue": true,
+        "description": "Sets/Updates the arbitrary _content_ of this alias.<br/>Historically, the alias system was considered for Name Service operations only, that's why it is called URI.<br/>The legacy format for account aliases is `acct:<rsAddress-content>@burst`. You may check for that format for legacy account aliases",
+        "schema": {
+          "type": "string",
+          "maxLength": 1000
+        }
+      },
+      {
+        "$ref": "../../parameters/transaction/feeNQT.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/secretPhrase.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/publicKey.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/deadline.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/broadcast.json"
+      },
+      {
+        "$ref": "../../parameters/transaction/referencedTransactionFullHash.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "$ref": "../../responses/transaction.json"
+      },
+      "500" : {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}

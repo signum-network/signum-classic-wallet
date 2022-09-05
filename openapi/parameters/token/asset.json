@@ -1,0 +1,10 @@
+{
+  "name": "asset",
+  "in": "query",
+  "allowEmptyValue": false,
+  "required": true,
+  "description": "The related token identifier",
+  "schema": {
+    "$ref": "../../schemas/assetId.json"
+  }
+}

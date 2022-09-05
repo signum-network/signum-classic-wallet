@@ -1,0 +1,6 @@
+{
+  "type": "integer",
+  "format": "int64",
+  "description": "The contract identifier",
+  "required": true,
+}

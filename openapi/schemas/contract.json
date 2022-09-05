@@ -1,0 +1,132 @@
+{
+  "type": "object",
+  "required": [
+    "balanceNQT",
+    "unconfirmedBalanceNQT",
+    "forgedBalanceNQT",
+    "guaranteedBalanceNQT",
+    "account",
+    "accountRS"
+  ],
+  "properties": {
+    "at": {
+      "$ref": "./contractId.json"
+    },
+    "atRS": {
+      "$ref": "./contractAddress.json"
+    },
+    "name": {
+      "description": "The name of this contract ",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9]{1,30}$"
+    },
+    "description": {
+      "description": "The description of the contract",
+      "type": "string",
+      "maxLength": 1000
+    },
+    "machineData": {
+      "description": "The current data stack of the contract in hexadecimal form. You can inspect the data using the [Contract Inspector](https://contracts-inspector.ohager.vercel.app/)",
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]+$"
+    },
+    "balanceNQT": {
+      "description": "The contracts current balance.<br/>Mind that contracts without balance do not run at all.<br/>The amount is always returned in Planck, that is Signa multiplied by 10E8",
+      "type": "integer",
+      "format": "int64",
+      "example": [
+        "100000000",
+        "1000000"
+      ]
+    },
+    "prevBalanceNQT": {
+      "description": "The contracts previous balance.",
+      "type": "integer",
+      "format": "int64",
+      "example": [
+        "100000000",
+        "1000000"
+      ]
+    },
+    "nextBlock": {
+      "description": "The next block when this contract will be ready to run",
+      "type": "integer",
+      "format": "int32"
+    },
+    "frozen": {
+      "description": "Indicates if a contract is stuck, i.e. due to insufficient balance.<br/>Do not rely on that status. Once frozen, this status never gets rest to zero, although the contract is able to run.<br/>Read about contract states also [here](https://github.com/deleterium/SmartC/blob/stable/docs/1-Basis.md#contract-states)",
+      "type": "boolean",
+      "example": [true, false]
+    },
+    "stopped": {
+      "description": "Indicates if a contract stopped (by sleep or halt instruction) and waiting for continuation.<br/>Read about contract states also [here](https://github.com/deleterium/SmartC/blob/stable/docs/1-Basis.md#contract-states)",
+      "type": "boolean",
+      "example": [true, false]
+    },
+    "finished": {
+      "description": "Indicates that a contract finished entirely his current execution cycle.<br/>Read about contract states also [here](https://github.com/deleterium/SmartC/blob/stable/docs/1-Basis.md#contract-states)",
+      "type": "boolean",
+      "example": [true, false]
+    },
+    "dead": {
+      "description": "Indicates that a contract suffered a severe error and is lost. <br/>Read about contract states also [here](https://github.com/deleterium/SmartC/blob/stable/docs/1-Basis.md#contract-states)",
+      "type": "boolean",
+      "example": [true, false]
+    },
+    "machineCode": {
+      "description": "The code",
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]+$"
+    },
+    "machineCodeHashId": {
+      "description": "The hash id for the contracts code. So, we can identify different instances of the same contract code by this identifier.",
+      "type": "integer",
+      "format": "int64",
+      "example": ["17139226199807531405"]
+    },
+    "atVersion": {
+      "description": "The version of this contract",
+      "type": "integer",
+      "format": "int32"
+    },
+    "creator": {
+      "$ref": "../schemas/numericId.json"
+    },
+    "creatorRS": {
+      "$ref": "../schemas/rsAddress.json"
+    },
+    "minActivation": {
+      "type": "integer",
+      "format": "int64",
+      "description": "The amount needed to activate an execution of the contract, i.e.is always returned in Planck, that is Signa multiplied by 10E8",
+      "example": ["25000000"]
+    },
+    "creationBlock": {
+      "description": "The block when this contract was created.",
+      "type": "integer",
+      "format": "int32"
+    }
+  },
+  "example":   {
+    "at": "16380523479488112662",
+    "machineData": "0000000000000000...",
+    "balanceNQT": "0",
+    "prevBalanceNQT": "0",
+    "nextBlock": 440889,
+    "frozen": false,
+    "running": false,
+    "stopped": true,
+    "finished": false,
+    "dead": false,
+    "machineCodeHashId": "17139226199807531405",
+    "atVersion": 3,
+    "atRS": "TS-DC2Q-C6GX-R56T-GHUN8",
+    "name": "RESTPOOL",
+    "description": "Some description",
+    "creator": "2402520554221019656",
+    "creatorRS": "TS-QAJA-QW5Y-SWVP-4RVP4",
+    "machineCode": "12ed000000303304030300...",
+    "minActivation": "25000000",
+    "creationBlock": 440889
+  }
+}

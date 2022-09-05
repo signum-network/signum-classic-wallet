@@ -1,0 +1,56 @@
+{
+  "get": {
+    "summary": "Get Block Range",
+    "description": "Gets a range of blocks. Return the most recent 500 blocks if no argument is given",
+    "tags": [
+      "network"
+    ],
+    "parameters": [
+      {
+        "$ref": "../../parameters/firstIndex.json"
+      },
+      {
+        "$ref": "../../parameters/lastIndex.json"
+      },
+      {
+        "name": "includeTransactions",
+        "in": "query",
+        "description": "If set `true` the transaction objects will be returned, otherwise the transaction identifiers",
+        "required": false,
+        "schema": {
+          "type": "boolean",
+          "example": [
+            true,
+            false
+          ]
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "A list of blockBlock",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "blocks"
+              ],
+              "properties": {
+                "blocks": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "../../schemas/block.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../responses/error.json"
+      }
+    }
+  }
+}
