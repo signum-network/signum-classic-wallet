@@ -738,6 +738,9 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.getAccountLink = function(object, acc) {
         if (typeof object[acc + "RS"] == "undefined") {
+            if (object["type"] === 2 && object["subtype"] === 1) {
+                return "Burn address"
+            }
             return "/";
         } else {
             return "<a href='#' data-user='" + String(object[acc + "RS"]).escapeHTML() + "' class='user-info'>" + BRS.getAccountTitle(object, acc) + "</a>";
