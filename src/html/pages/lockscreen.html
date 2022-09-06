@@ -43,7 +43,7 @@
             </div>
             <div class="lockscreen-item">
                 <label for="node_to_connect" data-i18n="node_to_connect_text" style="color: #c4c4c4;">Connect to node:</label><br />
-                <input type="text" class="form-control" oninput="BRS.checkSelectedNode();" list="nodes" name="node_to_connect" id="node_to_connect" /> 
+                <input type="text" class="form-control" oninput="BRS.checkSelectedNode();" list="nodes" placeholder="Prefered node" data-i18n="[placeholder]prefered_node" name="node_to_connect" id="node_to_connect" /> 
                 <datalist id="nodes">
                   <option>http://localhost:8125</option>
                   <option>http://localhost:6876</option>
@@ -56,6 +56,7 @@
             </div>
           </form>
           <div id="registration_link">
+            <a href="#" data-i18n="watch_only_mode" title="Ex: S-AAAA-BBBB-CCCC-DDDDD">You can use an account as passphrase to login in watch-only mode</a><br><br>
             <a href="#" onclick="BRS.registerAccount();" data-i18n="no_account_q_create_account">Don't have an account? Click here to create one!</a>
           </div>
         </div>

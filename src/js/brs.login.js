@@ -277,7 +277,8 @@ var BRS = (function(BRS, $, undefined) {
             };
 
             if ((password.trim().toUpperCase().substring(0, 6) === "BURST-" && password.length === 26) ||
-            (password.trim().toUpperCase().substring(0, 2) === "S-" && password.length === 24)) {
+                (password.trim().toUpperCase().substring(0, 2) === "S-" && password.length === 22) ||
+                (password.trim().toUpperCase().substring(0, 3) === "TS-" && password.length === 23)) {
                 // Login to a watch-only address
                 var account_id = password.trim();
 
