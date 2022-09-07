@@ -4,7 +4,7 @@
     Version: 1.0, license: Public Domain, coder: NxtChg (admin@nxtchg.com).
 */
 
-function NxtAddress() {
+function NxtAddress(prefix) {
 	var codeword = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 	var syndrome = [0, 0, 0, 0, 0];
 
@@ -12,6 +12,12 @@ function NxtAddress() {
 	var glog = [0, 0, 1, 18, 2, 5, 19, 11, 3, 29, 6, 27, 20, 8, 12, 23, 4, 10, 30, 17, 7, 22, 28, 26, 21, 25, 9, 16, 13, 14, 24, 15];
 
 	var cwmap = [3, 2, 1, 0, 7, 6, 5, 4, 13, 14, 15, 16, 12, 8, 9, 10, 11];
+
+	if (typeof prefix === 'undefined') {
+		prefix = "S-";
+	}
+	// must match js/brs.js
+	const rsRegEx = /^(BURST-|S-|TS-)([0-9A-Z]{3,5}-[0-9A-Z]{3,5}-[0-9A-Z]{3,5}-[0-9A-Z]{4,6})-?([0-9A-Z]+)?$/;
 
 	var alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
 
@@ -254,15 +260,13 @@ function NxtAddress() {
 		return true;
 	} //__________________________
 
-	this.toString = function(out) {
-
-        for (var i = 0; i < 17; i++) {
+	this.toString = function() {
+		let out = prefix;
+		for (var i = 0; i < 17; i++) {
 			out += alphabet[codeword[cwmap[i]]];
-
 			if ((i & 3) == 3 && i < 13) out += '-';
 		}
-
-        return out;
+		return out;
 	}; //__________________________
 
 	this.account_id = function() {
@@ -303,66 +307,74 @@ function NxtAddress() {
 
 		var len = 0;
 		this.guess = [];
+		let clean = [];
+
 		reset();
 
 		adr = String(adr);
-
 		adr = adr.replace(/(^\s+)|(\s+$)/g, '').toUpperCase();
 
-    if (adr.indexOf('BURST-') == 0) adr = adr.substr(6);
-    if (adr.indexOf('S-') == 0) adr = adr.substr(2);
+		if (adr.match(/^\d{1,20}$/g)) {
+			// account id
+			if (allow_accounts) {
+				return from_acc(adr);
+			}
+			return false
+		}
 
-		if (adr.match(/^\d{1,20}$/g)) // account id
-		{
-			if (allow_accounts) return from_acc(adr);
-		} else // address
-		{
-			var clean = [];
+		const rsParts = rsRegEx.exec(adr);
+		if (rsParts !== null) {
+			// remove prefix and public key
+			adr = rsParts[2];
+		}
 
-			for (var i = 0; i < adr.length; i++) {
-				var pos = alphabet.indexOf(adr[i]);
-
-				if (pos >= 0) {
-					clean[len++] = pos;
-					if (len > 18) return false;
+		for (let i = 0; i < adr.length; i++) {
+			const pos = alphabet.indexOf(adr[i]);
+			if (pos >= 0) {
+				clean[len++] = pos;
+				if (len > 18) {
+					return false;
 				}
 			}
 		}
 
-		if (len == 16) // guess deletion
-		{
+		switch (len) {
+		case 16: // guess deletion
 			for (var i = 16; i >= 0; i--) {
 				for (var j = 0; j < 32; j++) {
 					clean[i] = j;
-
 					set_codeword(clean);
-
-					if (this.ok()) this.add_guess();
+					if (this.ok()) {
+						this.add_guess();
+					}
 				}
-
 				if (i > 0) {
 					var t = clean[i - 1];
 					clean[i - 1] = clean[i];
 					clean[i] = t;
 				}
 			}
-		}
-
-		if (len == 18) // guess insertion
-		{
+			break;
+		case 18: // guess insertion
 			for (var i = 0; i < 18; i++) {
 				set_codeword(clean, 18, i);
-
-				if (this.ok()) this.add_guess();
+				if (this.ok()) {
+					this.add_guess();
+				}
 			}
-		}
-
-		if (len == 17) {
+			break;
+		case 17:
 			set_codeword(clean);
-
-			if (this.ok()) return true;
-
-			if (guess_errors() && this.ok()) this.add_guess();
+			if (this.ok()) {
+				return true;
+			}
+			if (guess_errors() && this.ok()) {
+				this.add_guess();
+			}
+			break;
+		default:
+			// length very far away
+			return false;
 		}
 
 		reset();
@@ -413,7 +425,7 @@ function NxtAddress() {
 			if (i >= list[j].s && i < list[j].e) {
 				d += s.charAt(i);
 			} else {
-				d += '<b style="color:red">' + s.charAt(i) + '</b>';
+				d += '<u>' + s.charAt(i) + '</u>';
 			}
 		}
 

@@ -107,11 +107,11 @@ var BRS = (function(BRS, $, undefined) {
         if (requestType == "getAccountId") {
             var accountId = BRS.getAccountId(data.secretPhrase);
 
-            var nxtAddress = new NxtAddress();
+            var nxtAddress = new NxtAddress(BRS.prefix);
             var accountRS;
 
             if (nxtAddress.set(accountId)) {
-                accountRS = nxtAddress.toString(BRS.prefix);
+                accountRS = nxtAddress.toString();
             } else {
                 accountRS = "";
             }
@@ -492,6 +492,17 @@ var BRS = (function(BRS, $, undefined) {
             data.recipientRS = "S-2222-2222-2222-22222";
         }
 
+        if (BRS.rsRegEx.test(data.recipient)) {
+            // wrong data type... Fix
+            const parts = BRS.rsRegEx.exec(data.recipient)
+            const address = new NxtAddress(BRS.prefix)
+            if (address.set(parts[1] + parts[2]) === false) {
+                return false
+            }
+            data.recipient = address.account_id();
+            data.recipientRS = address.toString();
+        }
+
         if (transaction.publicKey != BRS.accountInfo.publicKey) {
             return false;
         }
@@ -503,6 +514,7 @@ var BRS = (function(BRS, $, undefined) {
         requestTypeWithoutRecipientInData = ["buyAlias", "dgsPurchase", "dgsRefund", "dgsDelivery", "dgsFeedback"]
         if ( ! ( requestTypeWithoutRecipientInData.indexOf(requestType) + 1) && transaction.recipient !== data.recipient) {
             if (data.recipient == "1739068987193023818" && transaction.recipient == "0") {
+                // deleterium: what a crazy rule?
                 //ok
             } else {
                 return false;

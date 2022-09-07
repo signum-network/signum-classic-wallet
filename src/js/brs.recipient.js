@@ -241,54 +241,43 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.checkRecipient = function(account, modal) {
-        var classes = "callout-info callout-danger callout-warning";
+        let classes = "callout-info callout-danger callout-warning";
 
-        var callout = modal.find(".account_info").first();
-        var accountInputField = modal.find("input[name=converted_account_id]");
-        var merchantInfoField = modal.find("input[name=merchant_info]");
-        var recipientPublicKeyField = modal.find("input[name=recipientPublicKey]");
+        let callout = modal.find(".account_info").first();
+        let accountInputField = modal.find("input[name=converted_account_id]");
+        let merchantInfoField = modal.find("input[name=merchant_info]");
+        let recipientPublicKeyField = modal.find("input[name=recipientPublicKey]");
 
         accountInputField.val("");
         merchantInfoField.val("");
 
         account = $.trim(account);
 
-        //solomon reed. Btw, this regex can be shortened..
-        if (/^(BURST\-)?[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+/i.test(account) ||
-          /^(S\-)?[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+/i.test(account)) {
-            var address = new NxtAddress();
+        const accountParts = BRS.rsRegEx.exec(account)
+        if (accountParts !== null) {
+            let address = new NxtAddress(BRS.prefix);
 
-            // Added usage of substr due to Burst implementation
-            var accountRS = account.substr(0, 22);
-            var offset = 4;
-            if(account.toUpperCase().substring(0, 6) === "BURST-"){
-              offset = 0;
-              accountRS = account.substr(0, 26);
-            }
-			      if (address.set(accountRS)) {
-                if(account.length > 28 + offset){
-                  // check if there is a public key
-                  var publicKeyBase36 = account.substr(27 - offset);
-                  var publicKey = new BigNumber(publicKeyBase36, 36).toString(16);
-                  var checkRS = BRS.getAccountIdFromPublicKey(publicKey, true);
-                  
-                  if(!checkRS.includes(accountRS.substr(6 - offset))){
-                    callout.removeClass(classes).addClass("callout-danger").html($.t("recipient_malformed")).show();
-                  }
-                  else {
-                    callout.removeClass(classes).addClass("callout-info").html($.t("recipient_info_extended")).show();
-                  }
+            if (address.set(accountParts[2])) {
+                if(accountParts[3] !== undefined) {
+                    // Verify the public key
+                    let publicKey = new BigNumber(accountParts[3], 36).toString(16);
+                    let checkRS = BRS.getAccountIdFromPublicKey(publicKey, true);
+                    
+                    if(!checkRS.includes(accountParts[2])){
+                        callout.removeClass(classes).addClass("callout-danger").html($.t("recipient_malformed")).show();
+                    }
+                    else {
+                        callout.removeClass(classes).addClass("callout-info").html($.t("recipient_info_extended")).show();
+                    }
                 }
                 else {
-                  BRS.getAccountError(account, function(response) {
+                  BRS.getAccountError(accountParts[2], function(response) {
                       modal.find("input[name=recipientPublicKey]").val("");
                       modal.find(".recipient_public_key").hide();
                       if (response.account && response.account.description) {
                           checkForMerchant(response.account.description, modal);
                       }
-  
-                      var message = response.message.escapeHTML();
-  
+                      let message = response.message.escapeHTML();
                       callout.removeClass(classes).addClass("callout-" + response.type).html(message).show();
                   });
                 }
@@ -298,13 +287,12 @@ var BRS = (function(BRS, $, undefined) {
                         "recipient": "<span class='malformed_address' data-address='" + String(address.guess[0]).escapeHTML() + "' onclick='BRS.correctAddressMistake(this);'>" + address.format_guess(address.guess[0], account) + "</span>"
                     })).show();
                 } else if (address.guess.length > 1) {
-                    var html = $.t("recipient_malformed_suggestion", {
+                    let html = $.t("recipient_malformed_suggestion", {
                         "count": address.guess.length
                     }) + "<ul>";
-                    for (var i = 0; i < address.guess.length; i++) {
+                    for (let i = 0; i < address.guess.length; i++) {
                         html += "<li><span clas='malformed_address' data-address='" + String(address.guess[i]).escapeHTML() + "' onclick='BRS.correctAddressMistake(this);'>" + address.format_guess(address.guess[i], account) + "</span></li>";
                     }
-
                     callout.removeClass(classes).addClass("callout-danger").html(html).show();
                 } else {
                     callout.removeClass(classes).addClass("callout-danger").html($.t("recipient_malformed")).show();

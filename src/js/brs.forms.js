@@ -304,22 +304,21 @@ var BRS = (function(BRS, $, undefined) {
 
         if (data.recipient) {
             data.recipient = $.trim(data.recipient);
-            if (/^\d+$/.test(data.recipient)) {
-            }
-            else if (!/(^BURST|^S)\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+/i.test(data.recipient)) {
-                var convertedAccountId = $modal.find("input[name=converted_account_id]").val();
-                if (!convertedAccountId || (!/^\d+$/.test(convertedAccountId) && !/(^BURST|^S)\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+/i.test(convertedAccountId))) {
+            if (BRS.idRegEx.test(data.recipient) === false && 
+                BRS.rsRegEx.test(data.recipient) === false) {
+                let convertedAccountId = $modal.find("input[name=converted_account_id]").val();
+                if (convertedAccountId && (BRS.idRegEx.test(convertedAccountId) || BRS.rsRegEx.test(convertedAccountId))) {
+                    data.recipient = convertedAccountId;
+                    data._extra = {
+                        "convertedAccount": true
+                    };
+                } else {
                     $form.find(".error_message").html($.t("error_account_id")).show();
                     if (formErrorFunction) {
                         formErrorFunction(false, data);
                     }
                     BRS.unlockForm($modal, $btn);
                     return;
-                } else {
-                    data.recipient = convertedAccountId;
-                    data._extra = {
-                        "convertedAccount": true
-                    };
                 }
             }
         }

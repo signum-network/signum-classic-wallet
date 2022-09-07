@@ -116,11 +116,11 @@ var BRS = (function(BRS, $, undefined) {
 					return;
 				}
 				var recipientHtml = "";
-				var nxtAddress = new NxtAddress();
+				var nxtAddress = new NxtAddress(BRS.prefix);
 				for (var i = 0; i < transaction.attachment.recipients.length; i++) {
 					var recipient = transaction.attachment.recipients[i];
 					nxtAddress.set(recipient[0]);
-					var address = nxtAddress.toString(BRS.prefix);
+					var address = nxtAddress.toString();
 					var amount = BRS.formatAmount(recipient[1]) + " SIGNA";
 					if (i !== 0) {
 						recipientHtml += "<br />";
@@ -151,11 +151,11 @@ var BRS = (function(BRS, $, undefined) {
                 }
                 var amountEach = parseInt(transaction.amountNQT) / transaction.attachment.recipients.length;
                 var recipientHtml = "";
-                var nxtAddress = new NxtAddress();
+                var nxtAddress = new NxtAddress(BRS.prefix);
                 for (var i = 0; i < transaction.attachment.recipients.length; i++) {
                     var recipient = transaction.attachment.recipients[i];
                     nxtAddress.set(recipient);
-                    var address = nxtAddress.toString(BRS.prefix);
+                    var address = nxtAddress.toString();
                     if (i !== 0) {
                         recipientHtml += "<br />";
                     }
