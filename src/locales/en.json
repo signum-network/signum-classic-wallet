@@ -675,6 +675,7 @@
     "recipient": "Recipient",
     "recipient_account": "Recipient Account",
     "recipient_alias_suggestion": "If you want to type an alias, prepend it with the @ character.",
+    "recipient_burning_address": "BURNING address detected: Signa and tokens will be lost forever.",
     "recipient_info": "The recipient account has a public key and a balance of __burst__ SIGNA.",
     "recipient_info_extended": "Sending to a recipient with an extended address.",
     "recipient_malformed": "The recipient account is malformed, please adjust.",

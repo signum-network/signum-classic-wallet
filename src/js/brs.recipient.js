@@ -200,38 +200,47 @@ var BRS = (function(BRS, $, undefined) {
                     }),
                     "account": response
                 });
-            } else {
-                if (response.errorCode) {
-                    if (response.errorCode === 4) {
-                        callback({
-                            "type": "danger",
-                            "message": $.t("recipient_malformed") + (!/^(BURST\-)/i.test(accountId) ? " " + $.t("recipient_alias_suggestion") : ""),
-                            "account": null
-                        });
-                    } else if (response.errorCode === 5) {
-                        callback({
-                            "type": "warning",
-                            "message": $.t("recipient_unknown_pka"),
-                            "account": null,
-                            "noPublicKey": true
-                        });
-                    } else {
-                        callback({
-                            "type": "danger",
-                            "message": $.t("recipient_problem") + " " + String(response.errorDescription).escapeHTML(),
-                            "account": null
-                        });
-                    }
-                } else {
+                return;
+            }
+            if (accountId === "0" || accountId === "2222-2222-2222-22222") {
+                callback({
+                    "type": "warning",
+                    "message": $.t("recipient_burning_address"),
+                    "account": "0",
+                    "noPublicKey": true
+                });
+                return;
+            }
+            if (response.errorCode) {
+                if (response.errorCode === 4) {
+                    callback({
+                        "type": "danger",
+                        "message": $.t("recipient_malformed") + (!/^(BURST\-)/i.test(accountId) ? " " + $.t("recipient_alias_suggestion") : ""),
+                        "account": null
+                    });
+                } else if (response.errorCode === 5) {
                     callback({
                         "type": "warning",
-                        "message": $.t("recipient_no_public_key", {
-                            "burst": BRS.formatAmount(response.unconfirmedBalanceNQT, false, true)
-                        }),
-                        "account": response,
+                        "message": $.t("recipient_unknown_pka"),
+                        "account": null,
                         "noPublicKey": true
                     });
+                } else {
+                    callback({
+                        "type": "danger",
+                        "message": $.t("recipient_problem") + " " + String(response.errorDescription).escapeHTML(),
+                        "account": null
+                    });
                 }
+            } else {
+                callback({
+                    "type": "warning",
+                    "message": $.t("recipient_no_public_key", {
+                        "burst": BRS.formatAmount(response.unconfirmedBalanceNQT, false, true)
+                    }),
+                    "account": response,
+                    "noPublicKey": true
+                });
             }
         });
     };
