@@ -1773,6 +1773,9 @@ var BRS = (function(BRS, $, undefined) {
                 }).capitalize()
             };
         }
+        if (!data.amountNXT) {
+            data.amountNXT = "0";
+        }
 
         if (!BRS.showedFormWarning) {
             if (BRS.settings.asset_transfer_warning && BRS.settings.asset_transfer_warning !== 0) {
