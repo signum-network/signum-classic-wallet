@@ -29,6 +29,7 @@ var BRS = (function(BRS, $, undefined) {
     BRS.blocks = [];
     BRS.genesis = "0";
     BRS.genesisRS = "S-2222-2222-2222-22222";
+    BRS.minimumFee = 0.01;
 
     // must match js/util/nxtaddress.js
     BRS.rsRegEx = /^(BURST-|S-|TS-)([0-9A-Z]{3,5}-[0-9A-Z]{3,5}-[0-9A-Z]{3,5}-[0-9A-Z]{4,6})-?([0-9A-Z]+)?$/;

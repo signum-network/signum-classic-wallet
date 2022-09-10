@@ -24,24 +24,22 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.sendMoneyCalculateTotal = function(element) {
-        var current_amount = parseFloat($("#send_money_amount").val(), 10);
-        var current_fee = parseFloat($("#send_money_fee").val(), 10);
-        var fee = isNaN(current_fee) ? 1 : (current_fee < 0.00735 ? 0.00735 : current_fee);
-        var amount = isNaN(current_amount) ? 0.00000001 : (current_amount < 0.00000001 ? 0.00000001 : current_amount);
+        const current_amount = parseFloat($("#send_money_amount").val(), 10);
+        const current_fee = parseFloat($("#send_money_fee").val(), 10);
+        const fee = isNaN(current_fee) ? BRS.minimumFee : (current_fee < BRS.minimumFee ? BRS.minimumFee : current_fee);
+        const amount = isNaN(current_amount) ? 0 : (current_amount < 0.00000001 ? 0 : current_amount);
 
-        $("#send_money_amount").val(amount.toFixed(8));
         $("#send_money_fee").val(fee.toFixed(8));
 
         $(element).closest(".modal").find(".total_amount_ordinary").html(BRS.formatAmount(BRS.convertToNQT(amount + fee)) + " SIGNA");
     };
     
     BRS.commitmentCalculateTotal = function(element) {
-        var current_amount = parseFloat($("#commitment_amount").val(), 10);
-        var current_fee = parseFloat($("#commitment_fee").val(), 10);
-        var fee = isNaN(current_fee) ? 1 : (current_fee < 0.00735 ? 0.00735 : current_fee);
-        var amount = isNaN(current_amount) ? 0.00000001 : (current_amount < 0.00000001 ? 0.00000001 : current_amount);
+        const current_amount = parseFloat($("#commitment_amount").val(), 10);
+        const current_fee = parseFloat($("#commitment_fee").val(), 10);
+        const fee = isNaN(current_fee) ? BRS.minimumFee : (current_fee < BRS.minimumFee ? BRS.minimumFee : current_fee);
+        const amount = isNaN(current_amount) ? 0 : (current_amount < 0.00000001 ? 0 : current_amount);
 
-        $("#commitment_amount").val(amount.toFixed(8));
         $("#commitment_fee").val(fee.toFixed(8));
 
         $(element).closest(".modal").find(".total_amount_commitment").html(BRS.formatAmount(BRS.convertToNQT(amount + fee)) + " SIGNA");
