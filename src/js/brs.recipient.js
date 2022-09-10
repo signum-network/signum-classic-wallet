@@ -187,10 +187,73 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.getAccountError = function(accountId, callback) {
-        BRS.sendRequest("getAccount", {
-            "account": accountId
-        }, function(response) {
-            if (response.publicKey) {
+        if (accountId === "0") {
+            callback({
+                "type": "warning",
+                "message": $.t("recipient_burning_address"),
+                "account": null,
+                "noPublicKey": true
+            });
+            return;
+        }
+        // first guess it is an AT
+        BRS.sendRequest("getAT", {
+            "at": accountId
+        }, function (newResponse) {
+            if (newResponse.errorCode === undefined) {
+                callback({
+                    "type": "info",
+                    "message": $.t("recipient_smart_contract", {
+                        "burst": BRS.formatAmount(newResponse.balanceNQT, false, true)
+                    }),
+                    "account": newResponse,
+                    "noPublicKey": true
+                });
+                return;
+            }
+
+            // It is not an AT, get account
+            BRS.sendRequest("getAccount", {
+                "account": accountId
+            }, function(response) {
+                switch (response.errorCode) {
+                case undefined:
+                    // expected right 
+                    break;
+                case 4:
+                    callback({
+                        "type": "danger",
+                        "message": $.t("recipient_malformed") + (!/^(BURST\-)/i.test(accountId) ? " " + $.t("recipient_alias_suggestion") : ""),
+                        "account": null
+                    });
+                    return;
+                case 5:
+                    callback({
+                        "type": "warning",
+                        "message": $.t("recipient_unknown_pka"),
+                        "account": null,
+                        "noPublicKey": true
+                    });
+                    return;
+                default:
+                    callback({
+                        "type": "danger",
+                        "message": $.t("recipient_problem") + " " + String(response.errorDescription).escapeHTML(),
+                        "account": null
+                    });
+                    return;
+                }
+                if (response.publicKey === undefined || response.publicKey === "0000000000000000000000000000000000000000000000000000000000000000") {
+                    callback({
+                        "type": "warning",
+                        "message": $.t("recipient_no_public_key", {
+                            "burst": BRS.formatAmount(response.unconfirmedBalanceNQT, false, true)
+                        }),
+                        "account": response,
+                        "noPublicKey": true
+                    });
+                    return;
+                }
                 callback({
                     "type": "info",
                     "message": $.t("recipient_info", {
@@ -198,50 +261,10 @@ var BRS = (function(BRS, $, undefined) {
                     }),
                     "account": response
                 });
-                return;
-            }
-            if (accountId === "0" || accountId === "2222-2222-2222-22222") {
-                callback({
-                    "type": "warning",
-                    "message": $.t("recipient_burning_address"),
-                    "account": "0",
-                    "noPublicKey": true
-                });
-                return;
-            }
-            if (response.errorCode) {
-                if (response.errorCode === 4) {
-                    callback({
-                        "type": "danger",
-                        "message": $.t("recipient_malformed") + (!/^(BURST\-)/i.test(accountId) ? " " + $.t("recipient_alias_suggestion") : ""),
-                        "account": null
-                    });
-                } else if (response.errorCode === 5) {
-                    callback({
-                        "type": "warning",
-                        "message": $.t("recipient_unknown_pka"),
-                        "account": null,
-                        "noPublicKey": true
-                    });
-                } else {
-                    callback({
-                        "type": "danger",
-                        "message": $.t("recipient_problem") + " " + String(response.errorDescription).escapeHTML(),
-                        "account": null
-                    });
-                }
-            } else {
-                callback({
-                    "type": "warning",
-                    "message": $.t("recipient_no_public_key", {
-                        "burst": BRS.formatAmount(response.unconfirmedBalanceNQT, false, true)
-                    }),
-                    "account": response,
-                    "noPublicKey": true
-                });
-            }
+            });
         });
-    };
+    }
+
 
     BRS.correctAddressMistake = function(el) {
         $(el).closest(".modal-body").find("input[name=recipient],input[name=account_id]").val($(el).data("address")).trigger("blur");
@@ -278,14 +301,14 @@ var BRS = (function(BRS, $, undefined) {
                     }
                 }
                 else {
-                  BRS.getAccountError(accountParts[2], function(response) {
+                  BRS.getAccountError(address.account_id(), function(response) {
                       modal.find("input[name=recipientPublicKey]").val("");
                       modal.find(".recipient_public_key").hide();
                       if (response.account && response.account.description) {
                           checkForMerchant(response.account.description, modal);
                       }
-                      let message = response.message.escapeHTML();
-                      callout.removeClass(classes).addClass("callout-" + response.type).html(message).show();
+                      // let message = response.message.escapeHTML();
+                      callout.removeClass(classes).addClass("callout-" + response.type).html(response.message).show();
                   });
                 }
             } else {
@@ -312,7 +335,7 @@ var BRS = (function(BRS, $, undefined) {
                 }], function(error, contact) {
                     if (!error && contact.length) {
                         contact = contact[0];
-                        BRS.getAccountError(contact.accountRS, function(response) {
+                        BRS.getAccountError(contact.account, function(response) {
                             modal.find("input[name=recipientPublicKey]").val("");
                             modal.find(".recipient_public_key").hide();
                             if (response.account && response.account.description) {
@@ -375,32 +398,25 @@ var BRS = (function(BRS, $, undefined) {
                     }
 
                     if (match && match[1]) {
-                        match[1] = String(match[1]).toUpperCase();
-
-                        if (/^\d+$/.test(match[1])) {
-                            var address = new NxtAddress();
-
-                            if (address.set(match[1])) {
-                                match[1] = address.toString();
-                            } else {
-                                accountInputField.val("");
-                                callout.html("Invalid account alias.");
-                            }
+                        var address = new NxtAddress();
+                        if (!address.set(String(match[1]).toUpperCase())) {
+                            accountInputField.val("");
+                            callout.html("Invalid account alias.");
                         }
 
-                        BRS.getAccountError(match[1], function(response) {
+                        BRS.getAccountError(address.account_id(), function(response) {
                             modal.find("input[name=recipientPublicKey]").val("");
                             modal.find(".recipient_public_key").hide();
                             if (response.account && response.account.description) {
                                 checkForMerchant(response.account.description, modal);
                             }
 
-                            accountInputField.val(match[1].escapeHTML());
+                            accountInputField.val(address.toString());
                             callout.html($.t("alias_account_link", {
-                                "account_id": String(match[1]).escapeHTML()
-                            }) + ". " + $.t("alias_last_adjusted", {
+                                "account_id": address.toString()
+                            }) + ".<br>" + $.t("alias_last_adjusted", {
                                 "timestamp": BRS.formatTimestamp(timestamp)
-                            })).removeClass(classes).addClass("callout-" + response.type).show();
+                            }) +  "<br>" + response.message).removeClass(classes).addClass("callout-" + response.type).show();
                         });
                     } else {
                         callout.removeClass(classes).addClass("callout-danger").html($.t("alias_account_no_link") + (!alias ? $.t("error_uri_empty") : $.t("uri_is", {
