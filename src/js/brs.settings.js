@@ -83,11 +83,10 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.applySettings = function(key) {
 	if (!key || key == "language") {
-	    if ($.i18n.lng() != BRS.settings.language) {
 		$.i18n.setLng(BRS.settings.language, null, function() {
 		    $("[data-i18n]").i18n();
 		});
-		if (key && window.localstorage) {
+		if (key && BRS.hasLocalStorage) {
 		    window.localStorage.setItem('i18next_lng', BRS.settings.language);
 		}
 		if (BRS.inApp) {
@@ -96,7 +95,6 @@ var BRS = (function(BRS, $, undefined) {
 			"version": BRS.settings.language
 		    }, "*");
 		}
-	    }
 	}
 
 	if (!key || key == "submit_on_enter") {
