@@ -398,7 +398,7 @@ var BRS = (function(BRS, $, undefined) {
                 });
             }
 
-            const accountAsset = BRS.accountInfo.assetBalances.find((Obj) => Obj.asset === asset.asset)
+            const accountAsset = BRS.accountInfo.assetBalances?.find((Obj) => Obj.asset === asset.asset)
             const userAssetQuantity = accountAsset === undefined ? "0" : BRS.formatQuantity(accountAsset.balanceQNT, asset.decimals)
             rows += "<a href='#' class='list-group-item list-group-item-"
                 + (ungrouped ? "ungrouped" : "grouped")

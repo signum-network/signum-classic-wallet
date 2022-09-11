@@ -536,11 +536,21 @@ var BRS = (function(BRS, $, undefined) {
 
         if (transaction.version > 0) {
             //has empty attachment, so no attachmentVersion byte...
-            if (requestType == "sendMoney" || requestType == "sendMessage") {
+            switch (requestType) {
+            case "sendMoney":
+            case "sendMessage":
                 pos = 176;
-            } else if (requestType == "transferAsset") {
+                break;
+            case "transferAsset":
+            case "placeBidOrder":
+            case "placeAskOrder":
+            case "cancelBidOrder":
+            case "cancelAskOrder":
+            case "issueAsset":
                 pos = 185;
-            } else {
+                break;
+            default:
+                console.log("BRS.verifyAndSignTransactionBytes(): Using default 'pos' for " + requestType);
                 pos = 177;
             }
         } else {
