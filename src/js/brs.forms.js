@@ -458,6 +458,10 @@ var BRS = (function(BRS, $, undefined) {
             return;
         }
 
+        if ("amountNXT" in data && data.amountNXT === "") {
+            data.amountNXT = "0";
+        }
+
         if (!BRS.showedFormWarning) {
             if ("amountNXT" in data && BRS.settings.amount_warning && BRS.settings.amount_warning !== "0") {
                 if (new BigInteger(BRS.convertToNQT(data.amountNXT)).compareTo(new BigInteger(BRS.settings.amount_warning)) > 0) {
