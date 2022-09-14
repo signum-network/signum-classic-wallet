@@ -211,7 +211,7 @@ var BRS = (function(BRS, $, undefined) {
                         }
                     }
 
-                    if ($("#remember_password").is(":checked")) {
+                    if (watch_only !== true && $("#remember_password").is(":checked")) {
                         BRS.rememberPassword = true;
                         $("#remember_password").prop("checked", false);
                         BRS.setPassword(password);
