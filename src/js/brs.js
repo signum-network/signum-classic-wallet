@@ -920,9 +920,9 @@ var BRS = (function(BRS, $, undefined) {
     	 BRS.sendRequest("suggestFee", {
           }, function(response) {
               if (!response.errorCode) {
-                 $(input_fee_field_id).val((response.priority/100000000).toFixed(8));
+                 $(input_fee_field_id).val((response.standard/100000000));
                  $(input_fee_field_id).trigger("change");
-                 $(response_span_id).html("<span class='margin-left-5' data-i18n='standard_fee'>Standard: <a href='#' class='btn-fee-response' name='suggested_fee_value_"+response_span_id.id+"' data-i18n='[title]click_to_apply'>" +(response.standard/100000000).toFixed(8)+ "</a></span> <span class='margin-left-5' data-i18n='cheap_fee'>Cheap: <a href='#' class='btn-fee-response' name='suggested_fee_value_"+response_span_id.id+"' data-i18n='[title]click_to_apply'>" + (response.cheap/100000000).toFixed(8)+ "</a></span> <span class='margin-left-5' data-i18n='priority_fee'>Priority: <a href='#' class='btn-fee-response' name='suggested_fee_value_"+response_span_id.id+"' data-i18n='[title]click_to_apply'>" +(response.priority/100000000).toFixed(8)+ "</a></span>");
+                 $(response_span_id).html("<span class='margin-left-5' data-i18n='standard_fee'>Standard: <a href='#' class='btn-fee-response' name='suggested_fee_value_"+response_span_id.id+"' data-i18n='[title]click_to_apply'>" +(response.standard/100000000)+ "</a></span> <span class='margin-left-5' data-i18n='cheap_fee'>Cheap: <a href='#' class='btn-fee-response' name='suggested_fee_value_"+response_span_id.id+"' data-i18n='[title]click_to_apply'>" + (response.cheap/100000000)+ "</a></span> <span class='margin-left-5' data-i18n='priority_fee'>Priority: <a href='#' class='btn-fee-response' name='suggested_fee_value_"+response_span_id.id+"' data-i18n='[title]click_to_apply'>" +(response.priority/100000000)+ "</a></span>");
                   $("[name='suggested_fee_value_"+response_span_id.id+"']").i18n(); // apply locale to DOM after ajax call
                   $("[name='suggested_fee_spinner']").addClass("suggested_fee_spinner_display_none");
                   $("[name='suggested_fee_value_"+response_span_id.id+"']").on("click", function(e) {
