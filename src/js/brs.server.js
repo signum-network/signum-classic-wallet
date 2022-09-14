@@ -538,8 +538,10 @@ var BRS = (function(BRS, $, undefined) {
             //has empty attachment, so no attachmentVersion byte...
             switch (requestType) {
             case "sendMoney":
-            case "sendMessage":
                 pos = 176;
+                break;
+            case "sendMessage":
+                pos = 184;
                 break;
             case "transferAsset":
             case "placeBidOrder":
