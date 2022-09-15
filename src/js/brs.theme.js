@@ -117,7 +117,7 @@ $(function() {
     })
     .append('<a href="javascript:void(0)" data-theme="theme-dark" style="display: block; box-shadow: 0 0 3px rgba(0,0,0,0.4)" class="clearfix full-opacity-hover">' +
       '<div><span style="display:block; width: 20%; float: left; height: 7px;" class="bg-dark-active"></span><span class="bg-dark" style="display:block; width: 80%; float: left; height: 7px;"></span></div>' +
-      '<div><span style="display:block; width: 20%; float: left; height: 20px; background: #222d32"></span><span style="display:block; width: 80%; float: left; height: 20px; background: #f4f5f7"></span></div>' +
+      '<div><span style="display:block; width: 20%; float: left; height: 20px; background: #222d32"></span><span style="display:block; width: 80%; float: left; height: 20px; background: #000000"></span></div>' +
       '</a>');
   $themesList.append($themeDark);
   $themeSettings.append($themesList);

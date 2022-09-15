@@ -1198,12 +1198,6 @@ a:focus {
 .form-group.has-error .help-block {
   color: #dd4b39;
 }
-/* Input group */
-.input-group .input-group-addon {
-  border-radius: 0;
-  border-color: #d2d6de;
-  background-color: #fff;
-}
 /* button groups */
 .btn-group-vertical .btn.btn-flat:first-of-type,
 .btn-group-vertical .btn.btn-flat:last-of-type {
