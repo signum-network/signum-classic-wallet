@@ -670,6 +670,7 @@
     "put_for_sale": "Put For Sale",
     "qty": "QTY",
     "quantity": "Quantity",
+    "quantity_circulating": "Circulating Quantity",
     "raw_transaction_details": "Raw Transaction Details",
     "recent_blocks": "Recent Blocks",
     "recent_transactions": "Recent Transactions",
