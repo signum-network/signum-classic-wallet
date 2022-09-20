@@ -942,7 +942,7 @@ var BRS = (function(BRS, $, undefined) {
             var price = new Big(BRS.convertToNQT(String($("#" + type + "_asset_price").val())));
             var balance = new Big(type == "buy" ? BRS.accountInfo.unconfirmedBalanceNQT : BRS.currentAsset.yourBalanceNQT);
             var balanceNQT = new Big(BRS.accountInfo.unconfirmedBalanceNQT);
-            var maxQuantity = new Big(BRS.convertToQNTf(BRS.currentAsset.quantityQNT, BRS.currentAsset.decimals));
+            var maxQuantity = new Big(BRS.convertToQNTf(BRS.currentAsset.quantityCirculatingQNT, BRS.currentAsset.decimals));
 
             if (balance.cmp(new Big("0")) <= 0) {
                 return;
