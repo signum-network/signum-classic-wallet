@@ -140,7 +140,8 @@
 }
 
 /* Modal dialog */
-.theme-dark .modal-content {
+.theme-dark .modal-content,
+.theme-dark .panel {
     background-color: #2c3b41;
     color: #b8c7ce;
 }
