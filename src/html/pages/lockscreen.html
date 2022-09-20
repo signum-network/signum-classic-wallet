@@ -1,18 +1,18 @@
 <div id="lockscreen">
   <div id="old_browser_warning" style="display:none;margin-left:auto;margin-right:auto;margin-top:200px;background:white;color:black;padding:20px;width:300px;" data-i18n="old_browser_warning">You are using an old Internet Explorer. Please update your IE or open localhost:8125 with your favorite Browser!</div>
-  <!--
     <div style="position:absolute;top:10px;left:10px;" id="server_select">
-      <div class="btn-group">
-        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-          <span class="text">Use localhost</span> <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu" role="menu">
-          <li><a href="#">Use localhost</a></li>
-          <li><a href="#">Use TestNet</a></li>
-        </ul>
-      </div>
+        <div class="form-group">
+            <label for="node_to_connect" data-i18n="node_to_connect_text" style="color: #c4c4c4;">Connect to node:</label><br />
+            <input type="text" class="form-control" oninput="BRS.checkSelectedNode();" list="nodes" placeholder="Prefered node" data-i18n="[placeholder]prefered_node" name="node_to_connect" id="node_to_connect" /> 
+            <datalist id="nodes">
+                <option>http://localhost:8125</option>
+                <option>http://localhost:6876</option>
+                <option>https://europe.signum.network</option>
+                <option>https://europe3.testnet.signum.network</option>
+            </datalist>
+            <span id="node_alert" class="incorrect" data-i18n="node_to_connect_error">Please select a valid node!</span>
+        </div>
     </div>
-    -->
   <table id="center" style="display:none;width:100%;height:100%;">
     <tr>
       <td style="text-align:center;vertical-align:middle">
@@ -20,8 +20,8 @@
           <img class="burst_logo_effect" src="img/signum_logo.png" alt="Signum" width="242" height="64" style="margin-right:20px;" />
           <img src="img/signum_logo.png" alt="Signum" width="242" height="64" style="margin-right:20px; opacity: 0.45" />
 
-		<i style="color: #c4c4c4;font-size: large;">
-		<div id="brs_version" style="padding-bottom: 20px;padding-left: 210px;" id="loading_dots"><span>.</span><span>.</span><span>.</span> 
+		<i style="color: #c4c4c4;">
+		<div id="brs_version" style="padding-bottom: 20px;padding-left: 210px;" class="loading_dots"><span>.</span><span>.</span><span>.</span> 
 		</div>
 		</i></center>
         <div id="login_panel">
@@ -41,16 +41,6 @@
                 </div>
               </div>
             </div>
-            <div class="lockscreen-item">
-                <label for="node_to_connect" data-i18n="node_to_connect_text" style="color: #c4c4c4;">Connect to node:</label><br />
-                <input type="text" class="form-control" oninput="BRS.checkSelectedNode();" list="nodes" placeholder="Prefered node" data-i18n="[placeholder]prefered_node" name="node_to_connect" id="node_to_connect" /> 
-                <datalist id="nodes">
-                  <option>http://localhost:8125</option>
-                  <option>http://localhost:6876</option>
-                  <option>https://europe.signum.network</option>
-                  <option>https://europe3.testnet.signum.network</option>
-                </datalist>
-            </div>
             <div id="remember_password_container">
               <input type="checkbox" name="remember_password" id="remember_password" /> <label for="remember_password" data-i18n="remember_passphrase_during_session">Remember passphrase on local computer</label>
             </div>
@@ -63,6 +53,40 @@
         <div class="panel panel-default" id="welcome_panel" style="display:none;max-width:500px;">
           <div class="panel-heading"><span class="glyphicon glyphicon-lock"></span> <span data-i18n="welcome_to_burst">Welcome to Signum</span></div>
           <div class="panel-body">
+          <div class="form-group">
+            <label for="start_settings_language" data-i18n="language">Idioma</label>  
+            <select name="language" id="start_settings_language" class="form-control">
+              <option value="en">English (Default)</option><!-- english -->
+              <option value="bg">Български</option><!-- bulgarian -->
+              <option value="ca">Català</option><!-- catalan -->
+              <option value="cs">Čeština</option><!-- czech -->
+              <option value="de-de">Deutsch</option><!-- german -->
+              <option value="el">Ελληνικά</option><!-- greek -->
+              <option value="es-es">Español</option><!-- spanish -->
+              <option value="fi">Suomi</option><!-- finnish -->
+              <option value="fr">Français</option><!-- french -->
+              <option value="gl">Galego</option><!-- galician -->
+              <option value="hi">हिंदी</option><!-- hindi -->
+              <option value="hr">Hrvatski</option><!-- croatian -->
+              <option value="id">Bahasa Indonesia</option><!-- indonesian -->
+              <option value="it">Italiano</option><!-- italian -->
+              <option value="ja">日本語</option><!-- japanese -->
+              <option value="lt">Lietuviškai</option><!-- lithuanian -->
+              <option value="nl">Nederlands</option><!-- dutch -->
+              <option value="sh">Hrvatski</option><!-- croatian -->
+              <option value="sk">Slovensky</option><!-- slovakian -->
+              <option value="pt-pt">Português (Portugal)</option><!-- portugese -->
+              <option value="pt-br">Português (Brazil)</option><!-- portugese -->
+              <option value="sr">Српски</option><!-- serbian, cyrillic -->
+              <option value="sr-cs">Srpski</option><!-- serbian, latin -->
+              <option value="tr">Türk</option><!-- turkish -->
+              <option value="uk">Yкраiнска</option><!-- ukranian -->
+              <option value="ro">Român</option><!-- romanian -->
+              <option value="ru">Русский</option><!-- russian -->
+              <option value="zh-cn">中文 (simplified)</option><!-- chinese simplified -->
+              <option value="zh-tw">中文 (traditional)</option><!-- chinese traditional -->
+            </select>
+          </div>
             <button class="btn btn-primary" id="registration_cancel" onclick="BRS.showLoginScreen();return false;" data-i18n="returning_user_q">Returning User?</button>
             &nbsp;&nbsp;
             <button class="btn btn-success" id="registration_cancel" onclick="BRS.registerAccount();return false;" data-i18n="new_q_create_account">New? Create Your Account!</button>

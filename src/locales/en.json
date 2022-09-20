@@ -551,6 +551,7 @@
     "next_block": "Next Block",
     "next_page": "Next Page",
     "no": "No",
+    "node_to_connect_text": "Node to connect:",
     "none": "None",
     "note": "Note",
     "note_is_encrypted": "This note is encrypted.",

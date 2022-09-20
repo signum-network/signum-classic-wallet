@@ -221,9 +221,12 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.checkSelectedNode = function() {
-        const selectedNode = $("#node_to_connect").val();
+        let selectedNode = $("#node_to_connect").val();
         if (selectedNode.length === 0) {
-            return
+            selectedNode = window.location.protocol + "//" + window.location.hostname
+            if (window.location.port.length !== 0) {
+                selectedNode += ":" + window.location.port
+            }
         }
         BRS.server = selectedNode;
         if (BRS.hasLocalStorage) {
@@ -247,61 +250,76 @@ var BRS = (function(BRS, $, undefined) {
 
         BRS.sendRequest("getBlockchainStatus", function(response) {
             if (response.errorCode) {
+                if (response.errorCode == -1) {
+                    $("#node_alert").show();
+                    $("#brs_version, #brs_version_dashboard").html("<span>.</span><span>.</span><span>.</span>").addClass("loading_dots");
+                }
                 //todo
+                return;
             }
-            else {
-                var firstTime = !("lastBlock" in BRS.state);
-                var previousLastBlock = (firstTime ? "0" : BRS.state.lastBlock);
+            $("#node_alert").hide();
+            const firstTime = !("lastBlock" in BRS.state);
+            const previousLastBlock = (firstTime ? "0" : BRS.state.lastBlock);
 
-                BRS.state = response;
+            BRS.state = response;
 
-                if (firstTime) {
-                    $("#brs_version, #brs_version_dashboard").html(BRS.state.version).removeClass("loading_dots");
-                    BRS.getBlock(BRS.state.lastBlock, BRS.handleInitialBlocks);
+            $("#brs_version, #brs_version_dashboard").html(BRS.state.version + " on " + BRS.server).removeClass("loading_dots");
+            switch (true) {
+            case firstTime:
+                BRS.getBlock(BRS.state.lastBlock, BRS.handleInitialBlocks);
+                break;
+            case BRS.state.isScanning:
+                //do nothing but reset BRS.state so that when isScanning is done, everything is reset.
+                isScanning = true;
+                break;
+            case isScanning:
+                //rescan is done, now we must reset everything...
+                isScanning = false;
+                BRS.blocks = [];
+                BRS.tempBlocks = [];
+                BRS.getBlock(BRS.state.lastBlock, BRS.handleInitialBlocks);
+                if (BRS.account) {
+                    BRS.getInitialTransactions();
+                    BRS.getAccountInfo();
                 }
-                else if (BRS.state.isScanning) {
-                    //do nothing but reset BRS.state so that when isScanning is done, everything is reset.
-                    isScanning = true;
+                break;
+            case (previousLastBlock !== BRS.state.lastBlock):
+                BRS.tempBlocks = [];
+                if (BRS.account) {
+                    BRS.getAccountInfo();
                 }
-                else if (isScanning) {
-                    //rescan is done, now we must reset everything...
-                    isScanning = false;
-                    BRS.blocks = [];
-                    BRS.tempBlocks = [];
-                    BRS.getBlock(BRS.state.lastBlock, BRS.handleInitialBlocks);
-                    if (BRS.account) {
-                        BRS.getInitialTransactions();
-                        BRS.getAccountInfo();
-                    }
+                BRS.getBlock(BRS.state.lastBlock, BRS.handleNewBlocks);
+                if (BRS.account) {
+                    BRS.getNewTransactions();
                 }
-                else if (previousLastBlock !== BRS.state.lastBlock) {
-                    BRS.tempBlocks = [];
-                    if (BRS.account) {
-                        BRS.getAccountInfo();
-                    }
-                    BRS.getBlock(BRS.state.lastBlock, BRS.handleNewBlocks);
-                    if (BRS.account) {
-                        BRS.getNewTransactions();
-                    }
+                break;
+            default:
+                if (BRS.account) {
+                    BRS.getUnconfirmedTransactions(function(unconfirmedTransactions) {
+                        BRS.handleIncomingTransactions(unconfirmedTransactions, false);
+                    });
                 }
-                else {
-                    if (BRS.account) {
-                        BRS.getUnconfirmedTransactions(function(unconfirmedTransactions) {
-                            BRS.handleIncomingTransactions(unconfirmedTransactions, false);
-                        });
-                    }
-                    //only done so that download progress meter updates correctly based on lastFeederHeight
-                    if (BRS.downloadingBlockchain) {
-                        BRS.updateBlockchainDownloadProgress();
-                    }
+                //only done so that download progress meter updates correctly based on lastFeederHeight
+                if (BRS.downloadingBlockchain) {
+                    BRS.updateBlockchainDownloadProgress();
                 }
+            }
 
-                if (callback) {
-                    callback();
-                }
+            if (callback) {
+                callback();
             }
         });
     };
+
+    $("#node_to_connect").on("blur", function() {
+        BRS.getState(null);
+    });
+
+    $("#start_settings_language").on("change", function(e) {
+        e.preventDefault();
+        var value = $(this).val();
+        BRS.updateSettings("language", value);
+    });
 
     $("#logo, .sidebar-menu a").click(function(e, data) {
         if ($(this).hasClass("ignore")) {
