@@ -69,6 +69,8 @@ var BRS = (function(BRS, $, undefined) {
     BRS.appPlatform = "";
     BRS.assetTableKeys = [];
 
+    BRS.loadingDotsHTML = "<span>.</span><span>.</span><span>.</span>"
+
     var stateInterval;
     var stateIntervalSeconds = 30;
     var isScanning = false;
@@ -252,7 +254,7 @@ var BRS = (function(BRS, $, undefined) {
             if (response.errorCode) {
                 if (response.errorCode == -1) {
                     $("#node_alert").show();
-                    $("#brs_version, #brs_version_dashboard").html("<span>.</span><span>.</span><span>.</span>").addClass("loading_dots");
+                    $("#brs_version, #brs_version_dashboard").html(BRS.loadingDotsHTML).addClass("loading_dots");
                 }
                 //todo
                 return;
@@ -449,7 +451,7 @@ var BRS = (function(BRS, $, undefined) {
 
         var $pageHeader = $("#" + BRS.currentPage + "_page .content-header h1");
         $pageHeader.find(".loading_dots").remove();
-        $pageHeader.append("<span class='loading_dots'><span>.</span><span>.</span><span>.</span></span>");
+        $pageHeader.append("<span class='loading_dots'>"+ BRS.loadingDotsHTML + "</span>");
     };
 
     BRS.pageLoaded = function(callback) {

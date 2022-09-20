@@ -412,7 +412,7 @@ var BRS = (function(BRS, $, undefined) {
 
         BRS.blocksPageType = $(this).data("type");
 
-        $("#blocks_average_amount, #blocks_average_fee, #blocks_transactions_per_hour, #blocks_average_generation_time, #forged_blocks_total, #forged_fees_total").html("<span>.</span><span>.</span><span>.</span></span>").addClass("loading_dots");
+        $("#blocks_average_amount, #blocks_average_fee, #blocks_transactions_per_hour, #blocks_average_generation_time, #forged_blocks_total, #forged_fees_total").html(BRS.loadingDotsHTML).addClass("loading_dots");
         $("#blocks_table tbody").empty();
         $("#blocks_table").parent().addClass("data-loading").removeClass("data-empty");
 

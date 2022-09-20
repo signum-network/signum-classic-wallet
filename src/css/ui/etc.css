@@ -84,25 +84,20 @@ brs_update_hashes {
   }
 }
 
-#loading_dots {
-  text-align: center;
-  margin: 100px 0 0 0;
-}
-
-#loading_dots span {
+.loading_dots span {
   animation-name: opacity;
   animation-duration: 1s;
   animation-iteration-count: infinite;
 }
 
-#loading_dots span:nth-child(1) {
+.loading_dots span:nth-child(1) {
   animation-delay: 100ms;
 }
 
-#loading_dots span:nth-child(2) {
+.loading_dots span:nth-child(2) {
   animation-delay: 300ms;
 }
 
-#loading_dots span:nth-child(3) {
+.loading_dots span:nth-child(3) {
   animation-delay: 500ms;
 }
