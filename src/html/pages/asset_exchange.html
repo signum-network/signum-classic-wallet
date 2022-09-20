@@ -149,6 +149,90 @@
               <hr />
               <div class="row">
                 <div class="col-md-6">
+                 <div class="box box-solid box-info collapsed-box" id="buy_asset_box">
+                    <div class="box-header" style="background-color:#DFF0D9;color: #48AB6C;">
+                      <h4 style="margin: 0;" id="buy_asset_with_burst"></h4>
+                      <div class="box-tools pull-right">
+                        <button class="btn btn-info btn-sm" style="background-color: #48AB6C"><i class="fas fa-plus"></i></button>
+                      </div>
+                    </div>
+                    <div class="box-body no-padding" style="display:none">
+                      <div style="background-color:#DFF0D9;color: #666;padding-left:10px;padding-right: 10px;padding-top: 0px;padding-bottom:3px;" id="buy_automatic_price"><strong data-i18n="balance">Balance</strong>: <span id="your_burst_balance"></span> SIGNA</div>
+                      <form role="form" class="form-horizontal" style="padding: 10px;;max-width:350px;margin-left:auto;margin-right:auto;" autocomplete="off">
+                        <div style="margin-left:-20px">
+                          <div class="form-group">
+                            <label for="buy_asset_quantity" class="col-sm-3 control-label" data-i18n="quantity">Quantity</label>
+                            <div class="col-sm-9">
+                              <div class="input-group">
+                                <input id="buy_asset_quantity" type="text" name="buy_asset_quantity" value="0" class="form-control" data-type="buy" />
+                                <span class="input-group-addon"><span class="asset_name"></span></span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="buy_asset_price" class="col-sm-3 control-label" data-i18n="price">Price</label>
+                            <div class="col-sm-9">
+                              <div class="input-group">
+                                <input id="buy_asset_price" type="text" value="0" name="buy_asset_price" class="form-control" data-type="buy" />
+                                <span class="input-group-addon">SIGNA / <span class="asset_name"></span></span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="buy_asset_total" class="col-sm-3 control-label" data-i18n="total">Total</label>
+                            <div class="col-sm-9">
+                              <div class="input-group">
+                                <input type="text" name="buy_asset_total" id="buy_asset_total" readonly value="0" class="form-control disabled" />
+                                <span class="input-group-addon">SIGNA</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="buy_asset_fee" class="col-sm-3 control-label" data-i18n="fee">Fee</label>
+                            <div class="col-sm-9">
+                              <div class="input-group">
+                                <input type="number" id="buy_asset_fee" step="0.01" min="0.01" name="buy_asset_fee" value="0.02" class="form-control" />
+                                <span class="input-group-addon">SIGNA</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group form-group-last">
+                            <div class="col-sm-3"></div>
+                            <div class="col-sm-9">
+                              <button type="button" class="btn btn-primary btn-lg btn-block" id="buy_asset_button" data-toggle="modal" data-target="#asset_order_modal" data-asset="" data-type="Buy"><span data-i18n="buy">Buy</span> (SIGNA → <span class="asset_name"></span>)</button>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                  <div class="box box-success" style="min-height:400px;max-height: 400px;overflow: auto;">
+                    <div class="box-header">
+                      <h3 class="box-title"><span data-i18n="buy_orders">Buy Orders</span> <span id="buy_orders_count"></span></h3>
+                    </div>
+                    <div class="box-body no-padding">
+                      <div class="data-container data-loading" data-no-padding="true">
+                        <table class="table table-striped" id="asset_exchange_bid_orders_table">
+                          <thead>
+                            <tr>
+                              <th data-i18n="account">Account</th>
+                              <th data-i18n="quantity">Quantity</th>
+                              <th data-i18n="price">Price</th>
+                              <th data-i18n="total">Total</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                        </table>
+                        <div class="data-loading-container"><i class="fas fa-circle-notch fa-spin fa-3x" style="display: block;"></i></div>
+                        <div class="data-empty-container">
+                          <p data-i18n="no_buy_orders_for_asset">No buy orders for this asset.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
                   <div class="box box-solid box-info collapsed-box" id="sell_asset_box">
                     <div class="box-header" style="background:#F2DEDE;color:#ED4348;">
                       <h4 style="margin: 0;" id="sell_asset_for_burst"></h4>
@@ -227,90 +311,6 @@
                         <div class="data-loading-container"><i class="fas fa-circle-notch fa-spin fa-3x" style="display: block;"></i></div>
                         <div class="data-empty-container">
                           <p data-i18n="no_sell_orders_for_asset">No sell orders for this asset.</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="box box-solid box-info collapsed-box" id="buy_asset_box">
-                    <div class="box-header" style="background-color:#DFF0D9;color: #48AB6C;">
-                      <h4 style="margin: 0;" id="buy_asset_with_burst"></h4>
-                      <div class="box-tools pull-right">
-                        <button class="btn btn-info btn-sm" style="background-color: #48AB6C"><i class="fas fa-plus"></i></button>
-                      </div>
-                    </div>
-                    <div class="box-body no-padding" style="display:none">
-                      <div style="background-color:#DFF0D9;color: #666;padding-left:10px;padding-right: 10px;padding-top: 0px;padding-bottom:3px;" id="buy_automatic_price"><strong data-i18n="balance">Balance</strong>: <span id="your_burst_balance"></span> SIGNA</div>
-                      <form role="form" class="form-horizontal" style="padding: 10px;;max-width:350px;margin-left:auto;margin-right:auto;" autocomplete="off">
-                        <div style="margin-left:-20px">
-                          <div class="form-group">
-                            <label for="buy_asset_quantity" class="col-sm-3 control-label" data-i18n="quantity">Quantity</label>
-                            <div class="col-sm-9">
-                              <div class="input-group">
-                                <input id="buy_asset_quantity" type="text" name="buy_asset_quantity" value="0" class="form-control" data-type="buy" />
-                                <span class="input-group-addon"><span class="asset_name"></span></span>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <label for="buy_asset_price" class="col-sm-3 control-label" data-i18n="price">Price</label>
-                            <div class="col-sm-9">
-                              <div class="input-group">
-                                <input id="buy_asset_price" type="text" value="0" name="buy_asset_price" class="form-control" data-type="buy" />
-                                <span class="input-group-addon">SIGNA / <span class="asset_name"></span></span>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <label for="buy_asset_total" class="col-sm-3 control-label" data-i18n="total">Total</label>
-                            <div class="col-sm-9">
-                              <div class="input-group">
-                                <input type="text" name="buy_asset_total" id="buy_asset_total" readonly value="0" class="form-control disabled" />
-                                <span class="input-group-addon">SIGNA</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="form-group">
-                            <label for="buy_asset_fee" class="col-sm-3 control-label" data-i18n="fee">Fee</label>
-                            <div class="col-sm-9">
-                              <div class="input-group">
-                                <input type="number" id="buy_asset_fee" step="0.01" min="0.01" name="buy_asset_fee" value="0.02" class="form-control" />
-                                <span class="input-group-addon">SIGNA</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="form-group form-group-last">
-                            <div class="col-sm-3"></div>
-                            <div class="col-sm-9">
-                              <button type="button" class="btn btn-primary btn-lg btn-block" id="buy_asset_button" data-toggle="modal" data-target="#asset_order_modal" data-asset="" data-type="Buy"><span data-i18n="buy">Buy</span> (SIGNA → <span class="asset_name"></span>)</button>
-                            </div>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                  <div class="box box-success" style="min-height:400px;max-height: 400px;overflow: auto;">
-                    <div class="box-header">
-                      <h3 class="box-title"><span data-i18n="buy_orders">Buy Orders</span> <span id="buy_orders_count"></span></h3>
-                    </div>
-                    <div class="box-body no-padding">
-                      <div class="data-container data-loading" data-no-padding="true">
-                        <table class="table table-striped" id="asset_exchange_bid_orders_table">
-                          <thead>
-                            <tr>
-                              <th data-i18n="account">Account</th>
-                              <th data-i18n="quantity">Quantity</th>
-                              <th data-i18n="price">Price</th>
-                              <th data-i18n="total">Total</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                          </tbody>
-                        </table>
-                        <div class="data-loading-container"><i class="fas fa-circle-notch fa-spin fa-3x" style="display: block;"></i></div>
-                        <div class="data-empty-container">
-                          <p data-i18n="no_buy_orders_for_asset">No buy orders for this asset.</p>
                         </div>
                       </div>
                     </div>
