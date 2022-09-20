@@ -265,7 +265,8 @@ var BRS = (function(BRS, $, undefined) {
 
             BRS.state = response;
 
-            $("#brs_version, #brs_version_dashboard").html(BRS.state.version + " on " + BRS.server).removeClass("loading_dots");
+            $("#brs_version").html(BRS.state.version + " on " + BRS.server).removeClass("loading_dots");
+            $("#brs_version_dashboard").html(BRS.state.version).removeClass("loading_dots");
             switch (true) {
             case firstTime:
                 BRS.getBlock(BRS.state.lastBlock, BRS.handleInitialBlocks);
