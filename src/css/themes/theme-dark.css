@@ -176,7 +176,7 @@
 
 /* dropdowns */
 .theme-dark .dropdown-menu {
-    background-color: #222d32;
+    background-color: #222d32 !important;;
 }
 .theme-dark .dropdown-menu li a {
     color: #b8c7ce;
