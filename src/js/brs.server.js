@@ -549,6 +549,11 @@ var BRS = (function(BRS, $, undefined) {
             case "cancelBidOrder":
             case "cancelAskOrder":
             case "issueAsset":
+            case "setAccountInfo":
+            case "setAlias":
+            case "sellAlias":
+            case "sendMoneyMultiSame":
+            case "subscriptionCancel":
                 pos = 185;
                 break;
             default:
