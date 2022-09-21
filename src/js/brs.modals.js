@@ -533,20 +533,19 @@ var BRS = (function(BRS, $, undefined) {
     $(".advanced_info a").on("click", function(e) {
         e.preventDefault();
 
-        var $modal = $(this).closest(".modal");
+        const $modal = $(this).closest(".modal");
 
-        var text = $(this).text().toLowerCase();
+        const text = $(this).text();
 
         if (text == $.t("advanced")) {
-            var not = ".optional_note";
-            $modal.find(".advanced").not(not).fadeIn();
+            $modal.find(".advanced").not(".optional_note").fadeIn();
         } else {
             $modal.find(".advanced").hide();
         }
 
         $modal.find(".advanced_extend").each(function(index, obj) {
-            var normalSize = $(obj).data("normal");
-            var advancedSize = $(obj).data("advanced");
+            const normalSize = $(obj).data("normal");
+            const advancedSize = $(obj).data("advanced");
 
             if (text == "advanced") {
                 $(obj).addClass("col-xs-" + advancedSize + " col-sm-" + advancedSize + " col-md-" + advancedSize).removeClass("col-xs-" + normalSize + " col-sm-" + normalSize + " col-md-" + normalSize);
