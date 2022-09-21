@@ -32,6 +32,7 @@
     "alias_buy": "Alias Buy",
     "alias_data_help": "The alias can contain any data you want.",
     "alias_last_adjusted": "The alias was last adjusted on __timestamp__.",
+    "alias_minimum_fee_help": "The minimum fee to register an alias is 0.2 SIGNA.",
     "alias_name": "Alias Name",
     "alias_sale": "Alias Sale",
     "alias_sale_cancellation": "Alias Sale Cancellation",

@@ -32,6 +32,7 @@
    "alias_buy" : "Compra de Pseudônimo",
    "alias_data_help" : "O pseudônimo pode conter quaisquer dados que você quiser.",
    "alias_last_adjusted" : "O pseudônimo foi ajustado pela última vez em __timestamp__.",
+   "alias_minimum_fee_help": "A tarifa mínima para registrar um pseudônimo é 0.2 SIGNA.",
    "alias_name" : "Nome do Pseudônimo",
    "alias_sale" : "Venda de Pseudônimo",
    "alias_sale_cancellation" : "Cancelamento da Venda de Pseudônimo",

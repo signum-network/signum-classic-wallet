@@ -56,7 +56,7 @@ var BRS = (function(BRS, $, undefined) {
 
     // just to be safe set total display
     var current_fee = parseFloat($("#multi_out_fee").val(), 10);
-    var fee = isNaN(current_fee) ? 1 : (current_fee < 0.00735 ? 0.00735 : current_fee);
+    var fee = BRS.checkMinimumFee(current_fee);
     $("#multi_out_fee").val(fee);
     var total_multi_out = fee;
     var amount_total = 0;
@@ -99,7 +99,7 @@ var BRS = (function(BRS, $, undefined) {
                 var current_fee = parseFloat($("#multi_out_fee").val(), 10);
 
                 var amount = isNaN(current_amount) ? 0.00000001 : (current_amount < 0.00000001 ? 0.00000001 : current_amount);
-                var fee = isNaN(current_fee) ? 1 : (current_fee < 0.00735 ? 0.00735 : current_fee);
+                var fee = BRS.checkMinimumFee(current_fee);
 
                 $("#multi-out-same-amount").val(amount.toFixed(8));
                 $("#multi_out_fee").val(fee.toFixed(8));
@@ -133,7 +133,7 @@ var BRS = (function(BRS, $, undefined) {
             var current_fee = parseFloat($("#multi_out_fee").val(), 10);
 
             var amount = isNaN(current_amount) ? 0.00000001 : (current_amount < 0.00000001 ? 0.00000001 : current_amount);
-            var fee = isNaN(current_fee) ? 1 : (current_fee < 0.00735 ? 0.00735 : current_fee);
+            var fee = BRS.checkMinimumFee(current_fee);
 
             $("#multi-out-same-amount").val(amount.toFixed(8));
             $("#multi_out_fee").val(fee.toFixed(8));
@@ -158,7 +158,7 @@ var BRS = (function(BRS, $, undefined) {
             });
 
             var current_fee = parseFloat($("#multi_out_fee").val(), 10);
-            var fee = isNaN(fee) ? 1 : (current_fee < 0.00735 ? 0.00735 : current_fee);
+            var fee = BRS.checkMinimumFee(current_fee);
             $("#multi_out_fee").val(fee.toFixed(8));
             total_multi_out = amount_total + fee;
 
@@ -178,7 +178,7 @@ var BRS = (function(BRS, $, undefined) {
         });
 
         var current_fee = parseFloat($("#multi_out_fee").val(), 10);
-        var fee = isNaN(current_fee) ? 1 : (current_fee < 0.00735 ? 0.00735 : current_fee);
+        var fee = BRS.checkMinimumFee(current_fee);
         $("#multi_out_fee").val(fee.toFixed(8));
         total_multi_out = amount_total + fee;
 
@@ -192,7 +192,7 @@ var BRS = (function(BRS, $, undefined) {
         var current_fee = parseFloat($("#multi_out_fee").val(), 10);
 
         var amount = isNaN(current_amount) ? 0.00000001 : (current_amount < 0.00000001 ? 0.00000001 : current_amount);
-        var fee = isNaN(current_fee) ? 1 : (current_fee < 0.00735 ? 0.00735 : current_fee);
+        var fee = BRS.checkMinimumFee(current_fee);
 
         $("#multi-out-same-amount").val(amount.toFixed(8));
         $("#multi_out_fee").val(fee.toFixed(8));
@@ -221,7 +221,7 @@ var BRS = (function(BRS, $, undefined) {
                  amount_total += current_amount;
             });
             var current_fee = parseFloat($("#multi_out_fee").val(), 10);
-            var fee = isNaN(current_fee) ? 1 : (current_fee < 0.00735 ? 0.00735 : current_fee);
+            var fee = BRS.checkMinimumFee(current_fee);
             $("#multi_out_fee").val(fee.toFixed(8));
             total_multi_out = amount_total + fee;
             $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " SIGNA");
@@ -239,7 +239,7 @@ var BRS = (function(BRS, $, undefined) {
             });
 
             var current_fee = parseFloat($("#multi_out_fee").val(), 10);
-            var fee = isNaN(current_fee) ? 1 : (current_fee < 0.00735 ? 0.00735 : current_fee);
+            var fee = BRS.checkMinimumFee(current_fee);
             $("#multi_out_fee").val(fee.toFixed(8));
             total_multi_out = amount_total + fee;
 
@@ -249,7 +249,7 @@ var BRS = (function(BRS, $, undefined) {
 
     $("#multi_out_fee").on("change", function(e) {
         var current_fee = parseFloat($(this).val(), 10);
-        var fee = isNaN(current_fee) ? 1 : (current_fee < 0.00735 ? 0.00735 : current_fee);
+        var fee = BRS.checkMinimumFee(current_fee);
 
         $("#multi_out_fee").val(fee.toFixed(8));
 

@@ -70,6 +70,7 @@ var BRS = (function(BRS, $, undefined) {
     BRS.assetTableKeys = [];
 
     BRS.loadingDotsHTML = "<span>.</span><span>.</span><span>.</span>"
+    BRS.minimumFeeNumber = 0.01;
 
     var stateInterval;
     var stateIntervalSeconds = 30;
@@ -936,6 +937,11 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
+    /** Checks if a Number is valid and greater than minimum fee. If not, return minimum fee */
+    BRS.checkMinimumFee = function (value) {
+        return (isNaN(value) ? BRS.minimumFeeNumber : (value < BRS.minimumFeeNumber ? BRS.minimumFeeNumber : value));
+    };
+    
     BRS.showFeeSuggestions = function(input_fee_field_id, response_span_id, fee_id){
     	$("[name='suggested_fee_spinner']").removeClass("suggested_fee_spinner_display_none");
     	 BRS.sendRequest("suggestFee", {

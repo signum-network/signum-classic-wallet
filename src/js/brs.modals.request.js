@@ -54,7 +54,7 @@ var BRS = (function(BRS, $, undefined) {
        $("#request_burst_fee").change(function() {
          var fee = Number($("#request_burst_fee").val());
          $("#request_burst_fee").val(fee);
-         if(fee >= 0.00735)
+         if(fee >= BRS.minimumFeeNumber)
          {
              for(var i = 0; i < radio.length; i++) {
                radio[i].checked = false;
@@ -117,7 +117,7 @@ var BRS = (function(BRS, $, undefined) {
               if(radio[i].checked == true)
               var suggested_fee = radio[i].value;
             }
-            if((!fee || fee < 0.00735) && !suggested_fee)
+            if((!fee || fee < BRS.minimumFeeNumber) && !suggested_fee)
             {
               $("#request_burst_fee_div").toggleClass("has-success",false);
               $("#request_burst_fee_div").toggleClass("has-error",true);

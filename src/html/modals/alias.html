@@ -41,7 +41,7 @@
           <div class="form-group">
             <label for="transfer_alias_fee" data-i18n="fee">FEE</label>
             <div class="input-group">
-              <input type="number" name="feeNXT" id="transfer_alias_fee" class="form-control" step="any" min="0.00735" placeholder="Fee" data-i18n="[placeholder]fee" data-default="0.1" value="0.1" tabindex="4">
+              <input type="number" name="feeNXT" id="transfer_alias_fee" class="form-control" step="0.01" min="0.01" placeholder="Fee" data-i18n="[placeholder]fee" data-default="0.01" value="0.01" tabindex="4">
               <span class="input-group-addon">SIGNA</span>
             </div>
             <div class="padding-top-5 padding-bottom-5 font-size-14">
@@ -119,16 +119,10 @@
             <p class="help-block" id="register_alias_help"></p>
           </div>
           <div class="form-group">
-            <label for="register_alias_fee" data-i18n="fee">FEE</label>
+            <label for="register_alias_fee" data-i18n="fee">FEE</label> <i class="fas fa-question-circle show_popover" data-content="The minimum fee to register an alias is 0.2 SIGNA." data-i18n="[data-content]alias_minimum_fee_help" data-container="body" style="color:red" data-original-title="" title=""></i>
             <div class="input-group">
-              <input type="number" name="feeNXT" id="register_alias_fee" class="form-control" step="any" min="0.00735" placeholder="Fee" data-i18n="[placeholder]fee" data-default="0.1" value="0.1" tabindex="3">
+              <input type="number" name="feeNXT" id="register_alias_fee" class="form-control" step="0.01" min="0.2" placeholder="Fee" data-i18n="[placeholder]fee" data-default="0.2" value="0.2" tabindex="3">
               <span class="input-group-addon">SIGNA</span>
-            </div>
-            <div class="padding-top-5 padding-bottom-5 font-size-14">
-              <span class="suggested_fee" data-i18n="[title]click_to_refresh"><a href="#" class="btn btn-suggested-fee btn-xs" id="suggested_fee_alias_register" data-i18n="suggested_fee">Suggested fee:</a></span>
-              <span id="suggested_fee_response_alias_register" class="suggested_fee margin-left-5"></span>
-              <span class="suggested_fee margin-left-10" data-toggle="tooltip" data-placement="top" data-html="true"  data-i18n="[title]suggested_fee_help"><i class="fa fa-info" aria-hidden="true"></i></span>
-              <span class="suggested_fee margin-left-10 suggested_fee_spinner_display_none" name="suggested_fee_spinner"><i class="fa fa-spinner fa-spin fa-fw text-danger"></i></span>
             </div>
           </div>
           <div class="form-group advanced">
@@ -196,7 +190,7 @@
           <div class="form-group">
             <label for="buy_alias_fee" data-i18n="fee">FEE</label>
             <div class="input-group">
-              <input type="number" name="feeNXT" id="buy_alias_fee" class="form-control" step="any" min="0.00735" placeholder="Fee" data-i18n="[placeholder]fee" data-default="0.1" value="0.1" tabindex="2">
+              <input type="number" name="feeNXT" id="buy_alias_fee" class="form-control" step="0.01" min="0.01" placeholder="Fee" data-i18n="[placeholder]fee" data-default="0.01" value="0.01" tabindex="2">
               <span class="input-group-addon">SIGNA</span>
             </div>
           </div>
@@ -299,7 +293,7 @@
               <div class="form-group padding-left-5 padding-right-5">
                 <label for="sell_alias_fee" data-i18n="fee">FEE</label>
                 <div class="input-group">
-                  <input type="number" name="feeNXT" id="sell_alias_fee" class="form-control" step="any" min="0.00735" placeholder="Fee" data-i18n="[placeholder]fee" data-default="0.1" value="0.1" tabindex="4">
+                  <input type="number" name="feeNXT" id="sell_alias_fee" class="form-control" step="0.01" min="0.01" placeholder="Fee" data-i18n="[placeholder]fee" data-default="0.01" value="0.01" tabindex="4">
                   <span class="input-group-addon">SIGNA</span>
                 </div>
                 <div class="padding-top-5 padding-bottom-5 font-size-14">
@@ -386,7 +380,7 @@
               <div class="form-group">
                 <label for="cancel_alias_sale_fee" data-i18n="fee">FEE</label>
                 <div class="input-group">
-                  <input type="number" name="feeNXT" id="cancel_alias_sale_fee" class="form-control" step="any" min="0.00735" placeholder="Fee" data-i18n="[placeholder]fee" data-default="0.1" value="0.1" tabindex="1">
+                  <input type="number" name="feeNXT" id="cancel_alias_sale_fee" class="form-control" step="0.01" min="0.01" placeholder="Fee" data-i18n="[placeholder]fee" data-default="0.01" value="0.01" tabindex="1">
                   <span class="input-group-addon">SIGNA</span>
                 </div>
               </div>
