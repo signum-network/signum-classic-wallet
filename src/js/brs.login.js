@@ -27,7 +27,8 @@ var BRS = (function(BRS, $, undefined) {
         $("#account_phrase_custom_panel, #account_phrase_generator_panel, #welcome_panel, #custom_passphrase_link").hide();
         $("#account_phrase_custom_panel :input:not(:button):not([type=submit])").val("");
         $("#account_phrase_generator_panel :input:not(:button):not([type=submit])").val("");
-        $("#login_panel").show();
+        $("#login_panel, #server_select").show();
+        
         setTimeout(function() {
             $("#login_password").focus();
         }, 10);
@@ -35,7 +36,7 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.showWelcomeScreen = function() {
         $("#login_panel, account_phrase_custom_panel, #account_phrase_generator_panel, #account_phrase_custom_panel, #welcome_panel, #custom_passphrase_link").hide();
-        $("#welcome_panel").show();
+        $("#welcome_panel, #server_select").show();
     };
 
     BRS.registerUserDefinedAccount = function() {
@@ -327,6 +328,7 @@ var BRS = (function(BRS, $, undefined) {
             setTimeout(function() {
                 $("#login_password").focus();
             }, 10);
+            $("#server_select").show()
         }
         else {
             BRS.showWelcomeScreen();
