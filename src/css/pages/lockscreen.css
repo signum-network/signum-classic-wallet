@@ -104,7 +104,7 @@ html.lockscreen, html.lockscreen body {
   color: rgba(255,255,255,1.0);
 }
 
-#login_panel #remember_password_container label {
+#login_panel {
   color: rgba(255,255,255,0.7);
 }
 

@@ -9,7 +9,7 @@ var BRS = (function(BRS, $, undefined) {
             if (e.which === '13') {
                 e.preventDefault();
                 var password = $("#login_password").val();
-                BRS.login(password);
+                BRS.loginWithPassphrase(password);
             }
         });
     };
@@ -91,7 +91,7 @@ var BRS = (function(BRS, $, undefined) {
         }
         else {
             BRS.newlyCreatedAccount = true;
-            BRS.login(password);
+            BRS.loginWithPassphrase(password);
             PassPhraseGenerator.reset();
             $("#account_phrase_generator_panel textarea").val("");
             $("#account_phrase_generator_panel .step_3 .callout").hide();
@@ -121,42 +121,54 @@ var BRS = (function(BRS, $, undefined) {
         }
         else {
             $("#registration_password, #registration_password_repeat").val("");
-            BRS.login(password);
+            BRS.loginWithPassphrase(password);
         }
     });
 
-    BRS.login = function(password, callback) {
+    BRS.loginCommon = function () {
 
-        BRS.checkSelectedNode();
+        if (BRS.state) {
+            BRS.checkBlockHeight();
+        }
 
-        if (!password.length) {
-            $.notify($.t("error_passphrase_required_login"), {
+        BRS.getAccountInfo(true, null);
+
+        BRS.unlock();
+
+        if (BRS.isOutdated) {
+            $.notify($.t("brs_update_available"), {
+                type: 'danger',
+        offset: {
+            x: 5,
+            y: 60
+            }
+            });
+        }
+
+        if (!BRS.downloadingBlockchain) {
+            BRS.checkIfOnAFork();
+        }
+
+        BRS.setupClipboardFunctionality();
+
+        BRS.checkLocationHash(BRS.getEncryptionPassword());
+
+        $(window).on("hashchange", BRS.checkLocationHash);
+
+        BRS.getInitialTransactions();
+    };
+
+    BRS.loginWithAccount = function(account) {
+        account = account.trim();
+        if (!account.length) {
+            $.notify($.t("error_account_required_login"), {
                 type: 'danger',
                 offset: 10
             });
             return;
         }
-        else if (!BRS.isTestNet && password.length < 12 && $("#login_check_password_length").val() == 1) {
-            $("#login_check_password_length").val(0);
-            $("#login_error .callout").html($.t("error_passphrase_login_length"));
-            $("#login_error").show();
-            return;
-        }
-        else {
-            BRS.settings.remember_passphrase = $("#remember_password").is(":checked");
-            BRS.applySettings("remember_passphrase");
-            if ( BRS.hasLocalStorage ) {
-                if ( BRS.settings.remember_passphrase ) {
-                    localStorage.setItem("burst.passphrase", $("#login_password").val());
-                }
-                else {
-                    localStorage.removeItem("burst.passphrase");
-                }
-            }
-        }
 
-        $("#login_password, #registration_password, #registration_password_repeat").val("");
-        $("#login_check_password_length").val(1);
+        BRS.checkSelectedNode();
 
         BRS.sendRequest("getBlockchainStatus", function(response) {
             if (response.errorCode) {
@@ -164,158 +176,142 @@ var BRS = (function(BRS, $, undefined) {
                     type: 'danger',
                     offset: 10
                 });
-
                 return;
             }
 
             BRS.state = response;
 
-            var login_response_function = function(response) {
-                if (!response.errorCode) {
-                    BRS.account = String(response.account).escapeHTML();
-                    BRS.accountRS = String(response.accountRS).escapeHTML();
-                    BRS.publicKey = BRS.getPublicKey(converters.stringToHexString(password));
-                    BRS.accountRSExtended = BRS.accountRS + '-' + new BigNumber(BRS.publicKey, 16).toString(36).toUpperCase();
-                }
-
-                if (!BRS.account) {
-                    $.notify($.t("error_find_account_id"), {
+            // Get the account information for the given address
+            BRS.sendRequest("getAccount", {
+                "account": account
+            }, function(response) {
+                if (response.errorCode) {
+                    if (BRS.rsRegEx.test(account) || BRS.idRegEx.test(account)) {
+                        $.notify($.t("error_account_unknow_watch_only"), {
+                            type: 'danger',
+                            offset: { x: 5, y: 60 }
+                        });
+                        return;
+                    }
+                    // Otherwise, show an error.  The address is in the right format perhaps, but
+                    // an address does not exist on the blockchain so there's nothing to see.
+                    $.notify("<strong>" + $.t("warning") + "</strong>: " + response.errorDescription, {
                         type: 'danger',
-                        offset: 10
-                    });
-                    return;
-                }
-                else if (!BRS.accountRS) {
-                    $.notify($.t("error_generate_account_id"), {
-                        type: 'danger',
-                        offset: 10
+                        offset: { x: 5, y: 60 }
                     });
                     return;
                 }
 
-                var watch_only = response.watch_only;
+                BRS.account = response.account;
+                BRS.accountRS = response.accountRS;
+                BRS.publicKey = response.publicKey;
+                BRS.accountRSExtended = response.accountRSExtended;
+
+                $("#login_password, #login_account, #registration_password, #registration_password_repeat").val("");
+                $("#login_check_password_length").val(1);
+                $.notify($.t("success_login_watch_only"), {
+                    type: 'success',
+                    offset: { x: 5, y: 60 }
+                });
+                $("#account_id").html(String(BRS.accountRS).escapeHTML());
+
+                BRS.loginCommon();
+            });
+
+        });
+    }
+
+    BRS.loginWithPassphrase = function(passphrase) {
+        if (!passphrase.length) {
+            $.notify($.t("error_passphrase_required_login"), {
+                type: 'danger',
+                offset: 10
+            });
+            return;
+        }
+
+        BRS.checkSelectedNode();
+
+        if (!BRS.isTestNet && passphrase.length < 12 && $("#login_check_password_length").val() == 1) {
+            $("#login_check_password_length").val(0);
+            $("#login_error .callout").html($.t("error_passphrase_login_length"));
+            $("#login_error").show();
+            return;
+        }
+
+        BRS.settings.remember_passphrase = $("#remember_password").is(":checked");
+        BRS.applySettings("remember_passphrase");
+        if ( BRS.hasLocalStorage ) {
+            if ( BRS.settings.remember_passphrase ) {
+                localStorage.setItem("burst.passphrase", $("#login_password").val());
+            }
+            else {
+                localStorage.removeItem("burst.passphrase");
+            }
+        }
+
+        BRS.sendRequest("getBlockchainStatus", function(response) {
+            if (response.errorCode) {
+                $.notify($.t("error_server_connect"), {
+                    type: 'danger',
+                    offset: 10
+                });
+                return;
+            }
+
+            BRS.state = response;
+
+            // Standard login logic
+            // this is done locally..  'sendRequest' has special logic to prevent
+            // transmitting the passphrase to the server unncessarily via BRS.getAccountId()
+            BRS.sendRequest("getAccountId", {
+                "secretPhrase": passphrase
+            }, function(response) {
+                // this hardcoded 'getAccountId' never returns errorCode.
+                BRS.account = response.account;
+                BRS.accountRS = response.accountRS;
+                BRS.publicKey = BRS.getPublicKey(converters.stringToHexString(passphrase));
+                BRS.accountRSExtended = BRS.accountRS + '-' + new BigNumber(BRS.publicKey, 16).toString(36).toUpperCase();
+
                 BRS.sendRequest("getAccountPublicKey", {
                     "account": BRS.account
                 }, function(response) {
-                    if (response && response.publicKey && response.publicKey !== BRS.generatePublicKey(password)) {
-                        if (watch_only !== true) {
-                            $.notify($.t("error_account_taken"), {
-                                type: 'danger',
-                                offset: 10
-                            });
-                            return;
-                        }
-                        else {
-                            // Can't use stadard 'dashboard_status' div because it is cleared by other functions.
-                            // So create a similar div for this purpose
-                            $(".content").prepend($('<div class="alert-danger alert alert-no-icon" style="padding: 5px; margin-bottom: 15px;">You are logged in as a watch-only address.  You will need the full passphrase for most operations.</div>'));
-                        }
+                    if (response && response.publicKey && response.publicKey !== BRS.publicKey) {
+                        $.notify($.t("error_account_taken"), {
+                            type: 'danger',
+                            offset: 10
+                        });
+                        return;
                     }
 
-                    if (watch_only !== true && $("#remember_password").is(":checked")) {
+                    let passwordNotice = "";
+                    if (passphrase.length < 35) {
+                        passwordNotice = $.t("error_passphrase_length_secure");
+                    } else if (passphrase.length < 50 && (!passphrase.match(/[A-Z]/) || !passphrase.match(/[0-9]/))) {
+                        passwordNotice = $.t("error_passphrase_strength_secure");
+                    }
+                    if (passwordNotice) {
+                        $.notify("<strong>" + $.t("warning") + "</strong>: " + passwordNotice, {
+                            type: 'danger',
+                            offset: { x: 5, y: 60 }
+                        });
+                    }
+
+                    if ($("#remember_password").is(":checked")) {
                         BRS.rememberPassword = true;
                         $("#remember_password").prop("checked", false);
-                        BRS.setPassword(password);
+                        BRS.setPassword(passphrase);
                         $(".secret_phrase, .show_secret_phrase").hide();
                         $(".hide_secret_phrase").show();
                     }
 
+                    $("#login_password, #login_account, #registration_password, #registration_password_repeat").val("");
+                    $("#login_check_password_length").val(1);
                     $("#account_id").html(String(BRS.accountRS).escapeHTML());
-
-                    var passwordNotice = "";
-
-                    if (watch_only !== true && password.length < 35) {
-                        passwordNotice = $.t("error_passphrase_length_secure");
-                    }
-                    else if (password.length < 50 && (!password.match(/[A-Z]/) || !password.match(/[0-9]/))) {
-                        passwordNotice = $.t("error_passphrase_strength_secure");
-                    }
-
-                    if (passwordNotice) {
-                        $.notify("<strong>" + $.t("warning") + "</strong>: " + passwordNotice, {
-                            type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                        });
-                    }
-
-                    if (BRS.state) {
-                        BRS.checkBlockHeight();
-                    }
-
-                    BRS.getAccountInfo(true, null);
-
-                    BRS.unlock();
-
-                    if (BRS.isOutdated) {
-                        $.notify($.t("brs_update_available"), {
-                            type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                        });
-                    }
-
-                    if (!BRS.downloadingBlockchain) {
-                        BRS.checkIfOnAFork();
-                    }
-
-                    BRS.setupClipboardFunctionality();
-
-                    if (callback) {
-                        callback();
-                    }
-
-                    BRS.checkLocationHash(password);
-
-                    $(window).on("hashchange", BRS.checkLocationHash);
-
-                    BRS.getInitialTransactions();
+            
+                    BRS.loginCommon();
                 });
-            };
-
-            if ((password.trim().toUpperCase().substring(0, 6) === "BURST-" && password.length === 26) ||
-                (password.trim().toUpperCase().substring(0, 2) === "S-" && password.length === 22) ||
-                (password.trim().toUpperCase().substring(0, 3) === "TS-" && password.length === 23)) {
-                // Login to a watch-only address
-                var account_id = password.trim();
-
-                // Get the account information for the given address
-                BRS.sendRequest("getAccount", {
-                    "account": account_id
-                }, function(response) {
-                    // If it is successful, set the "watch_only" flag and all the standard
-                    // login response logic.
-                    if (!response.errorCode) {
-                        response.watch_only = true;  // flag to tell later code to disable some checks.
-                        login_response_function(response);
-                    }
-                    else {
-                        // Otherwise, show an error.  The address is in the right format perhaps, but
-                        // an address does not exist on the blockchain so there's nothing to see.
-                        $.notify("<strong>" + $.t("warning") + "</strong>: " + response.errorDescription, {
-                            type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                        });
-                    }
-                });
-            }
-            else {
-                // Standard login logic
-                // this is done locally..  'sendRequest' has special logic to prevent
-                // transmitting the passphrase to the server unncessarily via BRS.getAccountId()
-                BRS.sendRequest("getAccountId", {
-                    "secretPhrase": password
-                }, login_response_function);
-            }
-
-
+            });
         });
     };
 
@@ -341,9 +337,6 @@ var BRS = (function(BRS, $, undefined) {
         if (BRS.hasLocalStorage && !localStorage.getItem("logged_in")) {
             localStorage.setItem("logged_in", true);
         }
-
-
-        //	$(".content-splitter-right").css("bottom", (contentHeaderHeight + navBarHeight + 10) + "px");
 
         $("#lockscreen").hide();
         $("body, html").removeClass("lockscreen");

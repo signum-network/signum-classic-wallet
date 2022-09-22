@@ -21,7 +21,7 @@
           <img src="img/signum_logo.png" alt="Signum" width="242" height="64" style="margin-right:20px; opacity: 0.45" />
 
 		<i style="color: #c4c4c4;">
-		<div id="brs_version" style="padding-bottom: 20px;padding-left: 210px;" class="loading_dots"><span>&#149;</span><span>&#149;</span><span>&#149;</span> 
+		<div id="brs_version" style="padding-bottom: 20px;" class="loading_dots"><span>&#149;</span><span>&#149;</span><span>&#149;</span> 
 		</div>
 		</i></center>
         <div id="login_panel">
@@ -30,12 +30,24 @@
             <div class="callout callout-danger"></div>
           </div>
           <form>
+            <p data-i18n="login_with_account">Login as watcher (no pass needed):</p>
+            <div class="lockscreen-item">
+              <div class="lockscreen-credentials">
+                <div class="input-group">
+                  <input type="text" class="form-control" id="login_account" name="login_account" placeholder="S-AAAA-BBBB-CCCC-DDDDD" />
+                  <div class="input-group-btn">
+                    <button class="btn btn-login" onclick="BRS.loginWithAccount($('#login_account').val()); return false;"><i class="fas fa-arrow-right text-muted"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p data-i18n="login_with_passphrase">Login with passphrase:</p>
             <div class="lockscreen-item">
               <div class="lockscreen-credentials">
                 <div class="input-group">
                   <input type="password" class="form-control" id="login_password" name="login_password" placeholder="Your Passphrase" data-i18n="[placeholder]your_passphrase" autocomplete="" autofocus />
                   <div class="input-group-btn">
-                    <button class="btn btn-login" onclick="BRS.login($('#login_password').val()); return false;"><i class="fas fa-arrow-right text-muted"></i></button>
+                    <button class="btn btn-login" onclick="BRS.loginWithPassphrase($('#login_password').val()); return false;"><i class="fas fa-arrow-right text-muted"></i></button>
                   </div>
                   <input type="hidden" name="check_password_length" id="login_check_password_length" value="1" />
                 </div>
@@ -46,7 +58,6 @@
             </div>
           </form>
           <div id="registration_link">
-            <a href="#" data-i18n="watch_only_mode" title="Ex: S-AAAA-BBBB-CCCC-DDDDD">You can use an account as passphrase to login in watch-only mode</a><br><br>
             <a href="#" onclick="BRS.registerAccount();" data-i18n="no_account_q_create_account">Don't have an account? Click here to create one!</a>
           </div>
         </div>

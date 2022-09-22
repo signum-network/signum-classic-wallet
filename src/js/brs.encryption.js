@@ -326,6 +326,10 @@ var BRS = (function(BRS, $, undefined) {
 	_password = password;
     };
 
+    BRS.getEncryptionPassword = function() {
+        return _password;
+    };
+
     BRS.setDecryptionPassword = function(password) {
 	_decryptionPassword = password;
     };
