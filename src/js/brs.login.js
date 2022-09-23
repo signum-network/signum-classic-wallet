@@ -27,7 +27,7 @@ var BRS = (function(BRS, $, undefined) {
         $("#account_phrase_custom_panel, #account_phrase_generator_panel, #welcome_panel, #custom_passphrase_link").hide();
         $("#account_phrase_custom_panel :input:not(:button):not([type=submit])").val("");
         $("#account_phrase_generator_panel :input:not(:button):not([type=submit])").val("");
-        $("#login_panel, #server_select").show();
+        $("#login_panel").show();
         
         setTimeout(function() {
             $("#login_password").focus();
@@ -36,7 +36,7 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.showWelcomeScreen = function() {
         $("#login_panel, account_phrase_custom_panel, #account_phrase_generator_panel, #account_phrase_custom_panel, #welcome_panel, #custom_passphrase_link").hide();
-        $("#welcome_panel, #server_select").show();
+        $("#welcome_panel").show();
     };
 
     BRS.registerUserDefinedAccount = function() {
@@ -127,6 +127,8 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.loginCommon = function () {
 
+        BRS.updateSettings("prefered_node", BRS.server);
+
         if (BRS.state) {
             BRS.checkBlockHeight();
         }
@@ -202,6 +204,9 @@ var BRS = (function(BRS, $, undefined) {
                     return;
                 }
 
+                BRS.updateSettings("remember_account", $("#remember_account").is(":checked"));
+                BRS.updateSettings("remember_account_account", account);
+
                 BRS.account = response.account;
                 BRS.accountRS = response.accountRS;
                 BRS.publicKey = response.publicKey;
@@ -239,16 +244,7 @@ var BRS = (function(BRS, $, undefined) {
             return;
         }
 
-        BRS.settings.remember_passphrase = $("#remember_password").is(":checked");
-        BRS.applySettings("remember_passphrase");
-        if ( BRS.hasLocalStorage ) {
-            if ( BRS.settings.remember_passphrase ) {
-                localStorage.setItem("burst.passphrase", $("#login_password").val());
-            }
-            else {
-                localStorage.removeItem("burst.passphrase");
-            }
-        }
+        BRS.updateSettings("remember_passphrase", $("#remember_password").is(":checked"));
 
         BRS.sendRequest("getBlockchainStatus", function(response) {
             if (response.errorCode) {
@@ -324,13 +320,13 @@ var BRS = (function(BRS, $, undefined) {
             setTimeout(function() {
                 $("#login_password").focus();
             }, 10);
-            $("#server_select").show()
         }
         else {
             BRS.showWelcomeScreen();
         }
 
-        $("#center").show();
+        $("#lockscreen_loading").hide();
+        $("#lockscreen_content").show();
     };
 
     BRS.unlock = function() {

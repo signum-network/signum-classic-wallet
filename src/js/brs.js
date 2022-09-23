@@ -48,6 +48,7 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.isTestNet = false;
     BRS.prefix = "S-"
+    BRS.valueSuffix = "SIGNA";
 
     BRS.lastBlockHeight = 0;
     BRS.downloadingBlockchain = false;
@@ -87,29 +88,11 @@ var BRS = (function(BRS, $, undefined) {
             BRS.getSettings();
         });
 
-        if (BRS.hasLocalStorage) {
-            const preferedNode = localStorage.getItem("burst.node");
-            if ( preferedNode !== null && preferedNode.length) {
-                $("#node_to_connect").val(preferedNode);
-            }
-        }
-
-        BRS.getState(null);
-        BRS.showLockscreen();
-
-        if ( BRS.getCookie("remember_passphrase") ) {
-            $("#remember_password").prop("checked", true);
-            if ( BRS.hasLocalStorage ) {
-                $("#remember_password_container").show();
-                var passphrase = localStorage.getItem("burst.passphrase");
-                if ( passphrase !== null && passphrase.length) {
-                    $("#login_password").val(passphrase);
-                }
-            }
-            else {
-                $("#remember_password_container").hide();
-            }
-        }
+        // Give some more time to loading settings
+        setTimeout(function (){
+            BRS.getState();
+            BRS.showLockscreen();
+        }, 250);
 
         if (window.parent) {
             var match = window.location.href.match(/\?app=?(win|mac|lin)?\-?([\d\.]+)?/i);
@@ -224,27 +207,32 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.checkSelectedNode = function() {
-        let selectedNode = $("#node_to_connect").val();
-        if (selectedNode.length === 0) {
-            selectedNode = window.location.protocol + "//" + window.location.hostname
+        let preferedNode = $("#prefered_node").val();
+        if (preferedNode.length === 0) {
+            preferedNode = window.location.protocol + "//" + window.location.hostname
             if (window.location.port.length !== 0) {
-                selectedNode += ":" + window.location.port
+                preferedNode += ":" + window.location.port
             }
         }
-        BRS.server = selectedNode;
-        if (BRS.hasLocalStorage) {
-            localStorage.setItem("burst.node", selectedNode);
-        }
-        if (selectedNode.includes("testnet") || selectedNode.includes("6876")) {
-            BRS.isTestNet = true;
-            BRS.prefix = "TS-"
-            $(".testnet_only, #testnet_login, #testnet_warning").show();
-            $(".testnet_only").show();
-        } else {
-            BRS.isTestNet = false;
-            BRS.prefix = "S-"
-            $(".testnet_only, #testnet_login, #testnet_warning").hide();
-            $(".testnet_only").hide();
+        if (preferedNode != BRS.server) {
+            // Server changed, get new network details
+            BRS.server = preferedNode;
+            BRS.sendRequest("getConstants", function(response) {
+                if (response.errorCode) {
+                    return;
+                }
+                if (response.networkName.includes("TESTNET")) {
+                    BRS.isTestNet = true;
+                    $(".testnet_only, #testnet_login, #testnet_warning").show();
+                    $(".testnet_only").show();
+                } else {
+                    BRS.isTestNet = false;
+                    $(".testnet_only, #testnet_login, #testnet_warning").hide();
+                    $(".testnet_only").hide();
+                }
+                BRS.prefix = response.addressPrefix + "-";
+                BRS.valueSuffix = response.valueSuffix;
+            });
         }
     }
 
@@ -315,7 +303,7 @@ var BRS = (function(BRS, $, undefined) {
         });
     };
 
-    $("#node_to_connect").on("blur", function() {
+    $("#prefered_node").on("blur", function() {
         BRS.getState(null);
     });
 
