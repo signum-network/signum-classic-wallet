@@ -34,7 +34,7 @@
               <div class="input-group">
                 <input type="text" class="form-control" id="login_account" name="login_account" placeholder="S-AAAA-BBBB-CCCC-DDDDD" />
                 <span class="input-group-btn btn-group recipient_selector">
-                  <button type="button" class="btn btn-default" onclick="BRS.loginWithAccount($('#login_account').val());" ><span class="fas fa-arrow-right text-muted"></span></button>
+                  <button type="button" class="btn btn-default" onclick="BRS.loginWithAccount($('#login_account').val()); return false;" ><span class="fas fa-arrow-right text-muted"></span></button>
                 </span>
               </div>
               <input type="checkbox" name="remember_account" id="remember_account" /> <label for="remember_account" class="checkbox-label" data-i18n="remember_account">Remember this account</label>
@@ -44,7 +44,7 @@
               <div class="input-group">
                 <input type="password" class="form-control" id="login_password" name="login_password" placeholder="Your Passphrase" data-i18n="[placeholder]your_passphrase" autocomplete="" autofocus />
                 <span iv class="input-group-btn btn-group recipient_selector">
-                  <button class="btn btn-login" onclick="BRS.loginWithPassphrase($('#login_password').val());"><span class="fas fa-arrow-right text-muted"></span></button>
+                  <button class="btn btn-login" onclick="BRS.loginWithPassphrase($('#login_password').val()); return false;"><span class="fas fa-arrow-right text-muted"></span></button>
                 </span>
               </div>
               <input type="checkbox" name="remember_password" id="remember_password" /> <label for="remember_password" class="checkbox-label" data-i18n="remember_passphrase_during_session">Remember passphrase on during session</label>
