@@ -8,11 +8,12 @@ If you still prefer this old fashion, fell free to use.
 ## Project scope
 
 - Just keep it working, no new features.
-- Personal project: this is like a puzzle for me, no pressure.
+- This is code is like a puzzle, please no pressure.
 
 ## Known issues
 
-This project depends on YOU opening issues to tell me what it is not working.
+* Loading can take a while. The project has a lot of files to be downloaded during page load.
+* Please open issues to tell what it is not working/buggy.
 
 ## How to use
 
@@ -26,4 +27,4 @@ OR
 
 ## Security advice
 - Transactions are signed on browser, no passphrase transmitted to servers.
-- The passphrase will be saved on browser localStorage without encryption if "Remeber passphrase" is checked. This mean, your passphrase can be stolen if a hacker have physical access to the computer or if the browser profile data copied.
+- Use a password manager integrated with your browser to speed up login. Classic does not store the passphrase on disc, just in memory and if selected "Remember passphrase on this session".
