@@ -158,10 +158,6 @@ var BRS = (function(BRS, $, undefined) {
 
         $(".sidebar .treeview").tree();
 
-        $("#dgs_search_account_top, #dgs_search_account_center").mask("BURST-****-****-****-*****", {
-            "unmask": false
-        });
-
         /*
           $("#asset_exchange_search input[name=q]").addClear({
           right: 0,
@@ -1031,9 +1027,6 @@ $(document).ready(function() {
         { location: 'body', path: 'html/modals/block_info.html' },
         { location: 'body', path: 'html/modals/brs.html' },
         { location: 'body', path: 'html/modals/contact.html' },
-        { location: 'body', path: 'html/modals/crowd_fund_project.html' },
-        { location: 'body', path: 'html/modals/deployCrowd.html' },
-        { location: 'body', path: 'html/modals/dgs.html' },
         { location: 'body', path: 'html/modals/dividends.html' },
         { location: 'body', path: 'html/modals/escrow.html' },
         { location: 'body', path: 'html/modals/messages_decrypt.html' },
@@ -1051,7 +1044,6 @@ $(document).ready(function() {
         { location: 'body', path: 'html/modals/sign_message.html' },
         { location: '#sidebar', path: 'html/sidebar.html' },
         { location: '#content', path: 'html/pages/dashboard.html' },
-        { location: '#content', path: 'html/pages/crowdfund.html' },
         { location: '#content', path: 'html/pages/transactions.html' },
         { location: '#content', path: 'html/pages/aliases.html' },
         { location: '#content', path: 'html/pages/messages.html' },
@@ -1059,7 +1051,6 @@ $(document).ready(function() {
         { location: '#content', path: 'html/pages/asset_exchange.html' },
         { location: '#content', path: 'html/pages/settings.html' },
         { location: '#content', path: 'html/pages/peers.html' },
-        { location: '#content', path: 'html/pages/dgs.html' },
         { location: '#content', path: 'html/pages/blocks.html' },
     ]
 
