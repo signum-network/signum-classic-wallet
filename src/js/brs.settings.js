@@ -153,24 +153,5 @@ var BRS = (function(BRS, $, undefined) {
         BRS.applySettings(key);
     };
 
-    $("#settings_box select").on("change", function(e) {
-        e.preventDefault();
-
-        var key = $(this).attr("name");
-        var value = $(this).val();
-
-        BRS.updateSettings(key, value);
-    });
-
-    $("#settings_box input[type=text]").on("input", function(e) {
-        var key = $(this).attr("name");
-        var value = $(this).val();
-
-        if (/_warning/i.test(key) && key != "asset_transfer_warning") {
-            value = BRS.convertToNQT(value);
-        }
-        BRS.updateSettings(key, value);
-    });
-
     return BRS;
 }(BRS || {}, jQuery));

@@ -2,8 +2,9 @@
  * @depends {brs.js}
  */
 var BRS = (function(BRS, $, undefined) {
-    var radio = document.request_burst_form.request_burst_suggested_fee;
-    $('#request_burst_qr_modal').on('show.bs.modal', function (e) {
+    
+    BRS.evRequestBurstQrModalOnShowBsModal = function (e) {
+        let radio = document.request_burst_form.request_burst_suggested_fee;
        $("#new_qr_button").hide();
        $("#request_burst_immutable").prop('checked', true);
        $("#request_burst_account_id").val(String(BRS.accountRS).escapeHTML());
@@ -35,71 +36,11 @@ var BRS = (function(BRS, $, undefined) {
                       $("[name='suggested_fee_spinner']").addClass("suggested_fee_spinner_display_none");
                       }
                  });
-    });
-        $("#request_burst_amount").change(function() {
-           var amount = Number($("#request_burst_amount").val());
-           $("#request_burst_amount").val(amount);
-           if(amount >= 0.00000001 || (!$("#request_burst_immutable").is(':checked') && (!amount || amount == 0)))
-           {
-               $("#request_burst_amount_div").toggleClass("has-error",false);
-               $("#request_burst_amount_div").toggleClass("has-success",true);
-           }
-           else
-           {
-              $("#request_burst_amount_div").toggleClass("has-success",false);
-              $("#request_burst_amount_div").toggleClass("has-error",true);
-           }
-         });
+    };
 
-       $("#request_burst_fee").change(function() {
-         var fee = Number($("#request_burst_fee").val());
-         $("#request_burst_fee").val(fee);
-         if(fee >= BRS.minimumFeeNumber)
-         {
-             for(var i = 0; i < radio.length; i++) {
-               radio[i].checked = false;
-             }
-             $("#request_burst_fee_div").toggleClass("has-error",false);
-             $("#request_burst_fee_div").toggleClass("has-success",true);
-         }
-         else
-         {
-               $("#request_burst_fee_div").toggleClass("has-success",false);
-               $("#request_burst_fee_div").toggleClass("has-error",true);
-         }
-       });
-
-       $('#request_burst_immutable').change(function() {
-        var amount = Number($("#request_burst_amount").val());
-        if($(this).is(":checked")) {
-             if(amount >= 0.00000001){
-                $("#request_burst_amount_div").toggleClass("has-error",false);
-                $("#request_burst_amount_div").toggleClass("has-success",true);
-             }
-             else
-             {
-                $("#request_burst_amount_div").toggleClass("has-success",false);
-                $("#request_burst_amount_div").toggleClass("has-error",true);
-             }
-
-           }
-           else
-           {
-            if(amount >= 0.00000001 || (!amount || amount == 0)){
-                $("#request_burst_amount_div").toggleClass("has-error",false);
-                $("#request_burst_amount_div").toggleClass("has-success",true);
-            }
-            else
-            {
-                $("#request_burst_amount_div").toggleClass("has-success",false);
-                $("#request_burst_amount_div").toggleClass("has-error",true);
-            }
-
-           }
-       });
-
-         $("#generate_qr_button").on("click", function(e) {
+    BRS.evGenerateQrButtonClick = function(e) {
             e.preventDefault();
+            let radio = document.request_burst_form.request_burst_suggested_fee;
             var amount = Number($("#request_burst_amount").val());
             if(((!amount || amount < 0.00000001) && $("#request_burst_immutable").is(':checked')) || (amount && amount < 0.00000001))
             {
@@ -157,46 +98,7 @@ var BRS = (function(BRS, $, undefined) {
             $("#request_burst_div").addClass("display-none");
             $("#request_burst_response_div").removeClass("display-none");
             $("#request_burst_response_div").addClass("display-visible");
-        });
-
-
-    $('#request_burst_qr_modal').on('hide.bs.modal', function (e) {
-        $("#request_burst_div").removeClass("display-none");
-        $("#request_burst_div").addClass("display-visible");
-        $("#request_burst_response_div").removeClass("display-visible");
-        $("#request_burst_response_div").addClass("display-none");
-        $("#request_burst_amount_div").toggleClass("has-error",false);
-        $("#request_burst_amount_div").toggleClass("has-success",false);
-        $("#request_burst_fee_div").toggleClass("has-success",true);
-        $("#request_burst_fee_div").toggleClass("has-error",false);
-        var radio = document.request_burst_form.request_burst_suggested_fee;
-        for(var i = 0; i < radio.length; i++) {
-            radio[i].checked = false;
-        }
-        $("#cancel_button").html('Cancel');
-        $("#generate_qr_button").show();
-     });
-
-    $("#new_qr_button").on("click", function(e) {
-        $("#request_burst_div").removeClass("display-none");
-        $("#request_burst_div").addClass("display-visible");
-        $("#request_burst_response_div").removeClass("display-visible");
-        $("#request_burst_response_div").addClass("display-none");
-        $("#request_burst_amount_div").toggleClass("has-error",false);
-        $("#request_burst_amount_div").toggleClass("has-success",false);
-        $("#request_burst_fee_div").toggleClass("has-success",true);
-        $("#request_burst_fee_div").toggleClass("has-error",false);
-        $("#request_burst_amount").val("");
-        $("#request_burst_fee").val(0.1);
-        var radio = document.request_burst_form.request_burst_suggested_fee;
-        for(var i = 0; i < radio.length; i++) {
-         radio[i].checked = false;
-        }
-        $("#request_burst_immutable").prop('checked', true);
-        $("#cancel_button").html('Cancel');
-        $("#generate_qr_button").show();
-        $("#new_qr_button").hide();
-    });
+    };
 
     return BRS;
 }(BRS || {}, jQuery));

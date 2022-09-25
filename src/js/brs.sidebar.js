@@ -3,7 +3,8 @@
  * Reverted from BRS version 2.0.4
  */
  var BRS = (function(BRS, $, undefined) {
-    $(".sidebar_context").on("contextmenu", "a", function(e) {
+
+    BRS.evSidebarContextOnContextmenu = function(e) {
 	e.preventDefault();
 
 	if (!BRS.databaseSupport) {
@@ -55,7 +56,7 @@
 	}
 
 	return false;
-    });
+    };
 
     BRS.closeContextMenu = function(e) {
 	if (e && e.which == 3) {

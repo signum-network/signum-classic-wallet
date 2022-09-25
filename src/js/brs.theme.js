@@ -1,4 +1,5 @@
-$(function() {
+var BRS = (function(BRS, $, undefined) {
+    BRS.theme = function() {
   var $theme = $('body').data('brs.theme');
   // Reinitialize variables on load
   $(window).on('load', function() {
@@ -124,4 +125,7 @@ $(function() {
   $themesettings.append($themeSettings);
   $('#themebox').after($themesettings);
   setup();
-});
+};
+
+return BRS;
+}(BRS || {}, jQuery));

@@ -3,27 +3,7 @@
  */
 var BRS;
 BRS = (function (BRS, $, undefined) {
-        $('#transfer_alias_modal').on('show.bs.modal', function (e) {
-            BRS.showFeeSuggestions("#transfer_alias_fee", "#suggested_fee_response_alias_transfer");
-        });
-        $("#suggested_fee_alias_transfer").on("click", function(e) {
-            e.preventDefault();
-            BRS.showFeeSuggestions("#transfer_alias_fee", "#suggested_fee_response_alias_transfer");
-        });
-        $('#sell_alias_modal').on('show.bs.modal', function (e) {
-            BRS.showFeeSuggestions("#sell_alias_fee", "#suggested_fee_response_alias_sell");
-        });
-        $("#suggested_fee_alias_sell").on("click", function(e) {
-            e.preventDefault();
-            BRS.showFeeSuggestions("#sell_alias_fee", "#suggested_fee_response_alias_sell");
-        });
-        $('#buy_alias_modal').on('show.bs.modal', function (e) {
-            BRS.showFeeSuggestions("#buy_alias_fee", "#suggested_fee_response_alias_buy");
-        });
-        $("#suggested_fee_alias_buy").on("click", function(e) {
-            e.preventDefault();
-            BRS.showFeeSuggestions("#buy_alias_fee", "#suggested_fee_response_alias_buy");
-        });
+
         var alias_page_elements = 500;
         var is_loading_aliases = false;
         var prev_search_length = 0;
@@ -397,12 +377,7 @@ BRS = (function (BRS, $, undefined) {
                 });
         };
 
-
-
-
-
-
-    $("#transfer_alias_modal, #sell_alias_modal, #cancel_alias_sale_modal").on("show.bs.modal", function (e) {
+    BRS.evAliasModalOnShowBsModal = function (e) {
         var $invoker = $(e.relatedTarget);
 
         var alias = String($invoker.data("alias"));
@@ -415,7 +390,7 @@ BRS = (function (BRS, $, undefined) {
             $(this).find("ul.nav-pills li:first-child").addClass("active");
             $("#sell_alias_recipient_div").show();
         }
-    });
+    };
 
     BRS.forms.sellAlias = function ($modal) {
         var data = BRS.getFormData($modal.find("form:first"));
@@ -502,7 +477,7 @@ BRS = (function (BRS, $, undefined) {
         }
     };
 
-    $("#sell_alias_to_specific_account, #sell_alias_to_anyone").on("click", function (e) {
+    BRS.evSellAliasClick = function (e) {
         e.preventDefault();
 
         $(this).closest("ul").find("li").removeClass("active");
@@ -530,9 +505,9 @@ BRS = (function (BRS, $, undefined) {
 
         $modal.find("input[name=converted_account_id]").val("");
         $modal.find(".callout").hide();
-    });
+    };
 
-    $("#buy_alias_modal").on("show.bs.modal", function (e) {
+    BRS.evBuyAliasModalOnShowBsModal = function (e) {
         var $modal = $(this);
 
         var $invoker = $(e.relatedTarget);
@@ -585,7 +560,7 @@ BRS = (function (BRS, $, undefined) {
                 }
             }
         }, false);
-    });
+    };
 
     BRS.forms.buyAliasError = function () {
         $("#buy_alias_modal").find("input[name=priceNXT]").prop("readonly", false);
@@ -610,7 +585,7 @@ BRS = (function (BRS, $, undefined) {
         }
     };
 
-    $("#register_alias_modal").on("show.bs.modal", function (e) {
+    BRS.evRegisterAliasModalOnShowBsModal = function (e) {
         var $invoker = $(e.relatedTarget);
 
         var alias = $invoker.data("alias");
@@ -639,14 +614,14 @@ BRS = (function (BRS, $, undefined) {
                     var keyword = "http:\/\/";
                     var reg =  new RegExp(keyword,"i");
                     if (reg.test(response.aliasURI)) {
-                        setAliasType("uri", response.aliasURI);
+                        BRS.setAliasType("uri", response.aliasURI);
                     }
                     else if ((aliasURI = /acct:(.*)@burst/.exec(response.aliasURI)) || (aliasURI = /nacc:(.*)/.exec(response.aliasURI))) {
-                        setAliasType("account", response.aliasURI);
+                        BRS.setAliasType("account", response.aliasURI);
                         response.aliasURI = String(aliasURI[1]).toUpperCase();
                     }
                     else {
-                        setAliasType("general", response.aliasURI);
+                        BRS.setAliasType("general", response.aliasURI);
                     }
 
                     $("#register_alias_modal h4.modal-title").html($.t("update_alias"));
@@ -671,9 +646,9 @@ BRS = (function (BRS, $, undefined) {
             }
             $("#register_alias_alias_noneditable").html("").hide();
             $("#register_alias_alias_update").val(0);
-            setAliasType("uri", "");
+            BRS.setAliasType("uri", "");
         }
-    });
+    };
 
     BRS.incoming.aliases = function (transactions) {
         if (BRS.hasTransactionUpdates(transactions)) {
@@ -718,7 +693,7 @@ BRS = (function (BRS, $, undefined) {
         };
     };
 
-    function setAliasType(type, uri) {
+    BRS.setAliasType = function (type, uri) {
         $("#register_alias_type").val(type);
 
         if (type == "uri") {
@@ -799,11 +774,6 @@ BRS = (function (BRS, $, undefined) {
             $("#register_alias_help").html($.t("alias_data_help")).show();
         }
     }
-
-    $("#register_alias_type").on("change", function () {
-        var type = $(this).val();
-        setAliasType(type, $("#register_alias_uri").val());
-    });
 
     BRS.forms.setAliasError = function (response, data) {
         if (response && response.errorCode && response.errorCode == 8) {
@@ -922,7 +892,7 @@ BRS = (function (BRS, $, undefined) {
         }
     };
 
-    $("#alias_search").on("submit", function (e) {
+    BRS.evAliasSearchSubmit = function (e) {
         e.preventDefault();
 
         if (BRS.fetchingModalData) {
@@ -985,7 +955,7 @@ BRS = (function (BRS, $, undefined) {
                 BRS.fetchingModalData = false;
             }
         });
-    });
+    };
 
     return BRS;
 }(BRS || {}, jQuery));

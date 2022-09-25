@@ -5,13 +5,7 @@ var BRS = (function(BRS, $, undefined) {
     var _messages = {};
     var _latestMessages = {};
 
-    $('#send_message_modal').on('show.bs.modal', function (e) {
-        BRS.showFeeSuggestions("#send_message_fee", "#suggested_fee_response_send_message");
-    });
-    $("#suggested_fee_send_message").on("click", function(e) {
-        e.preventDefault();
-        BRS.showFeeSuggestions("#send_message_fee", "#suggested_fee_response_send_message");
-    });
+
 
     BRS.pages.messages = function(callback) {
 	_messages = {};
@@ -155,11 +149,7 @@ var BRS = (function(BRS, $, undefined) {
 	}
     }
 
-    $("#suggested_fee_messages_page").on("click", function(e) {
-        e.preventDefault();
-       BRS.showFeeSuggestions("#send_message_fee_page", "#suggested_fee_response_messages_page");
-    });
-    $("#messages_sidebar").on("click", "a", function(e) {
+    BRS.evMessagesSidebarClick =  function(e) {
 	e.preventDefault();
     BRS.showFeeSuggestions("#send_message_fee_page", "#suggested_fee_response_messages_page");
 
@@ -324,9 +314,9 @@ var BRS = (function(BRS, $, undefined) {
 
 	$("#message_details").empty().append(output);
 	$('#messages_page .content-splitter-right-inner').scrollTop($('#messages_page .content-splitter-right-inner')[0].scrollHeight);
-    });
+    };
 
-    $("#messages_sidebar_context").on("click", "a", function(e) {
+    BRS.evMessagesSidebarContextClick = function(e) {
 	e.preventDefault();
 
 	var account = BRS.getAccountFormatted(BRS.selectedContext.data("account"));
@@ -345,35 +335,7 @@ var BRS = (function(BRS, $, undefined) {
         else if (option == "account_info") {
 	    BRS.showAccountModal(account);
 	}
-    });
-
-    $("#messages_sidebar_update_context").on("click", "a", function(e) {
-	e.preventDefault();
-
-	var account = BRS.getAccountFormatted(BRS.selectedContext.data("account"));
-	var option = $(this).data("option");
-
-	BRS.closeContextMenu();
-
-	if (option == "update_contact") {
-	    $("#update_contact_modal").modal("show");
-	}
-        else if (option == "send_burst") {
-	    $("#send_money_recipient").val(BRS.selectedContext.data("contact")).trigger("blur");
-	    $("#send_money_modal").modal("show");
-	}
-
-    });
-
-
-    $("body").on("click", "a[data-goto-messages-account]", function(e) {
-	e.preventDefault();
-	
-	var account = $(this).data("goto-messages-account");
-	
-
-	BRS.goToPage("messages", function(){ $('#message_sidebar a[data-account=' + account + ']').trigger('click'); });
-    });
+    };
 
     BRS.forms.sendMessage = function($modal) {
 	var data = BRS.getFormData($modal.find("form:first"));
@@ -391,7 +353,7 @@ var BRS = (function(BRS, $, undefined) {
 	};
     };
 
-    $("#inline_message_form").submit(function(e) {
+    BRS.evInlineMessageFormSubmit = function(e) {
 	e.preventDefault();
 
 	var data = {
@@ -507,7 +469,7 @@ var BRS = (function(BRS, $, undefined) {
 	    }
 	    $btn.button("reset");
 	});
-    });
+    };
 
     BRS.forms.sendMessageComplete = function(response, data) {
 	data.message = data._extra.message;
@@ -574,10 +536,6 @@ var BRS = (function(BRS, $, undefined) {
 	    $('#messages_page .content-splitter-right-inner').scrollTop($('#messages_page .content-splitter-right-inner')[0].scrollHeight);
 	}
     };
-
-    $("#message_details").on("click", "dd.to_decrypt", function(e) {
-	$("#messages_decrypt_modal").modal("show");
-    });
 
     BRS.forms.decryptMessages = function($modal) {
 	var data = BRS.getFormData($modal.find("form:first"));

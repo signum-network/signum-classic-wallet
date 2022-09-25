@@ -98,7 +98,7 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
-    $("#account_phrase_custom_panel form").submit(function(event) {
+    BRS.evAccountPhraseCustomPanelSubmit = function(event) {
         event.preventDefault();
 
         var password = $("#registration_password").val();
@@ -123,7 +123,7 @@ var BRS = (function(BRS, $, undefined) {
             $("#registration_password, #registration_password_repeat").val("");
             BRS.loginWithPassphrase(password);
         }
-    });
+    };
 
     BRS.loginCommon = function () {
 
@@ -311,10 +311,6 @@ var BRS = (function(BRS, $, undefined) {
         });
     };
 
-    $("#logout_button_container").on("show.bs.dropdown", function(e) {
-        e.preventDefault();
-    });
-
     BRS.showLockscreen = function() {
         if (BRS.hasLocalStorage && localStorage.getItem("logged_in")) {
             setTimeout(function() {
@@ -341,11 +337,6 @@ var BRS = (function(BRS, $, undefined) {
 
         $(document.documentElement).scrollTop(0);
     };
-
-    $("#logout_button").click(function(e) {
-        e.preventDefault();
-        BRS.logout();
-    });
 
     BRS.logout = function() {
         BRS.setDecryptionPassword("");

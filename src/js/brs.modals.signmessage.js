@@ -3,12 +3,6 @@
  * @depends {brs.modals.js}
  */
 var BRS = (function(BRS, $, undefined) {
-    $("#sign_message_modal").on("show.bs.modal", function(e) {
-        $("#sign_message_output, #verify_message_output").html("").hide();
-
-        $("#sign_message_modal_sign_message").show();
-        $("#sign_message_modal_button").text("Sign Message").data("form", "sign_message_form");
-    });
 
     BRS.forms.signModalButtonClicked = function() {
 		if ($("#sign_message_nav").hasClass("active")) {
@@ -52,36 +46,6 @@ var BRS = (function(BRS, $, undefined) {
             $("#verify_message_error").show();
         }
     };
-
-    $("#sign_message_modal ul.nav li").click(function(e) {
-        e.preventDefault();
-
-        var tab = $(this).data("tab");
-
-        $(this).siblings().removeClass("active");
-        $(this).addClass("active");
-
-        $(".sign_message_modal_content").hide();
-
-        var content = $("#sign_message_modal_" + tab);
-
-        if (tab === "sign_message") {
-            $("#sign_message_modal_button").text("Sign Message").data("form", "sign_message_form");
-        }
-        else {
-            $("#sign_message_modal_button").text("Verify Message").data("form", "verify_message_form");
-        }
-
-        $("#sign_message_modal .error_message").hide();
-
-        content.show();
-    });
-
-    $("#sign_message_modal").on("hidden.bs.modal", function(e) {
-        $(this).find(".sign_message_modal_content").hide();
-        $(this).find("ul.nav li.active").removeClass("active");
-        $("#sign_message_nav").addClass("active");
-    });
 
     return BRS;
 }(BRS || {}, jQuery));

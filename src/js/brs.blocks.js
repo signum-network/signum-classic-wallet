@@ -406,26 +406,5 @@ var BRS = (function(BRS, $, undefined) {
         BRS.dataLoaded(rows);
     };
 
-    $("#blocks_page_type .btn").click(function(e) {
-        //	$("#blocks_page_type li a").click(function(e) {
-        e.preventDefault();
-
-        BRS.blocksPageType = $(this).data("type");
-
-        $("#blocks_average_amount, #blocks_average_fee, #blocks_transactions_per_hour, #blocks_average_generation_time, #forged_blocks_total, #forged_fees_total").html(BRS.loadingDotsHTML).addClass("loading_dots");
-        $("#blocks_table tbody").empty();
-        $("#blocks_table").parent().addClass("data-loading").removeClass("data-empty");
-
-        BRS.loadPage("blocks");
-    });
-
-    $("#goto_forged_blocks").click(function(e) {
-        e.preventDefault();
-
-        $("#blocks_page_type").find(".btn:last").button("toggle");
-        BRS.blocksPageType = "forged_blocks";
-        BRS.goToPage("blocks");
-    });
-
     return BRS;
 }(BRS || {}, jQuery));

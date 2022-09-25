@@ -84,6 +84,8 @@ var BRS = (function(BRS, $, undefined) {
             BRS.hasLocalStorage = false;
         }
 
+        BRS.theme();
+
         BRS.createDatabase(function() {
             BRS.getSettings();
         });
@@ -303,17 +305,7 @@ var BRS = (function(BRS, $, undefined) {
         });
     };
 
-    $("#prefered_node").on("blur", function() {
-        BRS.getState(null);
-    });
-
-    $("#start_settings_language").on("change", function(e) {
-        e.preventDefault();
-        var value = $(this).val();
-        BRS.updateSettings("language", value);
-    });
-
-    $("#logo, .sidebar-menu a").click(function(e, data) {
+    BRS.logoSidebarClick = function (e, data) {
         if ($(this).hasClass("ignore")) {
             $(this).removeClass("ignore");
             return;
@@ -385,13 +377,7 @@ var BRS = (function(BRS, $, undefined) {
                 BRS.pages[page]();
             }
         }
-    });
-
-    $("button.goto-page, a.goto-page").click(function(event) {
-        event.preventDefault();
-
-        BRS.goToPage($(this).data("page"));
-    });
+    };
 
     BRS.loadPage = function(page, callback) {
         BRS.pageLoading();
@@ -482,11 +468,6 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
-    $(".data-pagination").on("click", "a", function(e) {
-        e.preventDefault();
-
-        BRS.goToPageNumber($(this).data("page"));
-    });
 
     BRS.goToPageNumber = function(pageNumber) {
         /*if (!pageLoaded) {
@@ -955,9 +936,10 @@ var BRS = (function(BRS, $, undefined) {
                $("[name='suggested_fee_spinner']").addClass("suggested_fee_spinner_display_none");
                }
           });
-    	};
+    };
 
-    $("#id_search").on("submit", function(e) {
+    
+    BRS.evIdSearchSubmit = function(e) {
         e.preventDefault();
 
         var id = $.trim($("#id_search input[name=q]").val());
@@ -1030,13 +1012,77 @@ var BRS = (function(BRS, $, undefined) {
                 }
             });
         }
-    });
+    };
 
     return BRS;
 }(BRS || {}, jQuery));
 
 $(document).ready(function() {
-    BRS.init();
+    let done = 0
+
+    const pages = [
+        { location: 'body', path: 'html/pages/lockscreen.html' },
+        { location: 'body', path: 'html/header.html' },
+        { location: 'body', path: 'html/sidebar_context.html' },
+        { location: 'body', path: 'html/modals/account.html' },
+        { location: 'body', path: 'html/modals/alias.html' },
+        { location: 'body', path: 'html/modals/asset.html' },
+        { location: 'body', path: 'html/modals/at_create.html' },
+        { location: 'body', path: 'html/modals/block_info.html' },
+        { location: 'body', path: 'html/modals/brs.html' },
+        { location: 'body', path: 'html/modals/contact.html' },
+        { location: 'body', path: 'html/modals/crowd_fund_project.html' },
+        { location: 'body', path: 'html/modals/deployCrowd.html' },
+        { location: 'body', path: 'html/modals/dgs.html' },
+        { location: 'body', path: 'html/modals/dividends.html' },
+        { location: 'body', path: 'html/modals/escrow.html' },
+        { location: 'body', path: 'html/modals/messages_decrypt.html' },
+        { location: 'body', path: 'html/modals/raw_transaction.html' },
+        { location: 'body', path: 'html/modals/request_burst_qr.html' },
+        { location: 'body', path: 'html/modals/reward_assignment.html' },
+        { location: 'body', path: 'html/modals/send_message.html' },
+        { location: 'body', path: 'html/modals/send_money.html' },
+        { location: 'body', path: 'html/modals/commitment.html' },
+        { location: 'body', path: 'html/modals/subscription.html' },
+        { location: 'body', path: 'html/modals/token.html' },
+        { location: 'body', path: 'html/modals/transaction_info.html' },
+        { location: 'body', path: 'html/modals/transaction_operations.html' },
+        { location: 'body', path: 'html/modals/user_info.html' },
+        { location: 'body', path: 'html/modals/sign_message.html' },
+        { location: '#sidebar', path: 'html/sidebar.html' },
+        { location: '#content', path: 'html/pages/dashboard.html' },
+        { location: '#content', path: 'html/pages/crowdfund.html' },
+        { location: '#content', path: 'html/pages/transactions.html' },
+        { location: '#content', path: 'html/pages/aliases.html' },
+        { location: '#content', path: 'html/pages/messages.html' },
+        { location: '#content', path: 'html/pages/contacts.html' },
+        { location: '#content', path: 'html/pages/asset_exchange.html' },
+        { location: '#content', path: 'html/pages/settings.html' },
+        { location: '#content', path: 'html/pages/peers.html' },
+        { location: '#content', path: 'html/pages/dgs.html' },
+        { location: '#content', path: 'html/pages/blocks.html' },
+    ]
+
+    function loadHTMLOn(domName, path) {
+        $.get(path, '', (data) => {
+            $(domName).prepend(data);
+            $("#loading_bar" ).val ((done / pages.length) * 100);
+            ++done;
+            if (done === pages.length) {
+                loadingDone();
+            }
+        });
+    }
+
+    function loadingDone () {
+        BRS.addEventListeners();
+        $("#loading_bar" ).val (100);
+        BRS.init();
+    }
+    
+    for (const page of pages) {
+        loadHTMLOn(page.location, page.path)
+    }
 });
 
 function receiveMessage(event) {

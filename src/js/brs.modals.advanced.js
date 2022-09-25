@@ -26,24 +26,7 @@ var BRS = (function(BRS, $, undefined) {
 	$("#raw_transaction_modal").modal("show");
     };
 
-    $("#transaction_operations_modal").on("show.bs.modal", function(e) {
-	$(this).find(".output_table tbody").empty();
-	$(this).find(".output").hide();
-
-	$(this).find(".tab_content:first").show();
-	$("#transaction_operations_modal_button").text($.t("broadcast")).data("resetText", $.t("broadcast")).data("form", "broadcast_transaction_form");
-    });
-
-    $("#transaction_operations_modal").on("hidden.bs.modal", function(e) {
-	$(this).find(".tab_content").hide();
-	$(this).find("ul.nav li.active").removeClass("active");
-	$(this).find("ul.nav li:first").addClass("active");
-
-	$(this).find(".output_table tbody").empty();
-	$(this).find(".output").hide();
-    });
-
-    $("#transaction_operations_modal ul.nav li").click(function(e) {
+    BRS.evTransactionOperationsModalClick = function(e) {
 	e.preventDefault();
 
 	var tab = $(this).data("tab");
@@ -64,7 +47,7 @@ var BRS = (function(BRS, $, undefined) {
 	}
 
 	$("#transaction_operations_modal_" + tab).show();
-    });
+    };
 
     BRS.forms.broadcastTransactionComplete = function(response, data) {
 	$("#parse_transaction_form").find(".error_message").hide();

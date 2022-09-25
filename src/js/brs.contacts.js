@@ -200,7 +200,7 @@ var BRS = (function(BRS, $, undefined) {
 	});
     };
 
-    $("#update_contact_modal").on("show.bs.modal", function(e) {
+    BRS.evUpdateContactModalOnShowBsModal = function(e) {
 	var $invoker = $(e.relatedTarget);
 
 	var contactId = parseInt($invoker.data("contact"), 10);
@@ -237,7 +237,7 @@ var BRS = (function(BRS, $, undefined) {
 		$("#update_contact_description").val(contact.description);
 	    });
 	}
-    });
+    };
 
     BRS.forms.updateContact = function($modal) {
 	var data = BRS.getFormData($modal.find("form:first"));
@@ -373,7 +373,7 @@ var BRS = (function(BRS, $, undefined) {
 	});
     };
 
-    $("#delete_contact_modal").on("show.bs.modal", function(e) {
+    BRS.evDeleteContactModalOnShowBsModal = function(e) {
 	var $invoker = $(e.relatedTarget);
 
 	var contactId = $invoker.data("contact");
@@ -388,7 +388,7 @@ var BRS = (function(BRS, $, undefined) {
 	    $("#delete_contact_name").html(contact.name.escapeHTML());
 	    $("#delete_contact_account_id").val(BRS.getAccountFormatted(contact, "account"));
 	});
-    });
+    };
 
     BRS.forms.deleteContact = function($modal) {
 	var id = parseInt($("#delete_contact_id").val(), 10);
@@ -417,6 +417,7 @@ var BRS = (function(BRS, $, undefined) {
 	    "stop": true
 	};
     };
+
     BRS.exportContacts = function() {
 	if (BRS.contacts && (Object.keys(BRS.contacts).length > 0)) {
 	    var contacts_download = document.createElement('a');
@@ -431,9 +432,7 @@ var BRS = (function(BRS, $, undefined) {
 	    console.log('No contacts found in database to backup');
 	}
     };
-    $("#export_contacts_button").on("click", function() {
-	BRS.exportContacts();
-    });
+    
     BRS.importContacts = function(imported_contacts) {
 	console.log('Import contacts called');
 	console.log(imported_contacts);
@@ -512,20 +511,6 @@ var BRS = (function(BRS, $, undefined) {
 	    });
 	});
     };
-    $("#import_contacts_button_field").css({'display':'none'});
-    $("#import_contacts_button_field").on("change", function(button_event) {
-	button_event.preventDefault();
-	var file = $("#import_contacts_button_field")[0].files[0];
-	var reader = new FileReader();
-	reader.onload = function (read_event) {
-	    var imported_contacts = JSON.parse(read_event.target.result);
-	    BRS.importContacts(imported_contacts);
-	};
-	reader.readAsText(file);
-	return false;
-    });
-    $("#import_contacts_button").on("click", function() {
-	$("#import_contacts_button_field").click();
-    });
+
     return BRS;
 }(BRS || {}, jQuery));

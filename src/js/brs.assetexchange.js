@@ -173,16 +173,7 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
-    $("#asset_exchange_bookmark_this_asset").on("click", function() {
-        if (BRS.viewingAsset) {
-            BRS.saveAssetBookmarks(new Array(BRS.viewingAsset), function(newAssets) {
-                BRS.viewingAsset = false;
-                BRS.loadAssetExchangeSidebar(function() {
-                    $("#asset_exchange_sidebar a[data-asset=" + newAssets[0].asset + "]").addClass("active").trigger("click");
-                });
-            });
-        }
-    });
+
 
     BRS.forms.addAssetBookmarkComplete = function(newAssets, submittedAssets) {
         BRS.assetSearch = false;
@@ -489,7 +480,7 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
-    $("#asset_exchange_sidebar").on("click", "a", function(e, data) {
+    BRS.evAssetExchangeSidebarClick = function(e, data) {
         e.preventDefault();
 
         currentAssetID = String($(this).data("asset")).escapeHTML();
@@ -558,7 +549,7 @@ var BRS = (function(BRS, $, undefined) {
                 }
             });
         }
-    });
+    };
 
     BRS.loadAsset = function(asset, refresh) {
         var assetId = asset.asset;
@@ -733,12 +724,7 @@ var BRS = (function(BRS, $, undefined) {
         });
     };
 
-    // if this is clicked we can assume there is asset selected
-    // might need to implement some safety check just in case.
-    // LithStud 2016.11.17
-    $("#ae_show_my_trades_only").on("change", function() {
-        $("#asset_exchange_sidebar a.active").trigger("click");
-    });
+
 
     BRS.loadAssetOrders = function(type, assetId, refresh) {
         type = type.toLowerCase();
@@ -827,12 +813,7 @@ var BRS = (function(BRS, $, undefined) {
         return false;
     };
 
-    $("#asset_exchange_search").on("submit", function(e) {
-        e.preventDefault();
-        $("#asset_exchange_search input[name=q]").trigger("input");
-    });
-
-    $("#asset_exchange_search input[name=q]").on("input", function(e) {
+    BRS.evAssetExchangeSearchInput = function(e) {
         var input = $.trim($(this).val()).toLowerCase();
 
         if (!input) {
@@ -860,31 +841,10 @@ var BRS = (function(BRS, $, undefined) {
             $("#asset_exchange_clear_search").show();
             $("#asset_exchange_show_type").hide();
         }
-    });
+    };
 
-    $("#asset_exchange_clear_search").on("click", function() {
-        $("#asset_exchange_search input[name=q]").val("");
-        $("#asset_exchange_search").trigger("submit");
-    });
 
-    $("#buy_asset_box .box-header, #sell_asset_box .box-header").click(function(e) {
-        e.preventDefault();
-        //Find the box parent
-        var box = $(this).parents(".box").first();
-        //Find the body and the footer
-        var bf = box.find(".box-body, .box-footer");
-        if (!box.hasClass("collapsed-box")) {
-            box.addClass("collapsed-box");
-            $(this).find(".btn i.fa").removeClass("fa-minus").addClass("fa-plus");
-            bf.slideUp();
-        } else {
-            box.removeClass("collapsed-box");
-            bf.slideDown();
-            $(this).find(".btn i.fa").removeClass("fa-plus").addClass("fa-minus");
-        }
-    });
-
-    $("#asset_exchange_bid_orders_table tbody, #asset_exchange_ask_orders_table tbody").on("click", "td", function(e) {
+    BRS.evAssetExchangeOrdersTableClick = function(e) {
         var $target = $(e.target);
         var totalNQT;
         if ($target.prop("tagName").toLowerCase() == "a") {
@@ -933,9 +893,9 @@ var BRS = (function(BRS, $, undefined) {
             box.removeClass("collapsed-box");
             box.find(".box-body").slideDown();
         }
-    });
+    };
 
-    $("#sell_automatic_price, #buy_automatic_price").on("click", function(e) {
+    BRS.evSellBuyAutomaticPriceClick = function(e) {
         try {
             var type = ($(this).attr("id") == "sell_automatic_price" ? "sell" : "buy");
 
@@ -980,7 +940,7 @@ var BRS = (function(BRS, $, undefined) {
                 "color": ""
             });
         } catch (err) {}
-    });
+    };
 
     function isControlKey(charCode) {
         if (charCode >= 32)
@@ -993,7 +953,7 @@ var BRS = (function(BRS, $, undefined) {
         return true;
     }
 
-    $("#buy_asset_quantity, #buy_asset_price, #sell_asset_quantity, #sell_asset_price, #buy_asset_fee, #sell_asset_fee").keydown(function(e) {
+    BRS.evAssetExchangeQuantityPriceKeydown = function(e) {
         var charCode = !e.charCode ? e.which : e.charCode;
 
         if (isControlKey(charCode) || e.ctrlKey || e.metaKey) {
@@ -1081,10 +1041,10 @@ var BRS = (function(BRS, $, undefined) {
             e.preventDefault();
             return false;
         }
-    });
+    };
 
     //calculate preview price (calculated on every keypress)
-    $("#sell_asset_quantity, #sell_asset_price, #buy_asset_quantity, #buy_asset_price").keyup(function(e) {
+    BRS.evCalculatePricePreviewKeyup = function(e) {
         var orderType = $(this).data("type").toLowerCase();
 
         try {
@@ -1100,9 +1060,9 @@ var BRS = (function(BRS, $, undefined) {
         } catch (err) {
             $("#" + orderType + "_asset_total").val("0");
         }
-    });
+    };
 
-    $("#asset_order_modal").on("show.bs.modal", function(e) {
+    BRS.evAssetOrderModalOnShowBsModal = function(e) {
         var $invoker = $(e.relatedTarget);
 
         var orderType = $invoker.data("type");
@@ -1195,7 +1155,7 @@ var BRS = (function(BRS, $, undefined) {
         $("#asset_order_quantity").val(quantityQNT.toString());
         $("#asset_order_price").val(priceNQT.toString());
         $("#asset_order_fee").val(feeNQT.toString());
-    });
+    };
 
     BRS.forms.orderAsset = function($modal) {
         var orderType = $("#asset_order_type").val();
@@ -1284,20 +1244,6 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
-    $("#asset_exchange_sidebar_group_context").on("click", "a", function(e) {
-        e.preventDefault();
-
-        var groupName = BRS.selectedContext.data("groupname");
-        var option = $(this).data("option");
-
-        if (option == "change_group_name") {
-            $("#asset_exchange_change_group_name_old_display").html(groupName.escapeHTML());
-            $("#asset_exchange_change_group_name_old").val(groupName);
-            $("#asset_exchange_change_group_name_new").val("");
-            $("#asset_exchange_change_group_name_modal").modal("show");
-        }
-    });
-
     BRS.forms.assetExchangeChangeGroupName = function($modal) {
         var oldGroupName = $("#asset_exchange_change_group_name_old").val();
         var newGroupName = $("#asset_exchange_change_group_name_new").val();
@@ -1330,7 +1276,7 @@ var BRS = (function(BRS, $, undefined) {
         };
     };
 
-    $("#asset_exchange_sidebar_context").on("click", "a", function(e) {
+    BRS.evAssetExchangeSidebarContextClick =  function(e) {
         e.preventDefault();
 
         var assetId = BRS.selectedContext.data("asset");
@@ -1438,17 +1384,7 @@ var BRS = (function(BRS, $, undefined) {
                 });
             }
         }
-    });
-
-    $("#asset_exchange_group_group").on("change", function() {
-        var value = $(this).val();
-
-        if (value == -1) {
-            $("#asset_exchange_group_new_group_div").show();
-        } else {
-            $("#asset_exchange_group_new_group_div").hide();
-        }
-    });
+    };
 
     BRS.forms.assetExchangeGroup = function($modal) {
         var assetId = $("#asset_exchange_group_asset").val();
@@ -1491,10 +1427,6 @@ var BRS = (function(BRS, $, undefined) {
             "stop": true
         };
     };
-
-    $("#asset_exchange_group_modal").on("hidden.bs.modal", function(e) {
-        $("#asset_exchange_group_new_group_div").val("").hide();
-    });
 
     /* TRANSFER HISTORY PAGE */
     BRS.pages.transfer_history = function() {
@@ -1735,7 +1667,7 @@ var BRS = (function(BRS, $, undefined) {
         BRS.loadPage("my_assets");
     };
 
-    $("#transfer_asset_modal").on("show.bs.modal", function(e) {
+    BRS.evTransferAssetModalOnShowBsModal = function(e) {
         var $invoker = $(e.relatedTarget);
 
         var assetId = $invoker.data("asset");
@@ -1781,7 +1713,7 @@ var BRS = (function(BRS, $, undefined) {
         }
 
         $("#transfer_asset_available").html(availableAssetsMessage);
-    });
+    };
 
     BRS.forms.transferAsset = function($modal) {
         var data = BRS.getFormData($modal.find("form:first"));
@@ -1837,18 +1769,6 @@ var BRS = (function(BRS, $, undefined) {
     BRS.forms.transferAssetComplete = function(response, data) {
         BRS.loadPage("my_assets");
     };
-
-    $("body").on("click", "a[data-goto-asset]", function(e) {
-        e.preventDefault();
-
-        var $visible_modal = $(".modal.in");
-
-        if ($visible_modal.length) {
-            $visible_modal.modal("hide");
-        }
-
-        BRS.goToAsset($(this).data("goto-asset"));
-    });
 
     BRS.goToAsset = function(asset) {
         BRS.assetSearch = false;
@@ -2099,21 +2019,6 @@ var BRS = (function(BRS, $, undefined) {
             BRS.loadPage("open_orders");
         }
     };
-
-    $("#cancel_order_modal").on("show.bs.modal", function(e) {
-        var $invoker = $(e.relatedTarget);
-
-        var orderType = $invoker.data("type");
-        var orderId = $invoker.data("order");
-
-        if (orderType == "bid") {
-            $("#cancel_order_type").val("cancelBidOrder");
-        } else {
-            $("#cancel_order_type").val("cancelAskOrder");
-        }
-
-        $("#cancel_order_order").val(orderId);
-    });
 
     BRS.forms.cancelOrder = function($modal) {
         var data = BRS.getFormData($modal.find("form:first"));

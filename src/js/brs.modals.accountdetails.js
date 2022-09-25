@@ -3,7 +3,8 @@
  * @depends {brs.modals.js}
  */
 var BRS = (function(BRS, $, undefined) {
-    $("#account_details_modal").on("show.bs.modal", function(e) {
+
+    BRS.evAccountDetailsModalOnShowBsModal = function(e) {
 	$("#account_details_modal_qr_code").empty().qrcode({
 	    "text": BRS.accountRS,
 	    "width": 128,
@@ -42,29 +43,7 @@ var BRS = (function(BRS, $, undefined) {
 		}
 	    }
 	}
-    });
-
-    $("#account_details_modal ul.nav li").click(function(e) {
-	e.preventDefault();
-
-	var tab = $(this).data("tab");
-
-	$(this).siblings().removeClass("active");
-	$(this).addClass("active");
-
-	$(".account_details_modal_content").hide();
-
-	var content = $("#account_details_modal_" + tab);
-
-	content.show();
-    });
-
-    $("#account_details_modal").on("hidden.bs.modal", function(e) {
-	$(this).find(".account_details_modal_content").hide();
-	$(this).find("ul.nav li.active").removeClass("active");
-	$("#account_details_balance_nav").addClass("active");
-	$("#account_details_modal_qr_code").empty();
-    });
+    };
 
     return BRS;
 }(BRS || {}, jQuery));

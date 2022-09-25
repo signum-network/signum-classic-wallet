@@ -3,14 +3,7 @@
  * @depends {brs.modals.js}
  */
 var BRS = (function(BRS, $, undefined) {
-    $("#escrow_table").on("click", "a[data-escrow]", function(e) {
-	e.preventDefault();
 
-	var escrowId = $(this).data("escrow");
-
-	BRS.showEscrowDecisionModal(escrowId);
-    });
-    
     BRS.showEscrowDecisionModal = function(escrow) {
 	if (BRS.fetchingModalData) {
 	    return;

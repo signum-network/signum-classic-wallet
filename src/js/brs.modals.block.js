@@ -3,7 +3,8 @@
  * @depends {brs.modals.js}
  */
 var BRS = (function(BRS, $, undefined) {
-    $("#blocks_table, #dashboard_blocks_table").on("click", "a[data-block]", function(event) {
+
+    BRS.evBlocksTableClick = function(event) {
 	event.preventDefault();
 
 	if (BRS.fetchingModalData) {
@@ -20,7 +21,7 @@ var BRS = (function(BRS, $, undefined) {
 	}, function(response) {
 	    BRS.showBlockModal(response);
 	});
-    });
+    };
 
     BRS.showBlockModal = function(block) {
 	$("#block_info_modal_block").html(String(block.block).escapeHTML());

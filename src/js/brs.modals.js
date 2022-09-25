@@ -36,24 +36,6 @@ var BRS = (function(BRS, $, undefined) {
         }
     });
 
-    //Reset scroll position of tab when shown.
-    $('a[data-toggle="tab"]').on("shown.bs.tab", function(e) {
-        var target = $(e.target).attr("href");
-        $(target).scrollTop(0);
-    });
-
-    // hide multi-out
-    $(".hide").hide();
-    $(".multi-out").hide();
-    $(".multi-out-same").hide();
-    $(".multi-out-recipients").append($("#additional_multi_out_recipient").html());
-    $(".multi-out-recipients").append($("#additional_multi_out_recipient").html());
-    $(".multi-out-same-recipients").append($("#additional_multi_out_same_recipient").html());
-    $(".multi-out-same-recipients").append($("#additional_multi_out_same_recipient").html());
-    $(".multi-out .remove_recipient").each(function() {
-        $(this).remove();
-    });
-
     // just to be safe set total display
     var current_fee = parseFloat($("#multi_out_fee").val(), 10);
     var fee = BRS.checkMinimumFee(current_fee);
@@ -61,32 +43,11 @@ var BRS = (function(BRS, $, undefined) {
     var total_multi_out = fee;
     var amount_total = 0;
 
-    $(".ordinary-nav a").on("click", function(e) {
-        $(".multi-out").hide();
-        $(".ordinary").fadeIn();
-        if (!$(".ordinary-nav").hasClass("active")) {
-            $(".ordinary-nav").addClass("active");
-        }
-        if ($(".multi-out-nav").toggleClass("active")) {
-            $(".multi-out-nav").removeClass("active");
-        }
-    });
-
-    $(".multi-out-nav a").on("click", function(e) {
-        $(".ordinary").hide();
-        $(".multi-out").fadeIn();
-        if ($(".ordinary-nav").hasClass("active")) {
-            $(".ordinary-nav").removeClass("active");
-        }
-        if (!$(".multi-out-nav").hasClass("active")) {
-            $(".multi-out-nav").addClass("active");
-        }
-    });
-
     // multi-out inputs
     var multi_out_recipients = 2;
     var multi_out_same_recipients = 2;
-    $(".add_recipients").on("click", function(e) {
+
+    BRS.evAddRecipientsClick = function(e) {
         e.preventDefault();
         if ($(".same_out_checkbox").is(":checked")) {
             if (multi_out_same_recipients < 128) {
@@ -118,9 +79,9 @@ var BRS = (function(BRS, $, undefined) {
                 $(".multi-out-recipients").append($("#additional_multi_out_recipient").html()); //add input box
             }
         }
-    });
+    };
 
-    $(document).on("click", ".remove_recipient .remove_recipient_button", function(e) {
+    BRS.evDocumentOnClickRemoveRecipient = function(e) {
         e.preventDefault();
         $(this).parent().parent('div').remove();
 
@@ -164,9 +125,9 @@ var BRS = (function(BRS, $, undefined) {
 
             $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " SIGNA");
         }
-    });
+    };
 
-    $(document).on("change remove", ".multi-out-amount", function(e) {
+    BRS.evDocumentOnChangeMultiOutAmount = function(e) {
         // get amount for each recipient
         total_multi_out = 0;
         amount_total = 0;
@@ -183,9 +144,9 @@ var BRS = (function(BRS, $, undefined) {
         total_multi_out = amount_total + fee;
 
         $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " SIGNA");
-    });
+    };
 
-    $("#multi-out-same-amount").on("change", function(e) {
+    BRS.evMultiOutSameAmountChange = function(e) {
         total_multi_out = 0;
         amount_total = 0;
         var current_amount = parseFloat($(this).val(), 10);
@@ -204,9 +165,9 @@ var BRS = (function(BRS, $, undefined) {
         total_multi_out = amount_total + fee;
 
         $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " SIGNA");
-    });
+    };
 
-    $(".same_out_checkbox").on("change", function(e) {
+    BRS.evSameOutCheckboxChange = function(e) {
         //amount_total = 0 ///fixing incorrect Total when switch from multi same to multi and fee is changed.
         $(".total_amount_multi_out").html("0.1 Signa");
         if ($(this).is(":checked")) {
@@ -245,18 +206,18 @@ var BRS = (function(BRS, $, undefined) {
 
             $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " SIGNA");
         }
-    });
+    };
 
-    $("#multi_out_fee").on("change", function(e) {
+    BRS.evMultiOutFeeChange = function(e) {
         var current_fee = parseFloat($(this).val(), 10);
         var fee = BRS.checkMinimumFee(current_fee);
 
         $("#multi_out_fee").val(fee.toFixed(8));
 
         $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(amount_total + fee)) + " SIGNA");
-    });
+    };
 
-    $("#multi-out-submit").on("click", function(e) {
+    BRS.evMultiOutSubmitClick = function(e) {
         var recipients = [];
         var passphrase = $("#multi-out-passphrase").val();
         // remember password set?
@@ -338,28 +299,10 @@ var BRS = (function(BRS, $, undefined) {
             }
             BRS.sendMultiOut(ids, amounts, fee, passphrase);
         }
-    });
-
-    $(".add_message").on("change", function(e) {
-        if ($(this).is(":checked")) {
-            $(this).closest("form").find(".optional_message").fadeIn();
-            $(this).closest(".form-group").css("margin-bottom", "5px");
-        } else {
-            $(this).closest("form").find(".optional_message").hide();
-            $(this).closest(".form-group").css("margin-bottom", "");
-        }
-    });
-
-    $(".add_note_to_self").on("change", function(e) {
-        if ($(this).is(":checked")) {
-            $(this).closest("form").find(".optional_note").fadeIn();
-        } else {
-            $(this).closest("form").find(".optional_note").hide();
-        }
-    });
+    };
 
     //hide modal when another one is activated.
-    $(".modal").on("show.bs.modal", function(e) {
+    BRS.evModalOnShowBsModal = function(e) {
         var $inputFields = $(this).find("input[name=recipient], input[name=account_id]").not("[type=hidden]");
 
         $.each($inputFields, function() {
@@ -388,16 +331,10 @@ var BRS = (function(BRS, $, undefined) {
         }
 
         $(this).find(".form-group").css("margin-bottom", "");
-    });
-
-    $(".modal").on("shown.bs.modal", function() {
-        $(this).find("input[type=text]:first, textarea:first, input[type=password]:first").not("[readonly]").first().focus();
-        $(this).find("input[name=converted_account_id]").val("");
-        BRS.showedFormWarning = false; //maybe not the best place... we assume forms are only in modals?
-    });
+    };
 
     //Reset form to initial state when modal is closed
-    $(".modal").on("hidden.bs.modal", function(e) {
+    BRS.evModalOnHiddenBsModal = function(e) {
         // multi-out reset
         multi_out_recipients = 2;
         multi_out_same_recipients = 2;
@@ -494,7 +431,7 @@ var BRS = (function(BRS, $, undefined) {
         }
 
         BRS.showedFormWarning = false;
-    });
+    };
 
     BRS.showModalError = function(errorMessage, $modal) {
         var $btn = $modal.find("button.btn-primary:not([data-dismiss=modal], .ignore)");
@@ -520,17 +457,7 @@ var BRS = (function(BRS, $, undefined) {
         $modal.modal("hide");
     };
 
-    $("input[name=feeNXT]").on("change", function() {
-        var $modal = $(this).closest(".modal");
-
-        var $feeInfo = $modal.find(".advanced_fee");
-
-        if ($feeInfo.length) {
-            $feeInfo.html(BRS.formatAmount(BRS.convertToNQT($(this).val())) + " SIGNA");
-        }
-    });
-
-    $(".advanced_info a").on("click", function(e) {
+    BRS.evAdvancedInfoClick = function(e) {
         e.preventDefault();
 
         const $modal = $(this).closest(".modal");
@@ -559,16 +486,7 @@ var BRS = (function(BRS, $, undefined) {
         } else {
             $(this).text($.t("advanced"));
         }
-    });
-
-
-    $("#reward_assignment_modal").on("show.bs.modal", function(e) {
-    	BRS.showFeeSuggestions("#reward_assignment_fee", "#suggested_fee_response_reward_assignment", "#reward_assignment_bottom_fee");
-        });
-        $("#reward_assignment_fee_suggested").on("click", function(e) {
-           e.preventDefault();
-           BRS.showFeeSuggestions("#reward_assignment_fee", "#suggested_fee_response_reward_assignment", "#reward_assignment_bottom_fee");
-        });
+    };
 
     return BRS;
 }(BRS || {}, jQuery));

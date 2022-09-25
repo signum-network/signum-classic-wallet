@@ -7,14 +7,6 @@ var BRS = (function(BRS, $, undefined) {
 	"user": 0
     };
 
-    $("#blocks_table, #contacts_table, #transactions_table, #dashboard_transactions_table, #asset_account, #asset_exchange_ask_orders_table, #transfer_history_table, #asset_exchange_bid_orders_table, #alias_info_table, .dgs_page_contents, .modal-content, #register_alias_modal").on("click", "a[data-user]", function(e) {
-	e.preventDefault();
-
-	var account = $(this).data("user");
-
-	BRS.showAccountModal(account);
-    });
-
     BRS.showAccountModal = function(account) {
 	if (BRS.fetchingModalData) {
 	    return;
@@ -84,34 +76,6 @@ var BRS = (function(BRS, $, undefined) {
 
 	$("#user_info_modal").modal("show");
     };
-
-    $("#user_info_modal").on("hidden.bs.modal", function(e) {
-	$(this).find(".user_info_modal_content").hide();
-	$(this).find(".user_info_modal_content table tbody").empty();
-	$(this).find(".user_info_modal_content:not(.data-loading,.data-never-loading)").addClass("data-loading");
-	$(this).find("ul.nav li.active").removeClass("active");
-	$("#user_info_transactions").addClass("active");
-	BRS.userInfoModal.user = 0;
-    });
-
-    $("#user_info_modal ul.nav li").click(function(e) {
-	e.preventDefault();
-
-	var tab = $(this).data("tab");
-
-	$(this).siblings().removeClass("active");
-	$(this).addClass("active");
-
-	$(".user_info_modal_content").hide();
-
-	var content = $("#user_info_modal_" + tab);
-
-	content.show();
-
-	if (content.hasClass("data-loading")) {
-	    BRS.userInfoModal[tab]();
-	}
-    });
 
     /*some duplicate methods here...*/
     BRS.userInfoModal.transactions = function(type) {

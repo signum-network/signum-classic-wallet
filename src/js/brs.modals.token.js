@@ -3,12 +3,7 @@
  * @depends {brs.modals.js}
  */
 var BRS = (function(BRS, $, undefined) {
-    $("#token_modal").on("show.bs.modal", function(e) {
-	$("#generate_token_output, #decode_token_output").html("").hide();
 
-	$("#token_modal_generate_token").show();
-	$("#token_modal_button").text($.t("generate")).data("form", "generate_token_form");
-    });
 
     BRS.forms.generateToken = function($modal) {
 	var data = $.trim($("#generate_token_data").val());
@@ -65,36 +60,6 @@ var BRS = (function(BRS, $, undefined) {
     BRS.forms.decodeTokenError = function() {
 	$("#decode_token_output").hide();
     };
-
-    $("#token_modal ul.nav li").click(function(e) {
-	e.preventDefault();
-
-	var tab = $(this).data("tab");
-
-	$(this).siblings().removeClass("active");
-	$(this).addClass("active");
-
-	$(".token_modal_content").hide();
-
-	var content = $("#token_modal_" + tab);
-
-	if (tab == "generate_token") {
-	    $("#token_modal_button").text($.t("generate")).data("form", "generate_token_form");
-	}
-        else {
-	    $("#token_modal_button").text($.t("validate")).data("form", "validate_token_form");
-	}
-
-	$("#token_modal .error_message").hide();
-
-	content.show();
-    });
-
-    $("#token_modal").on("hidden.bs.modal", function(e) {
-	$(this).find(".token_modal_content").hide();
-	$(this).find("ul.nav li.active").removeClass("active");
-	$("#generate_token_nav").addClass("active");
-    });
 
     return BRS;
 }(BRS || {}, jQuery));

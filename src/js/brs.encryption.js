@@ -492,15 +492,6 @@ var BRS = (function(BRS, $, undefined) {
 	}
     };
 
-    $("#decrypt_note_form_container button.btn-primary").click(function() {
-	BRS.decryptNoteFormSubmit();
-    });
-
-    $("#decrypt_note_form_container").on("submit", function(e) {
-	e.preventDefault();
-	BRS.decryptNoteFormSubmit();
-    });
-
     BRS.decryptNoteFormSubmit = function() {
 	var $form = $("#decrypt_note_form_container");
 

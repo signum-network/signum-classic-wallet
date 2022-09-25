@@ -55,10 +55,5 @@ var BRS = (function(BRS, $, undefined) {
 	$el.removeClass("data-loading").find("img").remove();
     };
 
-    $("#rss_news_enable").on("click", function() {
-	BRS.updateSettings("news", 1);
-	BRS.loadPage("news");
-    });
-
     return BRS;
 }(BRS || {}, jQuery));

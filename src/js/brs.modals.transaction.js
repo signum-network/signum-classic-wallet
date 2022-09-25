@@ -5,33 +5,6 @@
 var message = "";
 var fieldsToDecrypt = {};
 var BRS = (function(BRS, $, undefined) {
-    $("#transactions_table, #dashboard_transactions_table, #transfer_history_table").on("click", "a[data-transaction]", function(e) {
-	e.preventDefault();
-
-	var transactionId = $(this).data("transaction");
-
-	BRS.showTransactionModal(transactionId);
-    });
-    $('#send_money_modal').on('show.bs.modal', function (e) {
-        BRS.showFeeSuggestions("#send_money_fee", "#suggested_fee_response_ordinary");
-        BRS.showFeeSuggestions("#multi_out_fee", "#suggested_fee_response_multi");
-    });
-    $('#commitment_modal').on('show.bs.modal', function (e) {
-        BRS.showFeeSuggestions("#commitment_fee", "#suggested_fee_response_commitment");
-    });
-    $('#send_money_modal').on('hide.bs.modal', function (e) {
-           $("#total_amount_multi_out").html('0.1 Signa');
-        });
-    $("#suggested_fee_ordinary").on("click", function(e) {
-        e.preventDefault();
-    	BRS.showFeeSuggestions("#send_money_fee", "#suggested_fee_response_ordinary");
-    });
-    $("#suggested_fee_multi").on("click", function(e) {
-        e.preventDefault();
-        BRS.showFeeSuggestions("#multi_out_fee","#suggested_fee_response_multi");
-    });
-
-
 
     BRS.showTransactionModal = function(transaction) {
 	if (BRS.fetchingModalData) {
@@ -994,11 +967,6 @@ var BRS = (function(BRS, $, undefined) {
 	    BRS.fetchingModalData = false;
 	}
     };
-
-    $("#transaction_info_modal").on("hide.bs.modal", function(e) {
-	BRS.removeDecryptionForm($(this));
-	$("#transaction_info_output_bottom, #transaction_info_output_top, #transaction_info_bottom").html("").hide();
-    });
 
     return BRS;
 }(BRS || {}, jQuery));

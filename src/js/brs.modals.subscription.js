@@ -3,14 +3,7 @@
  * @depends {brs.modals.js}
  */
 var BRS = (function(BRS, $, undefined) {
-    $("#subscription_table").on("click", "a[data-subscription]", function(e) {
-	e.preventDefault();
 
-	var subscriptionId = $(this).data("subscription");
-
-	BRS.showSubscriptionCancelModal(subscriptionId);
-    });
-    
     BRS.showSubscriptionCancelModal = function(subscription) {
 	if (BRS.fetchingModalData) {
 	    return;

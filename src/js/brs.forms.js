@@ -6,25 +6,7 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.forms = {};
 
-    $(".modal form input").keydown(function(e) {
-        if (e.which === "13") {
-            e.preventDefault();
-            if (BRS.settings.submit_on_enter && e.target.type !== "textarea") {
-                $(this).submit();
-            } else {
-                return false;
-            }
-        }
-    });
 
-    $(".modal button.btn-primary:not([data-dismiss=modal]):not([data-ignore=true])").click(function() {
-        // ugly hack - this whole ui is hack, got a big urge to vomit
-        if ($(this)[0].id === "sign_message_modal_button") { // hack hackity hack!
-            BRS.forms.signModalButtonClicked();
-        } else if (!$(this).hasClass("multi-out")) {
-            BRS.submitForm($(this).closest(".modal"), $(this));
-        }
-    });
 
     function getSuccessMessage(requestType) {
         var ignore = ["asset_exchange_change_group_name", "asset_exchange_group", "add_contact", "update_contact", "delete_contact",

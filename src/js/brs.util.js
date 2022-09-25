@@ -1151,33 +1151,7 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
-    $("body").on(".description_toggle", "click", function(e) {
-        e.preventDefault();
-
-        if ($(this).closest(".description").hasClass("open")) {
-            BRS.showPartialDescription();
-        } else {
-            BRS.showFullDescription();
-        }
-    });
-
-    $("#offcanvas_toggle").on("click", function(e) {
-        e.preventDefault();
-
-        //If window is small enough, enable sidebar push menu
-        if ($(window).width() <= 992) {
-            $('.row-offcanvas').toggleClass('active');
-            $('.left-side').removeClass("collapse-left");
-            $(".right-side").removeClass("strech");
-            $('.row-offcanvas').toggleClass("relative");
-        } else {
-            //Else, enable content streching
-            $('.left-side').toggleClass("collapse-left");
-            $(".right-side").toggleClass("strech");
-        }
-    });
-
-    $.fn.tree = function() {
+    BRS.FnTree = function() {
         return this.each(function() {
             var btn = $(this).children("a").first();
             var menu = $(this).children(".treeview-menu").first();
