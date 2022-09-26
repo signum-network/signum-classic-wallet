@@ -1432,11 +1432,11 @@ var BRS = (function(BRS, $, undefined) {
     BRS.pages.transfer_history = function() {
         BRS.sendRequest("getAssetTransfers+", {
             "account": BRS.accountRS,
-            "firstIndex": BRS.pageNumber * BRS.itemsPerPage - BRS.itemsPerPage,
-            "lastIndex": BRS.pageNumber * BRS.itemsPerPage - 1
+            "firstIndex": BRS.pageSize * (BRS.pageNumber - 1),
+            "lastIndex": BRS.pageSize * BRS.pageNumber,
         }, function(response, input) {
             if (response.transfers && response.transfers.length) {
-                if (response.transfers.length > BRS.itemsPerPage) {
+                if (response.transfers.length > BRS.pageSize) {
                     BRS.hasMorePages = true;
                     response.transfers.pop();
                 }

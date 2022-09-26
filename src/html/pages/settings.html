@@ -47,6 +47,18 @@
             </select>
           </div>
           <div class="form-group">
+            <label for="settings_page_size" data-i18n="page_size">page size</label>
+            <select name="page_size" id="settings_page_size" class="form-control" style="width:200px">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+              <option value="200">200</option>
+              <option value="400">400</option>
+            </select>
+            <p class="help-block" data-i18n="page_size_help">Use lower for faster response or higher if running node locally.</p>
+          </div>
+          <div class="form-group">
             <label for="settings_24_hour_format" data-i18n="use_24_hour_format">Use 24 Hour Format</label>
             <select name="24_hour_format" id="settings_24_hour_format" class="form-control" style="width:200px">
               <option value="1" data-i18n="yes">Yes</option>
@@ -60,14 +72,6 @@
               <option value="0" data-i18n="no">No</option>
             </select>
             <p class="help-block" data-i18n="submit_forms_on_enter_help">Be careful when choosing to submit forms via the enter key, submitting can't be undone.</p>
-          </div>
-         <div class="form-group">
-            <label for="settings_remember_passphrase" data-i18n="remember_passphrase_by_default">Remember Passphrase By Default</label>
-            <select name="remember_passphrase" id="settings_remember_passphrase" class="form-control" style="width:200px">
-              <option value="0" data-i18n="no">No</option>
-              <option value="1" data-i18n="yes">Yes</option>
-            </select>
-            <p class="help-block" data-i18n="remember_passphrase_by_default_help">On the login screen.</p>
           </div>
           <div class="form-group">
             <label for="settings_news" data-i18n="enable_news_section">Enable News Section</label>

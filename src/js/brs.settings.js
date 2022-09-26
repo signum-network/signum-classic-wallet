@@ -12,6 +12,7 @@ var BRS = (function(BRS, $, undefined) {
         "24_hour_format": 1,
         "remember_passphrase": 0,
         "remember_account": 0,
+        "page_size": 25,
         "prefered_node": "",
         "language": "en"
     };
@@ -109,6 +110,10 @@ var BRS = (function(BRS, $, undefined) {
 
         if (!key || key == "prefered_node") {
             $("#prefered_node").val(BRS.settings.prefered_node);
+        }
+
+        if (!key || key == "page_size") {
+            BRS.pageSize = Number(BRS.settings.page_size)
         }
 
         if (key == "24_hour_format") {

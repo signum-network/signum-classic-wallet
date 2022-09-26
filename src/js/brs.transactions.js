@@ -419,8 +419,8 @@ var BRS = (function(BRS, $, undefined) {
         var unconfirmedTransactions;
         var params = {
             "account": BRS.account,
-            "firstIndex": 0,
-            "lastIndex": 99,
+            "firstIndex": BRS.pageSize * (BRS.pageNumber - 1),
+            "lastIndex": BRS.pageSize * BRS.pageNumber,
             "includeIndirect": true
         };
 
@@ -441,6 +441,11 @@ var BRS = (function(BRS, $, undefined) {
 
         BRS.sendRequest("getAccountTransactions+", params, function(response) {
             if (response.transactions && response.transactions.length) {
+                if (response.transactions.length > BRS.pageSize) {
+                    BRS.hasMorePages = true;
+                    response.transactions.pop();
+                }
+
                 for (var i = 0; i < response.transactions.length; i++) {
                     var transaction = response.transactions[i];
 
@@ -721,6 +726,9 @@ var BRS = (function(BRS, $, undefined) {
                 "subtype": type[1]
             };
         }
+
+        BRS.pageNumber = 1;
+        BRS.hasMorePages = false;
 
         $(this).parents(".btn-group").find(".text").text($(this).text());
 

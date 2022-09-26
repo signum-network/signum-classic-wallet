@@ -59,7 +59,7 @@ var BRS = (function(BRS, $, undefined) {
     BRS.currentPage = "dashboard";
     BRS.currentSubPage = "";
     BRS.pageNumber = 1;
-    BRS.itemsPerPage = 50;
+    BRS.pageSize = 25;
 
     BRS.pages = {};
     BRS.incoming = {};
@@ -324,8 +324,6 @@ var BRS = (function(BRS, $, undefined) {
 
         $(".page").hide();
 
-        $(document.documentElement).scrollTop(0);
-
         $("#" + page + "_page").show();
 
         $(".content-header h1").find(".loading_dots").remove();
@@ -434,6 +432,11 @@ var BRS = (function(BRS, $, undefined) {
         if ($currentPage.hasClass("paginated")) {
             BRS.addPagination();
         }
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
 
         if (callback) {
             callback();
