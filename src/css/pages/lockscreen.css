@@ -38,9 +38,17 @@
   height: 100%;
   overflow: auto;
   background-image: url(../../img/bg1.svg);
+  background-size: cover;
+  background-position: center; 
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+@media screen and (max-width: 1920px) and (max-height: 1280px) {
+    #lockscreen {
+        background-size: auto;
+    }
 }
 
 #lockscreen img.burst_logo_effect {
