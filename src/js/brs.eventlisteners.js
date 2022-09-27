@@ -155,12 +155,7 @@
             }
         });
         $("#asset_exchange_sidebar").on("click", "a", BRS.evAssetExchangeSidebarClick);
-        // if this is clicked we can assume there is asset selected
-        // might need to implement some safety check just in case.
-        // LithStud 2016.11.17
-        $("#ae_show_my_trades_only").on("change", function() {
-            $("#asset_exchange_sidebar a.active").trigger("click");
-        });
+        $("#ae_show_my_trades_only").on("change", BRS.evAssetExchangeSidebarClick);
         $("#asset_exchange_search").on("submit", function(e) {
             e.preventDefault();
             $("#asset_exchange_search input[name=q]").trigger("input");
