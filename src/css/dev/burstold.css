@@ -20,13 +20,6 @@ outline:none;
 resize:none
 }
 
-#show_console {
-bottom:0;
-display:none;
-position:fixed;
-right:3px
-}
-
 .advanced_info {
 color:#737373;
 float:left;
@@ -148,11 +141,6 @@ border-bottom-left-radius:0!important;
 border-bottom-right-radius:0!important
 }
 
-.context_menu {
-display:none;
-position:absolute
-}
-
 .data-container.data-loading .data-loading-container,.data-container.data-empty .data-empty-container {
 display:block
 }
@@ -228,14 +216,6 @@ font-size:14px;
 font-weight:700
 }
 
-.list-group-item.context {
-background-color:#f5f5f5!important
-}
-
-.list-group-item.context p.list-group-item-text,.list-group-item.context h4 {
-color:#000!important
-}
-
 .loading-spinner {
 left:50%;
 margin:-12px 0 0 -12px;
@@ -281,23 +261,6 @@ vertical-align:top
 height:auto;
 max-height:500px;
 overflow-x:hidden
-}
-
-.small-box .icon-smaller {
-bottom:-7px;
-color:rgba(0,0,0,0.15);
-font-size:75px;
-position:absolute;
-right:5px;
-z-index:0
-}
-
-.small-box:hover .icon-smaller {
-animation-duration:.5s;
-animation-fill-mode:forwards;
-animation-iteration-count:1;
-animation-name:transformAnimationSmall;
-animation-timing-function:ease
 }
 
 .suggested_fee {
@@ -544,28 +507,6 @@ tr.your-order td {
 background-color:#FFFAF0!important
 }
 
-@keyframes transformAnimationSmall {
-from{
-}
-}
-
-to {
-  font-size: 85px;
-}
-
-@keyframes pulse {
-  from;
-}
-
-50% {
-  color: #91bd09;
-  text-shadow: 0 0 18px #9bc92b;
-}
-
-to {
-  color: #749a02;
-  text-shadow: 0 0 9px #266000;
-}
 .btn-suggested-fee {
     color: #fff !important;
     background-color: #428bca;

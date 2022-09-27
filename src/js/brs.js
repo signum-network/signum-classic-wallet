@@ -1020,7 +1020,6 @@ $(document).ready(function() {
     let done = 0
 
     const pages = [
-        { location: 'body', path: 'html/pages/lockscreen.html' },
         { location: 'body', path: 'html/header.html' },
         { location: 'body', path: 'html/sidebar_context.html' },
         { location: 'body', path: 'html/modals/account.html' },
@@ -1045,6 +1044,7 @@ $(document).ready(function() {
         { location: 'body', path: 'html/modals/transaction_operations.html' },
         { location: 'body', path: 'html/modals/user_info.html' },
         { location: 'body', path: 'html/modals/sign_message.html' },
+        { location: '#lockscreen', path: 'html/pages/lockscreen.html' },
         { location: '#sidebar', path: 'html/sidebar.html' },
         { location: '#content', path: 'html/pages/dashboard.html' },
         { location: '#content', path: 'html/pages/transactions.html' },
@@ -1060,7 +1060,7 @@ $(document).ready(function() {
     function loadHTMLOn(domName, path) {
         $.get(path, '', (data) => {
             $(domName).prepend(data);
-            $("#loading_bar" ).val ((done / pages.length) * 100);
+            $("#loading_bar" ).val (80 + (done / pages.length) * 20);
             ++done;
             if (done === pages.length) {
                 loadingDone();

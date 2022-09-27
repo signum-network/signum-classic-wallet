@@ -16,11 +16,13 @@
   bottom: 0px;
   right: 3px;
   display: none;
+  z-index: 1;
 }
 
 .context_menu {
   display: none;
   position: absolute;
+  z-index: 1;
 }
 
 .list-group-item.context {
