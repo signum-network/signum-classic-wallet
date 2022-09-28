@@ -537,38 +537,88 @@ var BRS = (function(BRS, $, undefined) {
             break;
         case 8:
             async = true;
-
+            var data = {
+                "type": $.t("distribute_to_holders"),
+                "amount": transaction.amountNQT,
+                "toHoldersOf": transaction.attachment.asset,
+                "distributingAsset": transaction.attachment.assetToDistribute,
+                "distributingQuantity": transaction.attachment.quantityQNT,
+                "youReceived": $.t("no")
+                };
             BRS.sendRequest("getIndirectIncoming", {
                 "transaction": transaction.transaction,
                 "account": BRS.account
             }, function(transactionII, input) {
+                let userQuantity = "0"
+                let userAmount = "0"
                 if (transactionII.errorCode === undefined) {
-                BRS.sendRequest("getAsset", {
-                    "asset": transaction.attachment.assetToDistribute === "0" ? transaction.attachment.asset : transaction.attachment.assetToDistribute
-                }, function(asset) {
-                    var data = {
-                    "type": $.t("distribute_to_holders"),
-                    "asset_name": asset.name,
-                    "quantity": [transactionII.quantityQNT, asset.decimals],
-                    "amount": transactionII.amountNQT,
-                    };
+                    userQuantity = transactionII.quantityQNT
+                    userAmount = transactionII.amountNQT
+                    data.youReceived = $.t("yes")
+                }
 
+                function doneCaching() {
+                    const foundAsset = BRS.assets.find((tkn) => tkn.asset === data.toHoldersOf)
+                    if (foundAsset) {
+                        data.toHoldersOf = foundAsset.name + " - ID: " + data.toHoldersOf
+                    }
+                    if (userAmount !== "0") {
+                        data["amountToYou"] = BRS.formatAmount(userAmount) + " " + BRS.valueSuffix
+                    }
+                    if (data.distributingAsset === "0") {
+                        // todo add language
+                        data.distributingAsset = $.t("no")
+                        delete data.distributingQuantity
+                    } else {
+                        const foundAsset2 = BRS.assets.find((tkn) => tkn.asset === data.distributingAsset)
+                        if (foundAsset2) {
+                            data.distributingAsset = foundAsset2.name + " - ID: " + data.distributingAsset
+                            data.distributingQuantity = BRS.convertToQNTf(data.distributingQuantity, foundAsset2.decimals)
+                            if (userQuantity != 0) {
+                                data["quantityToYou"] = BRS.convertToQNTf(userQuantity, foundAsset2.decimals)
+                            }
+                        } else {
+                            if (userQuantity != 0) {
+                                data["quantityToYou"] = BRS.convertToQNTf(userQuantity, "0") + " [QNT]"
+                            }
+                        }
+                    }
                     if (transaction.sender != BRS.account) {
                         data.sender = BRS.getAccountTitle(transaction, "sender");
                     }
-
                     $("#transaction_info_table tbody").append(BRS.createInfoTable(data));
                     $("#transaction_info_table").show();
 
                     $("#transaction_info_modal").modal("show");
                     BRS.fetchingModalData = false;
-                });
                 }
-                        else {
-                BRS.fetchingModalData = false;
+                let assetsToCache = 1
+                if (transaction.attachment.assetToDistribute !== "0") {
+                    assetsToCache = 2
+                    BRS.sendRequest("getAsset", {
+                        "asset": transaction.attachment.assetToDistribute
+                    }, function(asset) {
+                        if (!asset.errorCode) {
+                            BRS.cacheAsset(asset)
+                        }
+                        assetsToCache--;
+                        if (assetsToCache === 0) {
+                            doneCaching()
+                        }
+                    })
                 }
+                BRS.sendRequest("getAsset", {
+                    "asset": transaction.attachment.asset
+                }, function(asset) {
+                    if (!asset.errorCode) {
+                        BRS.cacheAsset(asset)
+                    }
+                    assetsToCache--;
+                    if (assetsToCache === 0) {
+                        doneCaching()
+                    }
+                })
             });
-
             break;
 
 	    default:
