@@ -301,6 +301,35 @@ var BRS = (function(BRS, $, undefined) {
                     BRS.addToConsole(this.url, this.type, this.data, response);
                 }
 
+                response.unconfirmed = false;
+                switch (requestType) {
+                case "getTransaction":
+                    if (!response.errorCode) {
+                        if (response.block === undefined) {
+                            response.unconfirmed = true;
+                        } else {
+                            response.unconfirmed = false;
+                        }
+                    }
+                    break;
+                case "getUnconfirmedTransactions":
+                    if (response.unconfirmedTransactions) {
+
+                        response.unconfirmedTransactions.forEach(transaction => transaction.unconfirmed = true)
+                    }
+                    break;
+                case "getAccountTransactions":
+                    if (response.transactions) {
+                        response.transactions.forEach(trans => {
+                            if (trans.block === undefined) {
+                                trans.unconfirmed = true;
+                            } else {
+                                trans.unconfirmed = false;
+                            }
+                        })
+                    }
+                }
+
                 if (typeof data == "object" && "recipient" in data) {
                   var address = new NxtAddress();
                     if (/^BURST\-/i.test(data.recipient)) {

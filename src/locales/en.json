@@ -533,6 +533,7 @@
     "mintable_asset": "Mintable asset. Not supported by Classic. Use BTDEX wallet for more options",
     "min_nr_of_options": "Minimum Nr of Options",
     "more_info": "More Info",
+    "multiple": "Multiple",
     "multiple_assets_differences": "Multiple different tokens have been sold and\/or bought.",
     "my_assets": "My Tokens",
     "my_completed_orders": "My Completed Orders",

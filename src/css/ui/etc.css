@@ -67,6 +67,10 @@ brs_update_hashes {
   border: 1px solid #E4404B !important;
 }
 
+.transaction-value-negative {
+    color: red;
+}
+
 .alert-no-icon {
   margin-left: 0px !important;
   padding-left: 15px !important;

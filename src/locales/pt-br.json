@@ -514,6 +514,7 @@
    "mintable_asset": "Ativo cunhável. Não suportado no Classic. Use a carteira BTDEX para mais opções",
    "min_nr_of_options" : "Número mínimo de opções",
    "more_info" : "Mais informações",
+   "multiple": "Múltiplos",
    "multiple_assets_differences" : "Vários ativos diferentes foram vendidos e comprados.",
    "my_assets" : "Meus ativos",
    "my_completed_orders" : "Minhas ordens concluídas",

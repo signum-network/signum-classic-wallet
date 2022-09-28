@@ -530,6 +530,9 @@ var BRS = (function(BRS, $, undefined) {
         return BRS.format(BRS.convertToQNTf(quantity, decimals, true), no_escaping);
     };
 
+    /** If amount is string or BigInteger, then assume it is NQT
+     *  If the amount is Number, then assume it is NOT NQT
+     */
     BRS.formatAmount = function(amount, round, no_escaping) {
         if (typeof amount === "undefined") {
             return "0";
@@ -737,6 +740,9 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.getAccountLink = function(object, acc) {
+        if (acc === 'multiple') {
+            return $.t("multiple")
+        }
         if (typeof object[acc + "RS"] == "undefined") {
             if (object["type"] === 2 && object["subtype"] === 1) {
                 return "Burn address"

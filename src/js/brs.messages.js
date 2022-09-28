@@ -125,7 +125,7 @@ var BRS = (function(BRS, $, undefined) {
 	    if (transactions.length) {
 		for (var i=0; i<transactions.length; i++) {
 		    var trans = transactions[i];
-		    if (trans.confirmed && trans.type == 1 && trans.subtype == 0 && trans.senderRS != BRS.accountRS) {
+		    if (!trans.unconfirmed && trans.type == 1 && trans.subtype == 0 && trans.senderRS != BRS.accountRS) {
 			if (trans.height >= BRS.lastBlockHeight - 3 && !_latestMessages[trans.transaction]) {
 			    _latestMessages[trans.transaction] = trans;
 			    $.notify($.t("you_received_message", {

@@ -24,7 +24,6 @@ var BRS = (function(BRS, $, undefined) {
                 for (var i = 0; i < response.transactions.length; i++) {
                     var transaction = response.transactions[i];
 
-                    transaction.confirmed = true;
                     transactions.push(transaction);
 
                     transactionIds.push(transaction.transaction);
@@ -43,69 +42,18 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.handleInitialTransactions = function(transactions, transactionIds) {
+        let rows = ''
         if (transactions.length) {
-            var rows = "";
-
             transactions.sort(BRS.sortArray);
 
             if (transactionIds.length) {
                 BRS.lastTransactions = transactionIds.toString();
             }
 
-            for (var i = 0; i < transactions.length; i++) {
-                var transaction = transactions[i];
-                var transactionType = BRS.getTransactionNameFromType(transaction);
-
-                var receiving = transaction.recipient == BRS.account;
-                var amount = transaction.amountNQT;
-                if (transaction.type === 0) {
-                    if (transaction.subtype === 1) {
-                        receiving = false;
-                        for (var i1 = 0; i1 < transaction.attachment.recipients.length; i1++) {
-                            var recipient = transaction.attachment.recipients[i1];
-                            if (recipient[0] === BRS.account) {
-                                receiving = true;
-                                amount = recipient[1];
-                            }
-                        }
-                    } else if (transaction.subtype === 2) {
-                        receiving = false;
-                        for (var i1 = 0; i1 < transaction.attachment.recipients.length; i1++) {
-                            if (transaction.attachment.recipients[i1] === BRS.account) {
-                                receiving = true;
-                                amount = (parseInt(transaction.amountNQT) / transaction.attachment.recipients.length).toString();
-                            }
-                        }
-                    }
-                }
-                else if (transaction.type === 20){
-                  if(transaction.subtype === 2)
-                    receiving = true;
-                  if(transaction.subtype === 1 || transaction.subtype === 2)
-                    amount = transaction.attachment.amountNQT.toString();
-                }
-
-                if (transaction.type === 2 && transaction.subtype === 8 && transaction.sender != BRS.account) {
-                    receiving = true;
-                }
-        
-                var account = (receiving ? "sender" : "recipient");
-
-                if (transaction.amountNQT) {
-                    transaction.amount = new BigInteger(transaction.amountNQT);
-                    transaction.fee = new BigInteger(transaction.feeNQT);
-                }
-
-                let amountText = BRS.formatAmount(amount)
-                if (transaction.type === 2 && transaction.subtype === 8) {
-                    amountText = "(" + amountText + ")";
-                }
-
-                rows += "<tr class='" + (!transaction.confirmed ? "tentative" : "confirmed") + "'><td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "' data-timestamp='" + String(transaction.timestamp).escapeHTML() + "'>" + BRS.formatTimestamp(transaction.timestamp) + "</a></td><td>" + transactionType + "</td><td style='width:5px;padding-right:0;'>" + (transaction.type == 0 ? (receiving ? "<i class='fas fa-plus-circle' style='color:#65C62E'></i>" : "<i class='fas fa-minus-circle' style='color:#E04434'></i>") : "") + "</td><td><span" + (transaction.type == 0 && receiving ? " style='color:#006400'" : (!receiving && amount > 0 ? " style='color:red'" : "")) + ">" + amountText + "</span> <span" + ((!receiving && transaction.type == 0) ? " style='color:red'" : "") + ">+</span> <span" + (!receiving ? " style='color:red'" : "") + ">" + BRS.formatAmount(transaction.fee) + "</span></td><td>" + BRS.getAccountLink(transaction, account) + "</td><td class='confirmations' data-confirmations='" + String(transaction.confirmations).escapeHTML() + "' data-content='" + BRS.formatAmount(transaction.confirmations) + " confirmations' data-container='body' data-initial='true'>" + (transaction.confirmations > 10 ? "10+" : String(transaction.confirmations).escapeHTML()) + "</td></tr>";
-            }
-
-            $("#dashboard_transactions_table tbody").empty().append(rows);
+            rows = transactions.reduce((prev, currTr) => prev + getTransactionRowDashboardHTML(currTr), '')
         }
+
+        $("#dashboard_transactions_table tbody").empty().append(rows);
 
         BRS.dataLoadFinished($("#dashboard_transactions_table"));
     };
@@ -127,12 +75,7 @@ var BRS = (function(BRS, $, undefined) {
                     "includeIndirect": true
                 }, function(response) {
                     if (response.transactions && response.transactions.length) {
-                        var transactionIds = [];
-
-                        $.each(response.transactions, function(key, transaction) {
-                            transactionIds.push(transaction.transaction);
-                            response.transactions[key].confirmed = true;
-                        });
+                        const transactionIds = response.transactions.map(tr => tr.transaction)
 
                         BRS.getUnconfirmedTransactions(function(unconfirmedTransactions) {
                             BRS.handleIncomingTransactions(response.transactions.concat(unconfirmedTransactions), transactionIds);
@@ -176,10 +119,6 @@ var BRS = (function(BRS, $, undefined) {
 
                 for (var i = 0; i < response.unconfirmedTransactions.length; i++) {
                     var unconfirmedTransaction = response.unconfirmedTransactions[i];
-
-                    unconfirmedTransaction.confirmed = false;
-                    unconfirmedTransaction.unconfirmed = true;
-                    unconfirmedTransaction.confirmations = "/";
 
                     if (unconfirmedTransaction.attachment) {
                         for (var key in unconfirmedTransaction.attachment) {
@@ -276,71 +215,24 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.incoming.updateDashboardTransactions = function(newTransactions, unconfirmed) {
-        var newTransactionCount = newTransactions.length;
+        if (newTransactions.length) {
+            let onlyUnconfirmed = true;
 
-        if (newTransactionCount) {
-            var rows = "";
-
-            var onlyUnconfirmed = true;
-
-            for (var i = 0; i < newTransactionCount; i++) {
-                var transaction = newTransactions[i];
-                var transactionType = BRS.getTransactionNameFromType(transaction);
-
-                var receiving = transaction.recipient == BRS.account;
-                var amount = transaction.amountNQT;
-                if (transaction.type === 0) {
-                    if (transaction.subtype === 1) {
-                        receiving = false;
-                        for (var i1 = 0; i1 < transaction.attachment.recipients.length; i1++) {
-                            var recipient = transaction.attachment.recipients[i1];
-                            if (recipient[0] === BRS.account) {
-                                receiving = true;
-                                amount = recipient[1];
-                            }
-                        }
-                    } else if (transaction.subtype === 2) {
-                        receiving = false;
-                        for (var i1 = 0; i1 < transaction.attachment.recipients.length; i1++) {
-                            if (transaction.attachment.recipients[i1] === BRS.account) {
-                                receiving = true;
-                                amount = (parseInt(transaction.amountNQT) / transaction.attachment.recipients.length).toString();
-                            }
-                        }
-                    }
-                }
-                if (transaction.type === 2 && transaction.subtype === 8 && transaction.sender != BRS.account) {
-                    receiving = true;
-                }
-        
-                var account = (receiving ? "sender" : "recipient");
-
-                if (transaction.confirmed) {
+            const rows = newTransactions.reduce((prev, currTr) => {
+                if (!currTr.unconfirmed) {
                     onlyUnconfirmed = false;
                 }
-
-                if (transaction.amountNQT) {
-                    transaction.amount = new BigInteger(transaction.amountNQT);
-                    transaction.fee = new BigInteger(transaction.feeNQT);
-                }
-
-                let amountText = BRS.formatAmount(amount)
-                if (transaction.type === 2 && transaction.subtype === 8) {
-                    amountText = "(" + amountText + ")";
-                }
-
-                rows += "<tr class='" + (!transaction.confirmed ? "tentative" : "confirmed") + "'><td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "' data-timestamp='" + String(transaction.timestamp).escapeHTML() + "'>" + BRS.formatTimestamp(transaction.timestamp) + "</a></td><td>" + transactionType + "</td><td style='width:5px;padding-right:0;'>" + (transaction.type == 0 ? (receiving ? "<i class='fas fa-plus-circle' style='color:#65C62E'></i>" : "<i class='fas fa-minus-circle' style='color:#E04434'></i>") : "") + "</td><td><span" + (transaction.type == 0 && receiving ? " style='color:#006400'" : (!receiving && amount > 0 ? " style='color:red'" : "")) + ">" + amountText + "</span> <span" + ((!receiving && transaction.type == 0) ? " style='color:red'" : "") + ">+</span> <span" + (!receiving ? " style='color:red'" : "") + ">" + BRS.formatAmount(transaction.fee) + "</span></td><td>" + BRS.getAccountLink(transaction, account) + "</td><td class='confirmations' data-confirmations='" + String(transaction.confirmations).escapeHTML() + "' data-content='" + (transaction.confirmed ? BRS.formatAmount(transaction.confirmations) + " " + $.t("confirmations") : $.t("unconfirmed_transaction")) + "' data-container='body' data-initial='true'>" + (transaction.confirmations > 10 ? "10+" : String(transaction.confirmations).escapeHTML()) + "</td></tr>";
-            }
+                return prev + getTransactionRowDashboardHTML(currTr);
+            }, '')
 
             if (onlyUnconfirmed) {
                 $("#dashboard_transactions_table tbody tr.tentative").remove();
                 $("#dashboard_transactions_table tbody").prepend(rows);
-            }
-            else {
+            } else {
                 $("#dashboard_transactions_table tbody").empty().append(rows);
             }
 
-            var $parent = $("#dashboard_transactions_table").parent();
+            const $parent = $("#dashboard_transactions_table").parent();
 
             if ($parent.hasClass("data-empty")) {
                 $parent.removeClass("data-empty");
@@ -348,8 +240,7 @@ var BRS = (function(BRS, $, undefined) {
                     $parent.parent().addClass("no-padding");
                 }
             }
-        }
-        else if (unconfirmed) {
+        } else if (unconfirmed) {
             $("#dashboard_transactions_table tbody tr.tentative").remove();
         }
     };
@@ -361,9 +252,6 @@ var BRS = (function(BRS, $, undefined) {
         }, function(response) {
             if (!response.errorCode) {
                 response.transaction = transactionId;
-                response.confirmations = "/";
-                response.confirmed = false;
-                response.unconfirmed = true;
 
                 if (response.attachment) {
                     for (var key in response.attachment) {
@@ -415,9 +303,9 @@ var BRS = (function(BRS, $, undefined) {
             return;
         }
 
-        var rows = "";
-        var unconfirmedTransactions;
-        var params = {
+        let rows = "";
+        let unconfirmedTransactions;
+        const params = {
             "account": BRS.account,
             "firstIndex": BRS.pageSize * (BRS.pageNumber - 1),
             "lastIndex": BRS.pageSize * BRS.pageNumber,
@@ -428,37 +316,23 @@ var BRS = (function(BRS, $, undefined) {
             params.type = BRS.transactionsPageType.type;
             params.subtype = BRS.transactionsPageType.subtype;
             unconfirmedTransactions = BRS.getUnconfirmedTransactionsFromCache(params.type, params.subtype);
-        }
-        else {
+        } else {
             unconfirmedTransactions = BRS.unconfirmedTransactions;
         }
 
-        if (unconfirmedTransactions) {
-            for (var i = 0; i < unconfirmedTransactions.length; i++) {
-                rows += BRS.getTransactionRowHTML(unconfirmedTransactions[i]);
-            }
+        if (unconfirmedTransactions && BRS.pageNumber == 1) {
+            rows = unconfirmedTransactions.reduce((prev, currTr) => prev + getTransactionRowHTML(currTr), '')
         }
 
-        BRS.sendRequest("getAccountTransactions+", params, function(response) {
+        BRS.sendRequest("getAccountTransactions+", params, (response) => {
             if (response.transactions && response.transactions.length) {
                 if (response.transactions.length > BRS.pageSize) {
                     BRS.hasMorePages = true;
                     response.transactions.pop();
                 }
-
-                for (var i = 0; i < response.transactions.length; i++) {
-                    var transaction = response.transactions[i];
-
-                    transaction.confirmed = true;
-
-                    rows += BRS.getTransactionRowHTML(transaction);
-                }
-
-                BRS.dataLoaded(rows);
+                rows += response.transactions.reduce((prev, currTr) => prev + getTransactionRowHTML(currTr), '')
             }
-            else {
-                BRS.dataLoaded(rows);
-            }
+            BRS.dataLoaded(rows);
         });
     };
 
@@ -468,12 +342,10 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.displayUnconfirmedTransactions = function() {
         BRS.sendRequest("getUnconfirmedTransactions", function(response) {
-            var rows = "";
-
+            let rows = ''
+            
             if (response.unconfirmedTransactions && response.unconfirmedTransactions.length) {
-                for (var i = 0; i < response.unconfirmedTransactions.length; i++) {
-                    rows += BRS.getTransactionRowHTML(response.unconfirmedTransactions[i]);
-                }
+                rows = response.unconfirmedTransactions.reduce((prev, currTr) => prev + getTransactionRowHTML(currTr), '')
             }
 
             BRS.dataLoaded(rows);
@@ -642,55 +514,98 @@ var BRS = (function(BRS, $, undefined) {
         return transactionType;
     };
 
-    BRS.getTransactionRowHTML = function(transaction) {
-        var transactionType = BRS.getTransactionNameFromType(transaction);
+    function formatTransactionDetails(transaction) {
+        const nameOfTransaction = BRS.getTransactionNameFromType(transaction);
+        let toFromMe = (transaction.sender == BRS.account || transaction.recipient == BRS.account)
+        let senderOrRecipientOrMultiple = "sender";
+        if (toFromMe && transaction.sender == BRS.account) {
+            senderOrRecipientOrMultiple = 'recipient'
+        }
+        let amount = transaction.amountNQT;
+        let amountText = BRS.formatAmount(amount)
+        let foundAsset, newAmountText;
 
-        var receiving = transaction.recipient == BRS.account;
-        var amount = transaction.amountNQT;
-        if (transaction.type === 0) {
-            if (transaction.subtype === 1) {
-                receiving = false;
-                for (var i1 = 0; i1 < transaction.attachment.recipients.length; i1++) {
-                    var recipient = transaction.attachment.recipients[i1];
-                    if (recipient[0] === BRS.account) {
-                        receiving = true;
-                        amount = recipient[1];
-                    }
+        // process transactions exceptions
+        switch (transaction.type) {
+        case 0: // "Payment"
+            switch (transaction.subtype) {
+            case 1: // "Multi-out payment"
+                if (transaction.sender == BRS.account) {
+                    senderOrRecipientOrMultiple = "multiple"
+                    break;
                 }
-            } else if (transaction.subtype === 2) {
-                receiving = false;
-                for (var i1 = 0; i1 < transaction.attachment.recipients.length; i1++) {
-                    if (transaction.attachment.recipients[i1] === BRS.account) {
-                        receiving = true;
+                transaction.attachment.recipients.find( Tuple => {
+                    if (Tuple[0] === BRS.account) {
+                        toFromMe = true;
+                        senderOrRecipientOrMultiple = "sender"
+                        amount = Tuple[1];
+                        amountText = BRS.formatAmount(amount)
+                        return true;
+                    }
+                })
+                break;
+            case 2: // "Multi-out Same Payment"
+                if (transaction.sender == BRS.account) {
+                    senderOrRecipientOrMultiple = "multiple"
+                    break;
+                }
+                transaction.attachment.recipients.find( rec => {
+                    if (rec === BRS.account) {
+                        toFromMe = true;
+                        senderOrRecipientOrMultiple = "sender"
                         amount = (parseInt(transaction.amountNQT) / transaction.attachment.recipients.length).toString();
+                        amountText = BRS.formatAmount(amount)
+                        return true;
                     }
+                })
+            }
+            break;
+        case 2: // "Colored coins"
+            switch (transaction.subtype) {
+            case 1: // "Asset Transfer"
+                foundAsset = BRS.assets.find((tkn) => tkn.asset === transaction.attachment.asset)
+                newAmountText = ''
+                if (foundAsset) {
+                    newAmountText = `${BRS.formatQuantity(transaction.attachment.quantityQNT, foundAsset.decimals)} ${foundAsset.name.toUpperCase()}`;
+                } else {
+                    newAmountText = `${transaction.attachment.quantityQNT} [QNT]`;
                 }
+                if (amountText !== "0") {
+                    newAmountText += `<br>${amountText} ${BRS.valueSuffix}`
+                }
+                amountText = newAmountText
+                break;
+            case 2: // "Ask Order Placement"
+            case 3: // "Bid Order Placement"
+                senderOrRecipientOrMultiple = "sender";
+                break;
+            case 8: // "Asset Distribute to Holders"
+                // Actually there is no way to know the current account is in recipients without another query.
+                // Assuming yes, because it will be wrong only in unconfirmed transaction.
+                toFromMe = true
+                senderOrRecipientOrMultiple = "sender"
+                if (transaction.sender != BRS.account) {
+                    // amount is unknow only if current user is in recipient list
+                    amountText = "(" + amountText + ")";    
+                }
+                break;
+            }
+            break;
+        case 20:  // "Mining",
+            switch (transaction.subtype) {
+            case 1: // "Add Commitment"
+                senderOrRecipientOrMultiple = "sender";
+                amount = transaction.attachment.amountNQT.toString();
+                amountText = BRS.formatAmount(amount)
+                break;
+            case 2: // "Remove Commitment"
+                senderOrRecipientOrMultiple = "sender";
+                amount = transaction.attachment.amountNQT.toString();
+                amountText = BRS.formatAmount(amount)
             }
         }
-        else if (transaction.type === 20){
-          if(transaction.subtype === 1){
-            receiving = false;
-            amount = transaction.attachment.amountNQT.toString();
-          }
-          else if (transaction.subtype === 2){
-            receiving = true;
-            amount = transaction.attachment.amountNQT.toString();            
-          }
-        }
 
-        if (transaction.type === 2 && transaction.subtype === 8 && transaction.sender != BRS.account) {
-            receiving = true;
-        }
-
-        var account = (receiving ? "sender" : "recipient");
-
-        if (transaction.amountNQT) {
-            transaction.amount = new BigInteger(transaction.amountNQT);
-            transaction.fee = new BigInteger(transaction.feeNQT);
-        }
-
-        var hasMessage = false;
-
+        let hasMessage = false;
         if (transaction.attachment) {
             if (transaction.attachment.encryptedMessage || transaction.attachment.message) {
                 hasMessage = true;
@@ -700,12 +615,76 @@ var BRS = (function(BRS, $, undefined) {
             }
         }
 
-        let amountText = BRS.formatAmount(amount)
-        if (transaction.type === 2 && transaction.subtype === 8) {
-            amountText = "(" + amountText + ")";
+        let circleText = ""
+        let colorClass = ""
+        if (toFromMe && amountText !== "0") {
+            if (senderOrRecipientOrMultiple === "sender") {
+                circleText = "<i class='fas fa-plus-circle' style='color:#65C62E'></i>"
+            } else {
+                circleText = "<i class='fas fa-minus-circle' style='color:#E04434'></i>"
+                colorClass = "class='transaction-value-negative'"
+            }
         }
 
-        return "<tr " + (!transaction.confirmed && (transaction.recipient == BRS.account || transaction.sender == BRS.account) ? " class='tentative'" : "") + "><td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "'>" + String(transaction.transaction).escapeHTML() + "</a></td><td>" + (hasMessage ? "<i class='far fa-envelope-open'></i>&nbsp;" : "/") + "</td><td>" + BRS.formatTimestamp(transaction.timestamp) + "</td><td>" + transactionType + "</td><td style='width:5px;padding-right:0;'>" + (transaction.type == 0 ? (receiving ? "<i class='fas fa-plus-circle' style='color:#65C62E'></i>" : "<i class='fas fa-minus-circle' style='color:#E04434'></i>") : "") + "</td><td " + (transaction.type == 0 && receiving ? " style='color:#006400;'" : (!receiving && amount > 0 ? " style='color:red'" : "")) + ">" + amountText + "</td><td " + (!receiving ? " style='color:red'" : "") + ">" + BRS.formatAmount(transaction.fee) + "</td><td>" + BRS.getAccountLink(transaction, account) + "</td><td class='confirmations' data-content='" + (transaction.confirmed ? BRS.formatAmount(transaction.confirmations) + " " + $.t("confirmations") : $.t("unconfirmed_transaction")) + "' data-container='body' data-placement='left'>" + (!transaction.confirmed ? "/" : (transaction.confirmations > 1440 ? "1440+" : BRS.formatAmount(transaction.confirmations))) + "</td></tr>";
+        const accountLink = BRS.getAccountLink(transaction, senderOrRecipientOrMultiple)
+
+        return {
+            nameOfTransaction,
+            accountLink,
+            toFromMe,
+            amount,
+            amountText,
+            foundAsset,
+            hasMessage,
+            circleText,
+            colorClass
+        }
+    }
+
+    function getTransactionRowDashboardHTML (transaction) {
+        const details = formatTransactionDetails(transaction);
+
+        let confirmationText = String(transaction.confirmations).escapeHTML()
+        if (transaction.unconfirmed) {
+            confirmationText = "/"
+        } else if (transaction.confirmations > 10) {
+            confirmationText = "10+"
+        }
+
+        let rowStr = ''
+        rowStr += "<tr class='" + (transaction.unconfirmed ? "tentative" : "confirmed") + "'>"
+        rowStr += "<td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "' data-timestamp='" + String(transaction.timestamp).escapeHTML() + "'>" + BRS.formatTimestamp(transaction.timestamp) + "</a></td>"
+        rowStr += "<td>" + details.nameOfTransaction + "</td>"
+        rowStr += "<td>" + details.circleText + "</td>"
+        rowStr += `<td ${details.colorClass}>${details.amountText}</td>`
+        rowStr += `<td>${details.accountLink}</td>`
+        rowStr += `<td>${confirmationText}</td>`
+        rowStr += "</tr>";
+
+        return rowStr;
+    }
+
+    function getTransactionRowHTML(transaction) {
+        const details = formatTransactionDetails(transaction);
+
+        let confirmationText = BRS.formatAmount(transaction.confirmations)
+        if (transaction.unconfirmed) {
+            confirmationText = "/"
+        }
+        let rowStr = ''
+        rowStr += "<tr " + ((transaction.unconfirmed && details.toFromMe) ? " class='tentative'" : "") + ">";
+        rowStr += "<td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "'>" + String(transaction.transaction).escapeHTML() + "</a></td>"
+        rowStr += "<td>" + (details.hasMessage ? "<i class='far fa-envelope-open'></i>&nbsp;" : "/") + "</td>"
+        rowStr += "<td>" + BRS.formatTimestamp(transaction.timestamp) + "</td>"
+        rowStr += "<td>" + details.nameOfTransaction + "</td>"
+        rowStr += "<td>" + details.circleText + "</td>"
+        rowStr += `<td ${details.colorClass}>${details.amountText}</td>`
+        rowStr += "<td>" + BRS.formatAmount(transaction.feeNQT) + "</td>"
+        rowStr += `<td>${details.accountLink}</td>`
+        rowStr += "<td>" + confirmationText + "</td>"
+        rowStr += "</tr>";
+
+        return rowStr;
     };
 
     BRS.evTransactionsPageTypeClick = function(e) {
