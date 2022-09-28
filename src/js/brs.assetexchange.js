@@ -31,6 +31,21 @@ var BRS = (function(BRS, $, undefined) {
         });
     }
 
+    BRS.loadCachedAssets = function () {
+        if (!BRS.databaseSupport) {
+            // only cached
+            return;
+        }
+        BRS.assets = [];
+        BRS.assetIds = [];
+        BRS.database.select("assets", null, function(error, assets) {
+            //select already bookmarked assets
+            if (error === null) {
+                assets.forEach(asset => BRS.cacheAsset(asset))
+            }
+        });
+    }
+
     function bookmarkUserAssets(callback) {
         //check owned assets, see if any are not yet in bookmarked assets
         if (!BRS.accountInfo.unconfirmedAssetBalances) {
@@ -66,6 +81,7 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.cacheAsset = function(asset) {
         if (BRS.assetIds.indexOf(asset.asset) != -1) {
+            BRS.assets.quantityCirculatingQNT = String(asset.quantityCirculatingQNT)
             return;
         }
 
@@ -77,9 +93,9 @@ var BRS = (function(BRS, $, undefined) {
 
         asset = {
             "asset": String(asset.asset),
-            "name": String(asset.name).toLowerCase(),
+            "name": String(asset.name),
             "description": String(asset.description),
-            "groupName": String(asset.groupName).toLowerCase(),
+            "groupName": String(asset.groupName),
             "account": String(asset.account),
             "accountRS": String(asset.accountRS),
             "quantityQNT": String(asset.quantityQNT),

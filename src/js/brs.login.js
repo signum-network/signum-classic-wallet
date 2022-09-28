@@ -153,6 +153,8 @@ var BRS = (function(BRS, $, undefined) {
 
         BRS.setupClipboardFunctionality();
 
+        BRS.loadCachedAssets();
+
         BRS.checkLocationHash(BRS.getEncryptionPassword());
 
         $(window).on("hashchange", BRS.checkLocationHash);

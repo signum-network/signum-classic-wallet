@@ -393,6 +393,7 @@ var BRS = (function(BRS, $, undefined) {
             BRS.sendRequest("getAsset", {
                 "asset": transaction.attachment.asset
             }, function(asset, input) {
+                BRS.cacheAsset(asset)
                 var data = {
                 "type": $.t("asset_transfer"),
                 "asset_name": asset.name,
@@ -472,6 +473,7 @@ var BRS = (function(BRS, $, undefined) {
                 BRS.sendRequest("getAsset", {
                     "asset": transaction.attachment.asset
                 }, function(asset) {
+                    BRS.cacheAsset(asset)
                     var data = {
                     "type": $.t("ask_order_cancellation"),
                     "asset_name": asset.name,
@@ -507,6 +509,7 @@ var BRS = (function(BRS, $, undefined) {
                 BRS.sendRequest("getAsset", {
                     "asset": transaction.attachment.asset
                 }, function(asset) {
+                    BRS.cacheAsset(asset)
                     var data = {
                     "type": $.t("bid_order_cancellation"),
                     "asset_name": asset.name,
