@@ -1002,7 +1002,7 @@ var BRS = (function(BRS, $, undefined) {
                 value = String(value).escapeHTML().nl2br();
             }
 
-            rows += "<tr><td style='font-weight:bold;white-space:nowrap" + (fixed ? ";width:150px" : "") + "'>" + $.t(key).escapeHTML() + (type ? " " + type.escapeHTML() : "") + ":</td><td style='width:90%;word-break:break-all'>" + value + "</td></tr>";
+            rows += "<tr><td style='font-weight:bold;'>" + $.t(key).escapeHTML() + (type ? " " + type.escapeHTML() : "") + ":</td><td style='word-break: break-word;'>" + value + "</td></tr>";
         }
 
         return rows;
