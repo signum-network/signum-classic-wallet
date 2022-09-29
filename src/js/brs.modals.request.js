@@ -81,11 +81,11 @@ var BRS = (function(BRS, $, undefined) {
                 $("#request_burst_immutable_response").html("No");
             }
             if(suggested_fee){
-                $("#request_burst_qrcode_response").html('<img src="/burst?requestType=generateSendTransactionQRCode&receiverId='+receiverId+'&amountNQT='+amountNQT+'&feeSuggestionType='+suggested_fee+immutable+'"/>');
+                $("#request_burst_qrcode_response").html(`<img src="${BRS.server}/burst?requestType=generateSendTransactionQRCode&receiverId=${receiverId}&amountNQT=${amountNQT}&feeSuggestionType=${suggested_fee}${immutable}"/>`);
                 $("#request_burst_fee_response").html(suggested_fee.charAt(0).toUpperCase() + suggested_fee.slice(1));
             }
             else{
-                $("#request_burst_qrcode_response").html('<img src="/burst?requestType=generateSendTransactionQRCode&receiverId='+receiverId+'&amountNQT='+amountNQT+'&feeNQT='+feeNQT+immutable+'"/>');
+                $("#request_burst_qrcode_response").html(`<img src="${BRS.server}/burst?requestType=generateSendTransactionQRCode&receiverId=${receiverId}&amountNQT=${amountNQT}&feeNQT=${feeNQT}${immutable}"/>`);
                 $("#request_burst_fee_response").html($("#request_burst_fee").val());
             }
             $("#generate_qr_button").hide();
