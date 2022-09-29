@@ -248,78 +248,68 @@ var BRS = (function(BRS, $, undefined) {
         });
     };
 
+    BRS.pages.blocks_forged = function() {
+        BRS.sendRequest("getAccountBlockIds+", {
+            "account": BRS.account,
+            "timestamp": 0
+        }, function(response) {
+            if (!response.blockIds || response.blockIds.length == 0) {
+                BRS.blocksPageLoaded([]);
+                return;
+            }
+            // We have blocks!
+            let blocks = [];
+            let nrBlocks = 0;
+
+            const blockIds = response.blockIds.slice(0, 100);
+
+            if (response.blockIds.length > 100) {
+                $("#blocks_page_forged_warning").show();
+            }
+
+            for (let i = 0; i < blockIds.length; i++) {
+                BRS.sendRequest("getBlock+", {
+                    "block": blockIds[i],
+                    "_extra": {
+                        "nr": i
+                    }
+                }, function(block, input) {
+                    if (BRS.currentPage != "blocks_forged") {
+                        blocks = {};
+                        return;
+                    }
+
+                    block.block = input.block;
+                    blocks[input._extra.nr] = block;
+                    nrBlocks++;
+
+                    if (nrBlocks == blockIds.length) {
+                        BRS.blocksPageLoaded(blocks);
+                    }
+                });
+            }
+        });
+    }
+
     BRS.pages.blocks = function() {
-        if (BRS.blocksPageType == "forged_blocks") {
-            $("#forged_fees_total_box, #forged_blocks_total_box").show();
-            $("#blocks_transactions_per_hour_box, #blocks_generation_time_box").hide();
-
-            BRS.sendRequest("getAccountBlockIds+", {
-                "account": BRS.account,
-                "timestamp": 0
-            }, function(response) {
-                if (response.blockIds && response.blockIds.length) {
-                    var blocks = [];
-                    var nrBlocks = 0;
-
-                    var blockIds = response.blockIds.slice(0, 100);
-
-                    if (response.blockIds.length > 100) {
-                        $("#blocks_page_forged_warning").show();
-                    }
-
-                    for (var i = 0; i < blockIds.length; i++) {
-                        BRS.sendRequest("getBlock+", {
-                            "block": blockIds[i],
-                            "_extra": {
-                                "nr": i
-                            }
-                        }, function(block, input) {
-                            if (BRS.currentPage != "blocks") {
-                                blocks = {};
-                                return;
-                            }
-
-                            block.block = input.block;
-                            blocks[input._extra.nr] = block;
-                            nrBlocks++;
-
-                            if (nrBlocks == blockIds.length) {
-                                BRS.blocksPageLoaded(blocks);
-                            }
-                        });
-                    }
-                }
-                else {
-                    BRS.blocksPageLoaded([]);
-                }
-            });
+        if (BRS.blocks.length >= 100 || BRS.downloadingBlockchain) {
+            // Just show what we have
+            BRS.blocksPageLoaded(BRS.blocks);
+            return;
         }
-        else {
-            $("#forged_fees_total_box, #forged_blocks_total_box").hide();
-            $("#blocks_transactions_per_hour_box, #blocks_generation_time_box").show();
-
-            if (BRS.blocks.length < 100) {
-                if (BRS.downloadingBlockchain) {
-                    BRS.blocksPageLoaded(BRS.blocks);
-                }
-                else {
-                    if (BRS.blocks && BRS.blocks.length) {
-                        var previousBlock = BRS.blocks[BRS.blocks.length - 1].previousBlock;
-                        //if previous block is undefined, dont try add it
-                        if (typeof previousBlock !== "undefined") {
-                            BRS.getBlock(previousBlock, BRS.finish100Blocks, true);
-                        }
-                    }
-                    else {
-                        BRS.blocksPageLoaded([]);
-                    }
-                }
-            }
-            else {
-                BRS.blocksPageLoaded(BRS.blocks);
-            }
+        if (BRS.blocks.length < 2) {
+            // should never happens because dashboard already loaded 10 of them
+            // buuut then show nothing
+            BRS.blocksPageLoaded([]);
+            return;
         }
-    };
+        // partial blocks only, fetch 100 of them
+        const previousBlock = BRS.blocks[BRS.blocks.length - 1].previousBlock;
+        //if previous block is undefined, dont try add it
+        if (typeof previousBlock !== "undefined") {
+            BRS.getBlock(previousBlock, BRS.finish100Blocks, true);
+        }
+    }
 
     BRS.incoming.blocks = function() {
         BRS.loadPage("blocks");
@@ -379,17 +369,15 @@ var BRS = (function(BRS, $, undefined) {
         averageFee = BRS.convertToNQT(averageFee);
         averageAmount = BRS.convertToNQT(averageAmount);
 
-        $("#blocks_average_fee").html(BRS.formatStyledAmount(averageFee)).removeClass("loading_dots");
-        $("#blocks_average_amount").html(BRS.formatStyledAmount(averageAmount)).removeClass("loading_dots");
-
-        if (BRS.blocksPageType == "forged_blocks") {
+        if (BRS.currentPage == "blocks_forged") {
             if (blocks.length == 100) {
                 blockCount = blocks.length + "+";
             }
             else {
                 blockCount = blocks.length;
             }
-
+            $("#blocks_forged_average_fee").html(BRS.formatStyledAmount(averageFee)).removeClass("loading_dots");
+            $("#blocks_forged_average_amount").html(BRS.formatStyledAmount(averageAmount)).removeClass("loading_dots");
             $("#forged_blocks_total").html(blockCount).removeClass("loading_dots");
             $("#forged_fees_total").html(BRS.formatStyledAmount(BRS.accountInfo.forgedBalanceNQT)).removeClass("loading_dots");
         }
@@ -400,6 +388,8 @@ var BRS = (function(BRS, $, undefined) {
             else {
                 $("#blocks_transactions_per_hour").html(Math.round(totalTransactions / (time / 60) * 60)).removeClass("loading_dots");
             }
+            $("#blocks_average_fee").html(BRS.formatStyledAmount(averageFee)).removeClass("loading_dots");
+            $("#blocks_average_amount").html(BRS.formatStyledAmount(averageAmount)).removeClass("loading_dots");
             $("#blocks_average_generation_time").html(Math.round(time / 100) + "s").removeClass("loading_dots");
         }
 

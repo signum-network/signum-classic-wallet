@@ -298,23 +298,6 @@
         });
         $("#alias_search").on("submit", BRS.evAliasSearchSubmit);
 
-        // from brs.blocks.js
-        $("#blocks_page_type .btn").click(function(e) {
-            //	$("#blocks_page_type li a").click(function(e) {
-            e.preventDefault();
-            BRS.blocksPageType = $(this).data("type");
-            $("#blocks_average_amount, #blocks_average_fee, #blocks_transactions_per_hour, #blocks_average_generation_time, #forged_blocks_total, #forged_fees_total").html(BRS.loadingDotsHTML).addClass("loading_dots");
-            $("#blocks_table tbody").empty();
-            $("#blocks_table").parent().addClass("data-loading").removeClass("data-empty");
-            BRS.loadPage("blocks");
-        });
-        $("#goto_forged_blocks").click(function(e) {
-            e.preventDefault();
-            $("#blocks_page_type").find(".btn:last").button("toggle");
-            BRS.blocksPageType = "forged_blocks";
-            BRS.goToPage("blocks");
-        });
-
         // from brs.messages.js
         $("#transactions_page_type li a").click(BRS.evTransactionsPageTypeClick);
 
@@ -458,7 +441,7 @@
         });
 
         // from brs.modals.account.js
-        $("#blocks_table, #contacts_table, #transactions_table, #dashboard_transactions_table, #asset_account, #asset_exchange_ask_orders_table, #transfer_history_table, #asset_exchange_bid_orders_table, #alias_info_table, .dgs_page_contents, .modal-content, #register_alias_modal").on("click", "a[data-user]", function(e) {
+        $("#blocks_table, #blocks_forged_table, #contacts_table, #transactions_table, #dashboard_transactions_table, #asset_account, #asset_exchange_ask_orders_table, #transfer_history_table, #asset_exchange_bid_orders_table, #alias_info_table, .dgs_page_contents, .modal-content, #register_alias_modal").on("click", "a[data-user]", function(e) {
             e.preventDefault();
             const account = $(this).data("user");
             BRS.showAccountModal(account);
@@ -531,7 +514,7 @@
         $("#transaction_operations_modal ul.nav li").click(BRS.evTransactionOperationsModalClick);
 
         // from brs.modals.block.js
-        $("#blocks_table, #dashboard_blocks_table").on("click", "a[data-block]",  BRS.evBlocksTableClick);
+        $("#blocks_table, #blocks_forged_table, #dashboard_blocks_table").on("click", "a[data-block]",  BRS.evBlocksTableClick);
 
         // from brs.modals.escrow.js
         $("#escrow_table").on("click", "a[data-escrow]", function(e) {

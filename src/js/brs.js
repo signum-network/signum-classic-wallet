@@ -315,7 +315,7 @@ var BRS = (function(BRS, $, undefined) {
 
         var page = $(this).data("page");
 
-        if (page === BRS.currentPage) {
+        if ( page === "keep" || page === BRS.currentPage) {
             if (data && data.callback) {
                 data.callback();
             }
