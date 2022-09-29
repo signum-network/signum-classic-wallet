@@ -71,7 +71,7 @@ var BRS = (function(BRS, $, undefined) {
 
                 total_multi_out = amount_total + fee;
 
-                $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " SIGNA");
+                $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " " + BRS.valueSuffix);
             }
         } else {
             if (multi_out_recipients < 64) {
@@ -105,7 +105,7 @@ var BRS = (function(BRS, $, undefined) {
 
             total_multi_out = amount_total + fee;
 
-            $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " SIGNA");
+            $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " " + BRS.valueSuffix);
         } else {
             multi_out_recipients--;
             // get amount for each recipient
@@ -123,7 +123,7 @@ var BRS = (function(BRS, $, undefined) {
             $("#multi_out_fee").val(fee.toFixed(8));
             total_multi_out = amount_total + fee;
 
-            $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " SIGNA");
+            $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " " + BRS.valueSuffix);
         }
     };
 
@@ -143,7 +143,7 @@ var BRS = (function(BRS, $, undefined) {
         $("#multi_out_fee").val(fee.toFixed(8));
         total_multi_out = amount_total + fee;
 
-        $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " SIGNA");
+        $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " " + BRS.valueSuffix);
     };
 
     BRS.evMultiOutSameAmountChange = function(e) {
@@ -164,7 +164,7 @@ var BRS = (function(BRS, $, undefined) {
 
         total_multi_out = amount_total + fee;
 
-        $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " SIGNA");
+        $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " " + BRS.valueSuffix);
     };
 
     BRS.evSameOutCheckboxChange = function(e) {
@@ -185,7 +185,7 @@ var BRS = (function(BRS, $, undefined) {
             var fee = BRS.checkMinimumFee(current_fee);
             $("#multi_out_fee").val(fee.toFixed(8));
             total_multi_out = amount_total + fee;
-            $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " SIGNA");
+            $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " " + BRS.valueSuffix);
             }
 
         } else {
@@ -204,7 +204,7 @@ var BRS = (function(BRS, $, undefined) {
             $("#multi_out_fee").val(fee.toFixed(8));
             total_multi_out = amount_total + fee;
 
-            $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " SIGNA");
+            $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " " + BRS.valueSuffix);
         }
     };
 
@@ -214,7 +214,7 @@ var BRS = (function(BRS, $, undefined) {
 
         $("#multi_out_fee").val(fee.toFixed(8));
 
-        $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(amount_total + fee)) + " SIGNA");
+        $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(amount_total + fee)) + " " + BRS.valueSuffix);
     };
 
     BRS.evMultiOutSubmitClick = function(e) {
@@ -427,7 +427,7 @@ var BRS = (function(BRS, $, undefined) {
                 defaultFee = 1;
             }
 
-            $(this).find(".advanced_fee").html(BRS.formatAmount(BRS.convertToNQT(defaultFee)) + " SIGNA");
+            $(this).find(".advanced_fee").html(BRS.formatAmount(BRS.convertToNQT(defaultFee)) + " " + BRS.valueSuffix);
         }
 
         BRS.showedFormWarning = false;

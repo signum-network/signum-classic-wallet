@@ -31,7 +31,7 @@ var BRS = (function(BRS, $, undefined) {
 
         $("#send_money_fee").val(fee.toFixed(8));
 
-        $(element).closest(".modal").find(".total_amount_ordinary").html(BRS.formatAmount(BRS.convertToNQT(amount + fee)) + " SIGNA");
+        $(element).closest(".modal").find(".total_amount_ordinary").html(BRS.formatAmount(BRS.convertToNQT(amount + fee)) + " " + BRS.valueSuffix);
     };
     
     BRS.commitmentCalculateTotal = function(element) {
@@ -42,13 +42,13 @@ var BRS = (function(BRS, $, undefined) {
 
         $("#commitment_fee").val(fee.toFixed(8));
 
-        $(element).closest(".modal").find(".total_amount_commitment").html(BRS.formatAmount(BRS.convertToNQT(amount + fee)) + " SIGNA");
+        $(element).closest(".modal").find(".total_amount_commitment").html(BRS.formatAmount(BRS.convertToNQT(amount + fee)) + " " + BRS.valueSuffix);
     };
 
 
     BRS.forms.sendMoneyComplete = function(response, data) {
         if (!(data._extra && data._extra.convertedAccount) && !(data.recipient in BRS.contacts)) {
-            $.notify($.t("success_send_money") + " <a href='#' data-account='" + BRS.getAccountFormatted(data, "recipient") + "' data-toggle='modal' data-target='#add_contact_modal' style='text-decoration:underline'>" + $.t("add_recipient_to_contacts_q") + "</a>", {
+            $.notify($.t("success_send_money", {"valueSuffix": BRS.valueSuffix}) + " <a href='#' data-account='" + BRS.getAccountFormatted(data, "recipient") + "' data-toggle='modal' data-target='#add_contact_modal' style='text-decoration:underline'>" + $.t("add_recipient_to_contacts_q") + "</a>", {
                 type: 'success',
                 offset: {
                     x: 5,
@@ -56,7 +56,7 @@ var BRS = (function(BRS, $, undefined) {
                 }
             });
         } else {
-            $.notify($.t("success_send_money"), {
+            $.notify($.t("success_send_money", {"valueSuffix": BRS.valueSuffix}), {
                 type: 'success',
                 offset: {
                     x: 5,
@@ -95,7 +95,8 @@ var BRS = (function(BRS, $, undefined) {
                 callback({
                     "type": "info",
                     "message": $.t("recipient_smart_contract", {
-                        "burst": BRS.formatAmount(newResponse.balanceNQT, false, true)
+                        "burst": BRS.formatAmount(newResponse.balanceNQT, false, true),
+                        "valueSuffix": BRS.valueSuffix
                     }),
                     "account": newResponse,
                     "noPublicKey": true
@@ -138,7 +139,8 @@ var BRS = (function(BRS, $, undefined) {
                     callback({
                         "type": "warning",
                         "message": $.t("recipient_no_public_key", {
-                            "burst": BRS.formatAmount(response.unconfirmedBalanceNQT, false, true)
+                            "burst": BRS.formatAmount(response.unconfirmedBalanceNQT, false, true),
+                            "valueSuffix": BRS.valueSuffix
                         }),
                         "account": response,
                         "noPublicKey": true
@@ -148,7 +150,8 @@ var BRS = (function(BRS, $, undefined) {
                 callback({
                     "type": "info",
                     "message": $.t("recipient_info", {
-                        "burst": BRS.formatAmount(response.unconfirmedBalanceNQT, false, true)
+                        "burst": BRS.formatAmount(response.unconfirmedBalanceNQT, false, true),
+                        "valueSuffix": BRS.valueSuffix
                     }),
                     "account": response
                 });

@@ -445,7 +445,7 @@
             const $modal = $(this).closest(".modal");
             const $feeInfo = $modal.find(".advanced_fee");
             if ($feeInfo.length) {
-                $feeInfo.html(BRS.formatAmount(BRS.convertToNQT($(this).val())) + " SIGNA");
+                $feeInfo.html(BRS.formatAmount(BRS.convertToNQT($(this).val())) + " " + BRS.valueSuffix);
             }
         });
         $(".advanced_info a").on("click", BRS.evAdvancedInfoClick);

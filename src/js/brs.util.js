@@ -995,7 +995,7 @@ var BRS = (function(BRS, $, undefined) {
                     value = BRS.formatQuantity(value, 0);
                 }
             } else if (key === "price" || key === "total" || key === "amount" || key === "fee" || key === "refund" || key === "discount") {
-                value = BRS.formatAmount(new BigInteger(String(value))) + " SIGNA";
+                value = BRS.formatAmount(new BigInteger(String(value))) + " " + BRS.valueSuffix;
             } else if (key === "sender" || key === "recipient" || key === "account" || key === "seller" || key === "buyer") {
                 value = "<a href='#' data-user='" + String(value).escapeHTML() + "'>" + BRS.getAccountTitle(value) + "</a>";
             } else {

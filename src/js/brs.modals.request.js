@@ -93,7 +93,7 @@ var BRS = (function(BRS, $, undefined) {
             $("#cancel_button").html('Close');
             $("#request_burst_recipient_response").html(receiverId);
             if($("#request_burst_amount").val())
-            $("#request_burst_amount_response").html($("#request_burst_amount").val() + " SIGNA");
+            $("#request_burst_amount_response").html($("#request_burst_amount").val() + " " + BRS.valueSuffix);
             $("#request_burst_div").removeClass("display-visible");
             $("#request_burst_div").addClass("display-none");
             $("#request_burst_response_div").removeClass("display-none");

@@ -129,6 +129,11 @@ var BRS = (function(BRS, $, undefined) {
 
         BRS.updateSettings("prefered_node", BRS.server);
 
+        const $valueSufix=document.querySelectorAll('[data-value-suffix]');
+        for (const $each of $valueSufix){
+            $each.innerText = BRS.valueSuffix
+        }
+
         if (BRS.state) {
             BRS.checkBlockHeight();
         }

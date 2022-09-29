@@ -449,7 +449,8 @@ var BRS = (function(BRS, $, undefined) {
                 if (new BigInteger(BRS.convertToNQT(data.amountNXT)).compareTo(new BigInteger(BRS.settings.amount_warning)) > 0) {
                     BRS.showedFormWarning = true;
                     $form.find(".error_message").html($.t("error_max_amount_warning", {
-                        "burst": BRS.formatAmount(BRS.settings.amount_warning)
+                        "burst": BRS.formatAmount(BRS.settings.amount_warning),
+                        "valueSuffix": BRS.valueSuffix
                     })).show();
                     if (formErrorFunction) {
                         formErrorFunction(false, data);
@@ -463,7 +464,8 @@ var BRS = (function(BRS, $, undefined) {
                 if (new BigInteger(BRS.convertToNQT(data.feeNXT)).compareTo(new BigInteger(BRS.settings.fee_warning)) > 0) {
                     BRS.showedFormWarning = true;
                     $form.find(".error_message").html($.t("error_max_fee_warning", {
-                        "burst": BRS.formatAmount(BRS.settings.fee_warning)
+                        "burst": BRS.formatAmount(BRS.settings.fee_warning),
+                        "valueSuffix": BRS.valueSuffix
                     })).show();
                     if (formErrorFunction) {
                         formErrorFunction(false, data);

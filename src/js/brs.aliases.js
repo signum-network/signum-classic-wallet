@@ -788,12 +788,14 @@ BRS = (function (BRS, $, undefined) {
                     if ("priceNQT" in response) {
                         if (response.buyer == BRS.account) {
                             message = $.t("alias_sale_direct_offer", {
-                                "burst": BRS.formatAmount(response.priceNQT)
+                                "burst": BRS.formatAmount(response.priceNQT),
+                                "valueSuffix": BRS.valueSuffix
                             }) + " <a href='#' data-alias='" + String(response.aliasName).escapeHTML() + "' data-toggle='modal' data-target='#buy_alias_modal'>" + $.t("buy_it_q") + "</a>";
                         }
                         else if (typeof response.buyer == "undefined") {
                             message = $.t("alias_sale_indirect_offer", {
-                                "burst": BRS.formatAmount(response.priceNQT)
+                                "burst": BRS.formatAmount(response.priceNQT),
+                                "valueSuffix": BRS.valueSuffix
                             }) + " <a href='#' data-alias='" + String(response.aliasName).escapeHTML() + "' data-toggle='modal' data-target='#buy_alias_modal'>" + $.t("buy_it_q") + "</a>";
                         }
                         else {

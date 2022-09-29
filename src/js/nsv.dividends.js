@@ -696,7 +696,7 @@ var NSV = (function(NSV, $, undefined) {
                 }
                 output = output.concat(asset_name, " (",String(asset),") Total found assets: ", String(tot_assets/unquant_mult), ", Assets to be distributed: ", String(tot2_assets/unquant_mult), "\n");
                 if (NSV_div_send_out_burst) {
-                    output = output.concat("Summary of proposed distribution of  ", amount, "SIGNA to ", String(aa_len),"\n");
+                    output = output.concat("Summary of proposed distribution of ", amount, + " " + BRS.valueSuffix + " to ", String(aa_len),"\n");
                 }
                 else {
                     output = output.concat("Summary of proposed distribution of ", amount, " [",outasset_name, "] assets to ", String(aa_len),"\n");
@@ -874,7 +874,7 @@ var NSV = (function(NSV, $, undefined) {
             if (BRS.accountInfo.unconfirmedBalanceNQT) {
                 balance = parseFloat(BRS.accountInfo.unconfirmedBalanceNQT);
                 if (balance < (len*100000000)) {
-                    err_message = "You don't have enough Signa in this account to pay the fees for this distribution. ".concat(String(len),"SIGNA needed.");
+                    err_message = "You don't have enough Signa in this account to pay the fees for this distribution. ".concat(String(len), " " + BRS.valueSuffix +" needed.");
                 }
             }
             else {
@@ -1248,7 +1248,7 @@ var NSV = (function(NSV, $, undefined) {
             }
             out_message = out_message + "-----------------------\n";
             if (num_tobe_swapped > 0) {
-                out_message = out_message + "SIGNA needed for transactions: " + num_tobe_swapped.toString() + ", Replacement Assets needed: " + total_replacement_assets.toString() + "\n";
+                out_message = out_message + " " + BRS.valueSuffix + " needed for transactions: " + num_tobe_swapped.toString() + ", Replacement Assets needed: " + total_replacement_assets.toString() + "\n";
                 document.getElementById("nsv_shareswap_but").disabled=false;
             }
             else {

@@ -926,7 +926,7 @@ var BRS = (function(BRS, $, undefined) {
                             if (fee_id === undefined)
                             $(input_fee_field_id).trigger("change"); //// --> for modals with Total field trigger BRS.sendMoneyCalculateTotal
                             else
-                            $(fee_id).html($(this).text()+ " SIGNA"); /// --> for modals without Total field set Fee field
+                            $(fee_id).html($(this).text()+ " " + BRS.valueSuffix); /// --> for modals without Total field set Fee field
 
                      });
               }

@@ -572,10 +572,12 @@ var BRS = (function(BRS, $, undefined) {
             $("#sell_asset_button").data("asset", assetId);
             $("#buy_asset_button").data("asset", assetId);
             $("#sell_asset_for_burst").html($.t("sell_asset_for_burst", {
-                "assetName": String(asset.name).escapeHTML()
+                "assetName": String(asset.name).escapeHTML(),
+                "valueSuffix": BRS.valueSuffix
             }));
             $("#buy_asset_with_burst").html($.t("buy_asset_with_burst", {
-                "assetName": String(asset.name).escapeHTML()
+                "assetName": String(asset.name).escapeHTML(),
+                "valueSuffix": BRS.valueSuffix
             }));
             $("#sell_asset_price, #buy_asset_price").val("");
             $("#sell_asset_quantity, #sell_asset_total, #buy_asset_quantity, #buy_asset_total").val("0");
@@ -1111,27 +1113,31 @@ var BRS = (function(BRS, $, undefined) {
             description = $.t("buy_order_description", {
                 "quantity": BRS.formatQuantity(quantityQNT, BRS.currentAsset.decimals, true),
                 "asset_name": $("#asset_name").html().escapeHTML(),
-                "burst": BRS.formatAmount(priceNQTPerWholeQNT)
+                "burst": BRS.formatAmount(priceNQTPerWholeQNT),
+                "valueSuffix": BRS.valueSuffix
             });
             tooltipTitle = $.t("buy_order_description_help", {
                 "burst": BRS.formatAmount(priceNQTPerWholeQNT, false, true),
-                "total_burst": totalNXT
+                "total_burst": totalNXT,
+                "valueSuffix": BRS.valueSuffix
             });
         } else {
             description = $.t("sell_order_description", {
                 "quantity": BRS.formatQuantity(quantityQNT, BRS.currentAsset.decimals, true),
                 "asset_name": $("#asset_name").html().escapeHTML(),
-                "burst": BRS.formatAmount(priceNQTPerWholeQNT)
+                "burst": BRS.formatAmount(priceNQTPerWholeQNT),
+                "valueSuffix": BRS.valueSuffix
             });
             tooltipTitle = $.t("sell_order_description_help", {
                 "burst": BRS.formatAmount(priceNQTPerWholeQNT, false, true),
-                "total_burst": totalNXT
+                "total_burst": totalNXT,
+                "valueSuffix": BRS.valueSuffix
             });
         }
 
         $("#asset_order_description").html(description);
-        $("#asset_order_total").html(totalNXT + " SIGNA");
-        $("#asset_order_fee_paid").html(BRS.formatAmount(feeNQT) + " SIGNA");
+        $("#asset_order_total").html(totalNXT + " " + BRS.valueSuffix);
+        $("#asset_order_fee_paid").html(BRS.formatAmount(feeNQT) + " " + BRS.valueSuffix);
 
         if (quantity != "1") {
             $("#asset_order_total_tooltip").show();
