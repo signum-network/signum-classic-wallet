@@ -644,11 +644,11 @@ var BRS = (function(BRS, $, undefined) {
     function getTransactionRowDashboardHTML (transaction) {
         const details = formatTransactionDetails(transaction);
 
-        let confirmationText = String(transaction.confirmations).escapeHTML()
+        let confirmationHTML = String(transaction.confirmations).escapeHTML()
         if (transaction.unconfirmed) {
-            confirmationText = "/"
+            confirmationHTML = BRS.pendingTransactionHTML
         } else if (transaction.confirmations > 10) {
-            confirmationText = "10+"
+            confirmationHTML = "10+"
         }
 
         let rowStr = ''
@@ -658,7 +658,7 @@ var BRS = (function(BRS, $, undefined) {
         rowStr += "<td>" + details.circleText + "</td>"
         rowStr += `<td ${details.colorClass}>${details.amountText}</td>`
         rowStr += `<td>${details.accountLink}</td>`
-        rowStr += `<td>${confirmationText}</td>`
+        rowStr += `<td>${confirmationHTML}</td>`
         rowStr += "</tr>";
 
         return rowStr;
@@ -667,9 +667,9 @@ var BRS = (function(BRS, $, undefined) {
     function getTransactionRowHTML(transaction) {
         const details = formatTransactionDetails(transaction);
 
-        let confirmationText = BRS.formatAmount(transaction.confirmations)
+        let confirmationHTML = BRS.formatAmount(transaction.confirmations)
         if (transaction.unconfirmed) {
-            confirmationText = "/"
+            confirmationHTML = BRS.pendingTransactionHTML
         }
         let rowStr = ''
         rowStr += "<tr " + ((transaction.unconfirmed && details.toFromMe) ? " class='tentative'" : "") + ">";
@@ -681,7 +681,7 @@ var BRS = (function(BRS, $, undefined) {
         rowStr += `<td ${details.colorClass}>${details.amountText}</td>`
         rowStr += "<td>" + BRS.formatAmount(transaction.feeNQT) + "</td>"
         rowStr += `<td>${details.accountLink}</td>`
-        rowStr += "<td>" + confirmationText + "</td>"
+        rowStr += "<td>" + confirmationHTML + "</td>"
         rowStr += "</tr>";
 
         return rowStr;
