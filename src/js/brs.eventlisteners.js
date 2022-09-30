@@ -50,13 +50,6 @@
 
         // from brs.login.js
         $("#account_phrase_custom_panel form").submit(BRS.evAccountPhraseCustomPanelSubmit);
-        $("#logout_button_container").on("show.bs.dropdown", function(e) {
-            e.preventDefault();
-        });
-        $("#logout_button").click(function(e) {
-            e.preventDefault();
-            BRS.logout();
-        });
 
         // from brs.recipient.js
         $("#send_message_modal, #send_money_modal, #add_contact_modal").on("show.bs.modal", function(e) {

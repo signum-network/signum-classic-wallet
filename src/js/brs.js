@@ -569,6 +569,34 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
+    BRS.clearData = function () {
+        var onDropped = function(error){
+            if (error != null){
+              alert("Something wrong happened");
+            } else{
+                console.log("Table deleted");
+            }
+        };
+    
+        let anwser;
+        if (BRS.databaseSupport) {
+            if (window.confirm($.t("remove_contacts_bookmark_q"))) {
+                BRS.database.drop("contacts", onDropped);
+            }
+            if (window.confirm($.t("remove_assets_bookmark_q"))) {
+                BRS.database.drop("assets", onDropped);
+            }
+            if (window.confirm($.t("remove_settings_q"))) {
+                BRS.database.drop("data", onDropped);
+                localStorage.removeItem("i18next_lng");
+                localStorage.removeItem("logged_in");
+                localStorage.removeItem("theme");
+            }
+        }
+
+        setTimeout(BRS.logout, 250);
+    }
+
     BRS.getAccountInfo = function(firstRun, callback) {
         BRS.sendRequest("getAccount", {
             "account": BRS.account,
