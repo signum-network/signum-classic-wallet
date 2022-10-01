@@ -101,6 +101,22 @@
                 $list.append("<li><a href='#' data-contact='" + String(BRS.contacts[accountId].name).escapeHTML() + "'>" + String(BRS.contacts[accountId].name).escapeHTML() + "</a></li>");
             }
         });
+        $("span.asset_selector button").on("click", function(e) {
+            const $list = $(this).parent().find("ul");
+            $list.empty();
+            if (!BRS.accountInfo.assetBalances) {
+                $list.append("<li>no-assets</li>");
+                return;
+            }
+            BRS.sortCachedAssets()
+            for (const asset of BRS.assets) {
+                const foundAsset = BRS.accountInfo.assetBalances.find((tkn) => tkn.asset === asset.asset)
+                if (foundAsset) {
+                    $list.append(`<li><a href='#' data-name='${asset.name}' data-asset='${asset.asset}' data-decimals='${asset.decimals}'>${asset.name} - ${asset.asset}</a></li>`);
+                }
+            }
+        });
+        $("span.asset_selector").on("click", "ul li a", BRS.evTransferAssetModalOnShowBsModal);
         $(document).on("click", "span.recipient_selector button", function(e) {
             if (!Object.keys(BRS.contacts).length) {
                 e.preventDefault();

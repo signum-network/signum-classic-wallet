@@ -114,9 +114,15 @@
         <form role="form" autocomplete="off">
           <div class="callout callout-danger error_message" style="display:none"></div>
           <div class="form-group">
-            <label data-i18n="asset">ASSET</label>
-            <p><span id="transfer_asset_name"></span><span id="transfer_asset_available" style="font-style:italic"></span></p>
-            <input type="hidden" name="asset" id="transfer_asset_asset" value="" />
+            <label for="transfer_asset_asset" data-i18n="asset">ASSET</label>
+            <div class="input-group">
+              <input name="name_plus_asset" class="form-control" id="transfer_asset_name_plus_asset" value="" placeholder="select_asset" data-i18n="[placeholder]select_asset" readonly /><span class="input-group-btn btn-group asset_selector">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fas fa-chart-pie"></span></button>      
+                <ul class="dropdown-menu scrollable-menu" role="menu" style="right:0;left:auto;"></ul>
+              </span>
+            </div>
+            <span id="transfer_asset_available" style="font-style:italic"></span></p>
+            <input type="hidden" name="asset" id="transfer_asset_asset" value=""/>
             <input type="hidden" name="decimals" id="transfer_asset_decimals" value="" />
           </div>
           <div class="form-group">
@@ -124,7 +130,7 @@
             <div class="input-group">
               <input type="text" class="form-control" name="recipient" id="transfer_asset_recipient" placeholder="Recipient Account" data-i18n="[placeholder]recipient_account" autofocus tabindex="1" />
               <span class="input-group-btn btn-group recipient_selector">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span></button>      
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fas fa-user"></span></button>      
                 <ul class="dropdown-menu scrollable-menu" role="menu" style="right:0;left:auto;"></ul>
               </span>
             </div>

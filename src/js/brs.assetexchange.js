@@ -46,6 +46,35 @@ var BRS = (function(BRS, $, undefined) {
         });
     }
 
+    BRS.cacheUserAssets = function () {
+        if (BRS.accountInfo.assetBalances === undefined) {
+            return
+        }
+        BRS.accountInfo.assetBalances.forEach(userAssetTuple => {
+            const foundAsset = BRS.assets.find((tkn) => tkn.asset === userAssetTuple.asset)
+            if (!foundAsset) {
+                BRS.sendRequest("getAsset", {
+                    "asset": userAssetTuple.asset
+                }, function(response) {
+                    if (!response.errorCode) {
+                        BRS.cacheAsset(response);
+                    }
+                });
+            }
+        })
+    }
+
+    BRS.sortCachedAssets = function () {
+        // sort by name ignoring case
+        BRS.assets.sort((a, b) => {
+            const nameA = a.name.toUpperCase();
+            const nameB = b.name.toUpperCase();
+            if (nameA < nameB) return -1;
+            if (nameA > nameB) return 1;
+            return 0;
+        });
+    }
+
     function bookmarkUserAssets(callback) {
         //check owned assets, see if any are not yet in bookmarked assets
         if (!BRS.accountInfo.unconfirmedAssetBalances) {
@@ -1670,15 +1699,21 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.evTransferAssetModalOnShowBsModal = function(e) {
         var $invoker = $(e.relatedTarget);
+        if (e.relatedTarget === null) {
+            $invoker = $(e.currentTarget);
+        }
 
-        var assetId = $invoker.data("asset");
-        var assetName = $invoker.data("name");
-        var decimals = $invoker.data("decimals");
+        var assetId = $invoker.data("asset") ?? "";
+        var assetName = $invoker.data("name") ?? "?";
+        var decimals = $invoker.data("decimals") ?? "";
 
         $("#transfer_asset_asset").val(assetId);
         $("#transfer_asset_decimals").val(decimals);
-        $("#transfer_asset_name, #transfer_asset_quantity_name").html(String(assetName).escapeHTML());
+        $("#transfer_asset_quantity_name").html(String(assetName).escapeHTML());
         $("#transer_asset_available").html("");
+        if (assetId !== "") {
+            $("#transfer_asset_name_plus_asset").val(assetName + " - " + assetId);
+        }
 
         var confirmedBalance = 0;
         var unconfirmedBalance = 0;
@@ -1704,11 +1739,11 @@ var BRS = (function(BRS, $, undefined) {
         var availableAssetsMessage = "";
 
         if (confirmedBalance == unconfirmedBalance) {
-            availableAssetsMessage = " - " + $.t("available_for_transfer", {
+            availableAssetsMessage = $.t("available_for_transfer", {
                 "qty": BRS.formatQuantity(confirmedBalance, decimals)
             });
         } else {
-            availableAssetsMessage = " - " + $.t("available_for_transfer", {
+            availableAssetsMessage = $.t("available_for_transfer", {
                 "qty": BRS.formatQuantity(unconfirmedBalance, decimals)
             }) + " (" + BRS.formatQuantity(confirmedBalance, decimals) + " " + $.t("total_lowercase") + ")";
         }
@@ -1755,6 +1790,7 @@ var BRS = (function(BRS, $, undefined) {
 
         delete data.quantity;
         delete data.decimals;
+        delete data.name_plus_asset;
 
         if (!data.add_message) {
             delete data.add_message;

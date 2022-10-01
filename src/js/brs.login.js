@@ -138,7 +138,7 @@ var BRS = (function(BRS, $, undefined) {
             BRS.checkBlockHeight();
         }
 
-        BRS.getAccountInfo(true, null);
+        BRS.getAccountInfo(true, BRS.cacheUserAssets);
 
         BRS.unlock();
 

@@ -277,7 +277,7 @@ var BRS = (function(BRS, $, undefined) {
             case (previousLastBlock !== BRS.state.lastBlock):
                 BRS.tempBlocks = [];
                 if (BRS.account) {
-                    BRS.getAccountInfo();
+                    BRS.getAccountInfo(false, BRS.cacheUserAssets);
                 }
                 BRS.getBlock(BRS.state.lastBlock, BRS.handleNewBlocks);
                 if (BRS.account) {
