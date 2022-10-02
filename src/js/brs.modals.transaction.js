@@ -538,7 +538,7 @@ var BRS = (function(BRS, $, undefined) {
         case 8:
             async = true;
             var data = {
-                "type": $.t("distribute_to_holders"),
+                "type": $.t("asset_distribute_to_holders"),
                 "amount": transaction.amountNQT,
                 "toHoldersOf": transaction.attachment.asset,
                 "distributingAsset": transaction.attachment.assetToDistribute,
