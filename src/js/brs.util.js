@@ -301,12 +301,14 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.calculatePercentage = function(a, b) {
-        a = new Big(String(a));
-        b = new Big(String(b));
-
-        var result = a.div(b).times(new Big("100")).toFixed(2);
-
-        return result.toString();
+        try {
+            a = new Big(String(a));
+            b = new Big(String(b));
+            const result = a.div(b).times(new Big("100")).toFixed(2);
+            return result.toString();
+        } catch (e) {
+            return e.message.escapeHTML()
+        }
     };
 
     BRS.convertToNXT = function(amount, returnAsObject) {
@@ -726,13 +728,26 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.convertNumericToRSAccountFormat = function(account) {
-        if (/(^BURST|^S)\-/i.test(account)) {
+        if (BRS.rsRegEx.test(account)) {
             return String(account).escapeHTML();
         } else {
-            var address = new NxtAddress();
+            const address = new NxtAddress();
 
             if (address.set(account)) {
                 return address.toString().escapeHTML();
+            } else {
+                return "";
+            }
+        }
+    };
+
+    BRS.convertRSAccountToNumeric = function(account) {
+        if (BRS.idRegEx.test(account)) {
+            return String(account).escapeHTML();
+        } else {
+            const address = new NxtAddress();
+            if (address.set(account)) {
+                return address.account_id().escapeHTML();
             } else {
                 return "";
             }
@@ -758,6 +773,9 @@ var BRS = (function(BRS, $, undefined) {
 
         var formattedAcc = "";
 
+        if (acc === 'multiple') {
+            return $.t("multiple")
+        }
         if (type === "string" || type == "number") {
             formattedAcc = object;
             object = null;

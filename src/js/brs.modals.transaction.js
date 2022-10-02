@@ -400,8 +400,8 @@ var BRS = (function(BRS, $, undefined) {
                 "quantity": [transaction.attachment.quantityQNT, asset.decimals]
                 };
 
-                data.sender = BRS.getAccountTitle(transaction, "sender");
-                data.recipient = BRS.getAccountTitle(transaction, "recipient");
+                data.sender = transaction.sender;
+                data.recipient = transaction.recipientRS;
 
                 $("#transaction_info_table tbody").append(BRS.createInfoTable(data));
                 $("#transaction_info_table").show();

@@ -77,202 +77,31 @@ var BRS = (function(BRS, $, undefined) {
 	$("#user_info_modal").modal("show");
     };
 
-    /*some duplicate methods here...*/
     BRS.userInfoModal.transactions = function(type) {
-	BRS.sendRequest("getAccountTransactions", {
-	    "account": BRS.userInfoModal.user,
-	    "firstIndex": 0,
-	    "lastIndex": 99,
-		"includeIndirect": true
-	}, function(response) {
-	    if (response.transactions && response.transactions.length) {
-		var rows = "";
-    var receiving;
-		for (var i = 0; i < response.transactions.length; i++) {
-		    var transaction = response.transactions[i];
+        BRS.sendRequest("getAccountTransactions", {
+            "account": BRS.userInfoModal.user,
+            "firstIndex": 0,
+            "lastIndex": BRS.pageSize,
+            "includeIndirect": true
+        }, function(response) {
+            let rows = "";
+            if (response.transactions && response.transactions.length) {
+                for (const transaction of response.transactions) {
+                    const details = BRS.getTransactionDetails(transaction, BRS.userInfoModal.user);
 
-		    var transactionType = "Unknown";
-
-		    if (transaction.type == 0) {
-                switch (transaction.subtype) {
-                    case 0:
-                        transactionType = $.t("ordinary_payment");
-                        break;
-
-                    case 1:
-                        transactionType = "Multi-out payment";
-                        break;
-
-                    case 2:
-                        transactionType = "Multi-out Same payment";
-                        break;
+                    rows += "<tr>";
+                    rows += "<td>" + BRS.formatTimestamp(transaction.timestamp) + "</td>"
+                    rows += "<td>" + details.nameOfTransaction + "</td>"
+                    rows += "<td>" + details.circleText + "</td>"
+                    rows += `<td ${details.colorClass}>${details.amountText}</td>`;
+                    rows += "<td>" + BRS.formatAmount(transaction.feeNQT) + "</td>"
+                    rows += `<td>${details.accountTitle}</td>`
+                    rows += "</tr>";
                 }
-		    }
-                    else if (transaction.type == 1) {
-			switch (transaction.subtype) {
-			case 1:
-			    transactionType = $.t("alias_assignment");
-			    break;
-			case 2:
-			    transactionType = $.t("poll_creation");
-			    break;
-			case 3:
-			    transactionType = $.t("vote_casting");
-			    break;
-			case 4:
-			    transactionType = $.t("hub_announcement");
-			    break;
-			case 5:
-			    transactionType = $.t("account_info");
-			    break;
-			case 6:
-			    if (transaction.attachment.priceNQT == "0") {
-				if (transaction.sender == transaction.recipient) {
-				    transactionType = $.t("alias_sale_cancellation");
-				}
-                                else {
-				    transactionType = $.t("alias_transfer");
-				}
-			    }
-                            else {
-				transactionType = $.t("alias_sale");
-			    }
-			    break;
-			case 7:
-			    transactionType = $.t("alias_buy");
-			    break;
-			}
-		    }
-                    else if (transaction.type == 2) {
-			switch (transaction.subtype) {
-			case 0:
-			    transactionType = $.t("asset_issuance");
-			    break;
-			case 1:
-			    transactionType = $.t("asset_transfer");
-			    break;
-			case 2:
-			    transactionType = $.t("ask_order_placement");
-			    break;
-			case 3:
-			    transactionType = $.t("bid_order_placement");
-			    break;
-			case 4:
-			    transactionType = $.t("ask_order_cancellation");
-			    break;
-			case 5:
-			    transactionType = $.t("bid_order_cancellation");
-			    break;
-			}
-		    }
-                    else if (transaction.type == 3) {
-			switch (transaction.subtype) {
-			case 0:
-			    transactionType = $.t("market_listing");
-			    break;
-			case 1:
-			    transactionType = $.t("market_removal");
-			    break;
-			case 2:
-			    transactionType = $.t("market_price_change");
-			    break;
-			case 3:
-			    transactionType = $.t("market_quantity_change");
-			    break;
-			case 4:
-			    transactionType = $.t("market_purchase");
-			    break;
-			case 5:
-			    transactionType = $.t("market_delivery");
-			    break;
-			case 6:
-			    transactionType = $.t("market_feedback");
-			    break;
-			case 7:
-			    transactionType = $.t("market_refund");
-			    break;
-			}
-		    }
-                    else if (transaction.type == 4) {
-			switch (transaction.subtype) {
-			case 0:
-			    transactionType = $.t("balance_leasing");
-			    break;
-			}
-		    }
-                    else if (transaction.type == 20) {
-                      if( transaction.subtype == 1 || transaction.subtype == 2){
-                        transaction.amountNQT = transaction.attachment.amountNQT.toString();
-                      }
-			switch (transaction.subtype) {
-			case 0:
-			    transactionType = "Reward Recipient Assignment";
-			    break;
-      case 1:
-          transactionType = "Add Commitment";
-          break;
-      case 2:
-          transactionType = "Remove Commitment";
-          break;
-			}
-		    }
-                    else if (transaction.type == 21) {
-			switch (transaction.subtype) {
-			case 0:
-			    transactionType = "Escrow Creation";
-			    break;
-			case 1:
-			    transactionType = "Escrow Signing";
-			    break;
-			case 2:
-			    transactionType = "Escrow Result";
-			    break;
-			case 3:
-			    transactionType = "Subscription Subscribe";
-			    break;
-			case 4:
-			    transactionType = "Subscription Cancel";
-			    break;
-			case 5:
-			    transactionType = "Subscription Payment";
-			    break;
-			}
-		    }
-                    else if (transaction.type == 22) {
-			switch (transaction.subtype) {
-			case 0:
-			    transactionType = "AT Creation";
-			    break;
-			case 1:
-			    transactionType = "AT Payment";
-			    break;
-			}
-		    }
-
-		    if (/^BURST\-/i.test(BRS.userInfoModal.user)) {
-			receiving = (transaction.recipientRS == BRS.userInfoModal.user);
-		    }
-                    else {
-			receiving = (transaction.recipient == BRS.userInfoModal.user);
-		    }
-
-		    if (transaction.amountNQT) {
-			transaction.amount = new BigInteger(transaction.amountNQT);
-			transaction.fee = new BigInteger(transaction.feeNQT);
-		    }
-
-		    var account = (receiving ? "sender" : "recipient");
-		    rows += "<tr><td>" + BRS.formatTimestamp(transaction.timestamp) + "</td><td>" + transactionType + "</td><td style='width:5px;padding-right:0;'>" + (transaction.type == 0 ? (receiving ? "<i class='fas fa-plus-circle' style='color:#65C62E'></i>" : "<i class='fas fa-minus-circle' style='color:#E04434'></i>") : "") + "</td><td " + (transaction.type == 0 && receiving ? " style='color:#006400;'" : (!receiving && transaction.amount > 0 ? " style='color:red'" : "")) + ">" + BRS.formatAmount(transaction.amount) + "</td><td " + (!receiving ? " style='color:red'" : "") + ">" + BRS.formatAmount(transaction.fee) + "</td><td>" + BRS.getAccountTitle(transaction, account) + "</td></tr>";
-		}
-
-		$("#user_info_modal_transactions_table tbody").empty().append(rows);
-		BRS.dataLoadFinished($("#user_info_modal_transactions_table"));
-	    }
-            else {
-		$("#user_info_modal_transactions_table tbody").empty();
-		BRS.dataLoadFinished($("#user_info_modal_transactions_table"));
-	    }
-	});
+            }
+            $("#user_info_modal_transactions_table tbody").empty().append(rows);
+            BRS.dataLoadFinished($("#user_info_modal_transactions_table"));
+        });
     };
 
     BRS.userInfoModal.aliases = function() {
@@ -393,8 +222,8 @@ var BRS = (function(BRS, $, undefined) {
 	BRS.sendRequest("getAssetsByIssuer", {
 	    "account": BRS.userInfoModal.user
 	}, function(response) {
-	    if (response.assets && response.assets[0] && response.assets[0].length) {
-		$.each(response.assets[0], function(key, issuedAsset) {
+	    if (response.assets && response.assets.length) {
+		$.each(response.assets, function(key, issuedAsset) {
 		    if (assets[issuedAsset.asset]) {
 			assets[issuedAsset.asset].issued = true;
 		    }
@@ -459,9 +288,9 @@ var BRS = (function(BRS, $, undefined) {
 	for (var i = 0; i < assetArray.length; i++) {
 	    var asset = assetArray[i];
 
-	    var percentageAsset = BRS.calculatePercentage(asset.balanceQNT, asset.quantityQNT);
+	    var percentageAsset = BRS.calculatePercentage(asset.balanceQNT, asset.quantityCirculatingQNT);
 
-	    rows += "<tr" + (asset.issued ? " class='asset_owner'" : "") + "><td><a href='#' data-goto-asset='" + String(asset.asset).escapeHTML() + "'" + (asset.issued ? " style='font-weight:bold'" : "") + ">" + String(asset.name).escapeHTML() + "</a></td><td class='quantity'>" + BRS.formatQuantity(asset.balanceQNT, asset.decimals) + "</td><td>" + BRS.formatQuantity(asset.quantityQNT, asset.decimals) + "</td><td>" + percentageAsset + "%</td></tr>";
+	    rows += "<tr" + (asset.issued ? " class='asset_owner'" : "") + "><td><a href='#' data-goto-asset='" + String(asset.asset).escapeHTML() + "'" + (asset.issued ? " style='font-weight:bold'" : "") + ">" + String(asset.name).escapeHTML() + "</a></td><td class='quantity'>" + BRS.formatQuantity(asset.balanceQNT, asset.decimals) + "</td><td>" + BRS.formatQuantity(asset.quantityCirculatingQNT, asset.decimals) + "</td><td>" + percentageAsset + "%</td></tr>";
 	}
 
 	$("#user_info_modal_assets_table tbody").empty().append(rows);

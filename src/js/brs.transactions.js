@@ -352,191 +352,46 @@ var BRS = (function(BRS, $, undefined) {
         });
     };
 
-    BRS.getTransactionNameFromType = function(transaction) {
-        var transactionType = $.t("unknown");
-        if (transaction.type === 0) {
-            switch (transaction.subtype) {
-                case 0:
-                    transactionType = $.t("ordinary_payment");
-                    break;
+    /** 
+     * Get transaction details.
+     * @param transaction to get the name
+     * @param viewingAccount Use this account as point of view. Default to current user
+     * @returns the transaction name in the configured language.
+    */
+    BRS.getTransactionDetails = function (transaction, viewingAccount) {
+        if (!viewingAccount) {
+            viewingAccount = BRS.account;
+        }
+        if (BRS.rsRegEx.test(viewingAccount)) {
+            viewingAccount = BRS.convertRSAccountToNumeric(viewingAccount)
+        }
 
-                case 1:
-                    transactionType = "Multi-out payment";
-                    break;
-
-                case 2:
-                    transactionType = "Multi-out Same payment";
-                    break;
-            }
-        }
-        else if (transaction.type == 1) {
-            switch (transaction.subtype) {
-            case 0:
-                transactionType = $.t("arbitrary_message");
-                break;
-            case 1:
-                transactionType = $.t("alias_assignment");
-                break;
-            case 2:
-                transactionType = $.t("poll_creation");
-                break;
-            case 3:
-                transactionType = $.t("vote_casting");
-                break;
-            case 4:
-                transactionType = $.t("hub_announcements");
-                break;
-            case 5:
-                transactionType = $.t("account_info");
-                break;
-            case 6:
-                if (transaction.attachment.priceNQT == "0") {
-                    if (transaction.sender == BRS.account && transaction.recipient == BRS.account) {
-                        transactionType = $.t("alias_sale_cancellation");
-                    }
-                    else {
-                        transactionType = $.t("alias_transfer");
-                    }
-                }
-                else {
-                    transactionType = $.t("alias_sale");
-                }
-                break;
-            case 7:
-                transactionType = $.t("alias_buy");
-                break;
-            }
-        }
-        else if (transaction.type == 2) {
-            switch (transaction.subtype) {
-            case 0:
-                transactionType = $.t("asset_issuance");
-                break;
-            case 1:
-                transactionType = $.t("asset_transfer");
-                break;
-            case 2:
-                transactionType = $.t("ask_order_placement");
-                break;
-            case 3:
-                transactionType = $.t("bid_order_placement");
-                break;
-            case 4:
-                transactionType = $.t("ask_order_cancellation");
-                break;
-            case 5:
-                transactionType = $.t("bid_order_cancellation");
-                break;
-            case 8:
-                transactionType = $.t("distribute_to_holders");
-            }
-        }
-        else if (transaction.type == 3) {
-            switch (transaction.subtype) {
-            case 0:
-                transactionType = $.t("marketplace_listing");
-                break;
-            case 1:
-                transactionType = $.t("marketplace_removal");
-                break;
-            case 2:
-                transactionType = $.t("marketplace_price_change");
-                break;
-            case 3:
-                transactionType = $.t("marketplace_quantity_change");
-                break;
-            case 4:
-                transactionType = $.t("marketplace_purchase");
-                break;
-            case 5:
-                transactionType = $.t("marketplace_delivery");
-                break;
-            case 6:
-                transactionType = $.t("marketplace_feedback");
-                break;
-            case 7:
-                transactionType = $.t("marketplace_refund");
-                break;
-            }
-        }
-        else if (transaction.type == 4) {
-            switch (transaction.subtype) {
-            case 0:
-                transactionType = $.t("balance_leasing");
-                break;
-            }
-        }
-        else if (transaction.type == 20) {
-            switch (transaction.subtype) {
-            case 0:
-                transactionType = "Reward Recipient Assignment";
-                break;
-            case 1:
-                transactionType = "Add Commitment";
-                break;
-            case 2:
-                transactionType = "Remove Commitment";
-                break;
-            }
-        }
-        else if (transaction.type == 21) {
-            switch (transaction.subtype) {
-            case 0:
-                transactionType = "Escrow Creation";
-                break;
-            case 1:
-                transactionType = "Escrow Signing";
-                break;
-            case 2:
-                transactionType = "Escrow Result";
-                break;
-            case 3:
-                transactionType = "Subscription Subscribe";
-                break;
-            case 4:
-                transactionType = "Subscription Cancel";
-                break;
-            case 5:
-                transactionType = "Subscription Payment";
-                break;
-            }
-        }
-        else if (transaction.type == 22) {
-            switch (transaction.subtype) {
-            case 0:
-                transactionType = "AT Creation";
-                break;
-            case 1:
-                transactionType = "AT Payment";
-                break;
-            }
-        }
-        return transactionType;
-    };
-
-    function formatTransactionDetails(transaction) {
-        const nameOfTransaction = BRS.getTransactionNameFromType(transaction);
-        let toFromMe = (transaction.sender == BRS.account || transaction.recipient == BRS.account)
+        let nameOfTransaction = $.t("unknown");
+        let toFromViewer = (transaction.sender == viewingAccount || transaction.recipient == viewingAccount)
         let senderOrRecipientOrMultiple = "sender";
-        if (toFromMe && transaction.sender == BRS.account) {
+        if (toFromViewer && transaction.sender == viewingAccount) {
             senderOrRecipientOrMultiple = 'recipient'
         }
         let amount = transaction.amountNQT;
         let amountText = BRS.formatAmount(amount)
         let foundAsset, newAmountText;
 
-        // process transactions exceptions
+        // process transactions exceptions and names
         switch (transaction.type) {
         case 0: // "Payment"
             switch (transaction.subtype) {
-            case 1: // "Multi-out payment"
-                if (transaction.sender == BRS.account) {
+            case 0:
+                nameOfTransaction = $.t("ordinary_payment");
+                break;
+            case 1:
+                nameOfTransaction = $.t("multi_out_payment");
+                if (transaction.sender == viewingAccount) {
                     senderOrRecipientOrMultiple = "multiple"
                     break;
                 }
                 transaction.attachment.recipients.find( Tuple => {
-                    if (Tuple[0] === BRS.account) {
-                        toFromMe = true;
+                    if (Tuple[0] === viewingAccount) {
+                        toFromViewer = true;
                         senderOrRecipientOrMultiple = "sender"
                         amount = Tuple[1];
                         amountText = BRS.formatAmount(amount)
@@ -544,14 +399,15 @@ var BRS = (function(BRS, $, undefined) {
                     }
                 })
                 break;
-            case 2: // "Multi-out Same Payment"
-                if (transaction.sender == BRS.account) {
+            case 2:
+                nameOfTransaction = $.t("multi_out_same_payment");
+                if (transaction.sender == viewingAccount) {
                     senderOrRecipientOrMultiple = "multiple"
                     break;
                 }
                 transaction.attachment.recipients.find( rec => {
-                    if (rec === BRS.account) {
-                        toFromMe = true;
+                    if (rec === viewingAccount) {
+                        toFromViewer = true;
                         senderOrRecipientOrMultiple = "sender"
                         amount = (parseInt(transaction.amountNQT) / transaction.attachment.recipients.length).toString();
                         amountText = BRS.formatAmount(amount)
@@ -560,9 +416,41 @@ var BRS = (function(BRS, $, undefined) {
                 })
             }
             break;
+        case 1:
+            switch (transaction.subtype) {
+            case 0:
+                nameOfTransaction = $.t("arbitrary_message");
+                break;
+            case 1:
+                nameOfTransaction = $.t("alias_assignment");
+                break;
+            case 5:
+                nameOfTransaction = $.t("account_info");
+                break;
+            case 6:
+                if (transaction.attachment.priceNQT == "0") {
+                    if (transaction.sender == viewingAccountId && transaction.recipient == viewingAccountId) {
+                        nameOfTransaction = $.t("alias_sale_cancellation");
+                    }
+                    else {
+                        nameOfTransaction = $.t("alias_transfer");
+                    }
+                }
+                else {
+                    nameOfTransaction = $.t("alias_sale");
+                }
+                break;
+            case 7:
+                nameOfTransaction = $.t("alias_buy");
+                break;
+            }
         case 2: // "Colored coins"
             switch (transaction.subtype) {
-            case 1: // "Asset Transfer"
+            case 0:
+                nameOfTransaction = $.t("asset_issuance");
+                break;
+            case 1:
+                nameOfTransaction = $.t("asset_transfer");
                 foundAsset = BRS.assets.find((tkn) => tkn.asset === transaction.attachment.asset)
                 newAmountText = ''
                 if (foundAsset) {
@@ -575,34 +463,121 @@ var BRS = (function(BRS, $, undefined) {
                 }
                 amountText = newAmountText
                 break;
-            case 2: // "Ask Order Placement"
-            case 3: // "Bid Order Placement"
+            case 2:
+                nameOfTransaction = $.t("ask_order_placement");
                 senderOrRecipientOrMultiple = "sender";
                 break;
-            case 8: // "Asset Distribute to Holders"
-                // Actually there is no way to know the current account is in recipients without another query.
+            case 3:
+                nameOfTransaction = $.t("bid_order_placement");
+                senderOrRecipientOrMultiple = "sender";
+                break;
+            case 4:
+                nameOfTransaction = $.t("ask_order_cancellation");
+                break;
+            case 5:
+                nameOfTransaction = $.t("bid_order_cancellation");
+                break;
+            case 8:
+                nameOfTransaction = $.t("asset_distribute_to_holders");
+                // Actually there is no way to know if viewingAccount is in recipients without another query.
                 // Assuming yes, because it will be wrong only in unconfirmed transaction.
-                toFromMe = true
+                toFromViewer = true
                 senderOrRecipientOrMultiple = "sender"
-                if (transaction.sender != BRS.account) {
+                if (transaction.sender != viewingAccount) {
                     // amount is unknow only if current user is in recipient list
                     amountText = "(" + amountText + ")";    
+                } else {
+                    senderOrRecipientOrMultiple = "multiple"
                 }
+                break;
+            }
+            break;
+        case 3:
+            switch (transaction.subtype) {
+            case 0:
+                nameOfTransaction = $.t("marketplace_listing");
+                break;
+            case 1:
+                nameOfTransaction = $.t("marketplace_removal");
+                break;
+            case 2:
+                nameOfTransaction = $.t("marketplace_price_change");
+                break;
+            case 3:
+                nameOfTransaction = $.t("marketplace_quantity_change");
+                break;
+            case 4:
+                nameOfTransaction = $.t("marketplace_purchase");
+                break;
+            case 5:
+                nameOfTransaction = $.t("marketplace_delivery");
+                break;
+            case 6:
+                nameOfTransaction = $.t("marketplace_feedback");
+                break;
+            case 7:
+                nameOfTransaction = $.t("marketplace_refund");
+                break;
+            }
+            break;
+        case 4:
+            switch (transaction.subtype) {
+            case 0:
+                nameOfTransaction = $.t("balance_leasing");
                 break;
             }
             break;
         case 20:  // "Mining",
             switch (transaction.subtype) {
+            case 0:
+                nameOfTransaction = $.t("reward_assignment");
+                break;
             case 1: // "Add Commitment"
-                senderOrRecipientOrMultiple = "sender";
+                nameOfTransaction = $.t("add_commitment");
+                senderOrRecipientOrMultiple = "recipient";
                 amount = transaction.attachment.amountNQT.toString();
                 amountText = BRS.formatAmount(amount)
                 break;
             case 2: // "Remove Commitment"
+                nameOfTransaction = $.t("remove_commitment");
                 senderOrRecipientOrMultiple = "sender";
                 amount = transaction.attachment.amountNQT.toString();
                 amountText = BRS.formatAmount(amount)
+                break;
             }
+            break;
+        case 21:
+            switch (transaction.subtype) {
+            case 0:
+                nameOfTransaction = "Escrow Creation";
+                break;
+            case 1:
+                nameOfTransaction = "Escrow Signing";
+                break;
+            case 2:
+                nameOfTransaction = "Escrow Result";
+                break;
+            case 3:
+                nameOfTransaction = $.t("subscription_subscribe");
+                break;
+            case 4:
+                nameOfTransaction = $.t("subscription_cancel");
+                break;
+            case 5:
+                nameOfTransaction = $.t("subscription_payment");
+                break;
+            }
+            break;
+        case 22:
+            switch (transaction.subtype) {
+            case 0:
+                nameOfTransaction = $.t("at_creation");
+                break;
+            case 1:
+                nameOfTransaction = $.t("at_payment");
+                break;
+            }
+            break;
         }
 
         let hasMessage = false;
@@ -610,14 +585,14 @@ var BRS = (function(BRS, $, undefined) {
             if (transaction.attachment.encryptedMessage || transaction.attachment.message) {
                 hasMessage = true;
             }
-            else if (transaction.sender == BRS.account && transaction.attachment.encryptToSelfMessage) {
+            else if (transaction.sender == viewingAccount && transaction.attachment.encryptToSelfMessage) {
                 hasMessage = true;
             }
         }
 
         let circleText = ""
         let colorClass = ""
-        if (toFromMe && amountText !== "0") {
+        if (toFromViewer && amountText !== "0") {
             if (senderOrRecipientOrMultiple === "sender") {
                 circleText = "<i class='fas fa-plus-circle' style='color:#65C62E'></i>"
             } else {
@@ -627,11 +602,12 @@ var BRS = (function(BRS, $, undefined) {
         }
 
         const accountLink = BRS.getAccountLink(transaction, senderOrRecipientOrMultiple)
-
+        const accountTitle = BRS.getAccountTitle(transaction, senderOrRecipientOrMultiple)
         return {
             nameOfTransaction,
             accountLink,
-            toFromMe,
+            accountTitle,
+            toFromViewer,
             amount,
             amountText,
             foundAsset,
@@ -642,7 +618,7 @@ var BRS = (function(BRS, $, undefined) {
     }
 
     function getTransactionRowDashboardHTML (transaction) {
-        const details = formatTransactionDetails(transaction);
+        const details = BRS.getTransactionDetails(transaction);
 
         let confirmationHTML = String(transaction.confirmations).escapeHTML()
         if (transaction.unconfirmed) {
@@ -654,7 +630,7 @@ var BRS = (function(BRS, $, undefined) {
         let rowStr = ''
         rowStr += "<tr class='" + (transaction.unconfirmed ? "tentative" : "confirmed") + "'>"
         rowStr += "<td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "' data-timestamp='" + String(transaction.timestamp).escapeHTML() + "'>" + BRS.formatTimestamp(transaction.timestamp) + "</a></td>"
-        rowStr += "<td>" + details.nameOfTransaction + "</td>"
+        rowStr += "<td>" + details.nameOfTransaction + (details.hasMessage ? " + <i class='far fa-envelope-open'></i>&nbsp;" : "") + "</td>"
         rowStr += "<td>" + details.circleText + "</td>"
         rowStr += `<td ${details.colorClass}>${details.amountText}</td>`
         rowStr += `<td>${details.accountLink}</td>`
@@ -665,16 +641,16 @@ var BRS = (function(BRS, $, undefined) {
     }
 
     function getTransactionRowHTML(transaction) {
-        const details = formatTransactionDetails(transaction);
+        const details = BRS.getTransactionDetails(transaction);
 
         let confirmationHTML = BRS.formatAmount(transaction.confirmations)
         if (transaction.unconfirmed) {
             confirmationHTML = BRS.pendingTransactionHTML
         }
         let rowStr = ''
-        rowStr += "<tr " + ((transaction.unconfirmed && details.toFromMe) ? " class='tentative'" : "") + ">";
+        rowStr += "<tr " + ((transaction.unconfirmed && details.toFromViewer) ? " class='tentative'" : "") + ">";
         rowStr += "<td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "'>" + String(transaction.transaction).escapeHTML() + "</a></td>"
-        rowStr += "<td>" + (details.hasMessage ? "<i class='far fa-envelope-open'></i>&nbsp;" : "/") + "</td>"
+        rowStr += "<td>" + (details.hasMessage ? "<i class='far fa-envelope-open'></i>&nbsp;" : "") + "</td>"
         rowStr += "<td>" + BRS.formatTimestamp(transaction.timestamp) + "</td>"
         rowStr += "<td>" + details.nameOfTransaction + "</td>"
         rowStr += "<td>" + details.circleText + "</td>"
