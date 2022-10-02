@@ -429,7 +429,7 @@ var BRS = (function(BRS, $, undefined) {
                 break;
             case 6:
                 if (transaction.attachment.priceNQT == "0") {
-                    if (transaction.sender == viewingAccountId && transaction.recipient == viewingAccountId) {
+                    if (transaction.sender == viewingAccount && transaction.recipient == viewingAccount) {
                         nameOfTransaction = $.t("alias_sale_cancellation");
                     }
                     else {
