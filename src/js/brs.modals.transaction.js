@@ -3,7 +3,6 @@
  * @depends {brs.modals.js}
  */
 var message = "";
-var fieldsToDecrypt = {};
 var BRS = (function(BRS, $, undefined) {
 
     BRS.showTransactionModal = function(transaction) {
@@ -189,6 +188,7 @@ var BRS = (function(BRS, $, undefined) {
 			$output.append("<div id='transaction_info_decryption_form'></div><div id='transaction_info_decryption_output' style='display:none;padding-bottom:10px;'></div>");
 
 			if (BRS.account == transaction.recipient || BRS.account == transaction.sender) {
+                const fieldsToDecrypt = {}
 
 			    if (transaction.attachment.encryptedMessage) {
 				fieldsToDecrypt.encryptedMessage = $.t("encrypted_message");
@@ -975,6 +975,7 @@ var BRS = (function(BRS, $, undefined) {
 		}
 
 		if (transaction.attachment.encryptedMessage || (transaction.attachment.encryptToSelfMessage && BRS.account == transaction.sender)) {
+            const fieldsToDecrypt = {}
 		    if (transaction.attachment.message) {
 			$("#transaction_info_output_bottom").append("<div style='height:5px'></div>");
 		    }

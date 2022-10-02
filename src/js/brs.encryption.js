@@ -433,9 +433,13 @@ var BRS = (function(BRS, $, undefined) {
 		    }
 
 		    try {
+                let destinationAccount = account
+                if (key === "encryptToSelfMessage") {
+                    destinationAccount = BRS.account
+                }
 			data = BRS.decryptNote(encrypted, {
 			    "nonce": nonce,
-			    "account": account
+			    "account": destinationAccount
 			});
 		    } catch (err) {
 			var mesage = String(err.message ? err.message : err);
