@@ -154,17 +154,16 @@
 
         // from brs.assetexchange.js
         $("#asset_exchange_bookmark_this_asset").on("click", function() {
-            if (BRS.viewingAsset) {
-                BRS.saveAssetBookmarks(new Array(BRS.viewingAsset), function(newAssets) {
-                    BRS.viewingAsset = false;
-                    BRS.loadAssetExchangeSidebar(function() {
-                        $("#asset_exchange_sidebar a[data-asset=" + newAssets[0].asset + "]").addClass("active").trigger("click");
-                    });
+                BRS.saveAssetBookmarks([BRS.currentAsset], function() {
+                    BRS.goToAsset(BRS.currentAsset.asset);
                 });
-            }
         });
+        $("#asset_exchange_add_all_assets_bookmark").on("click", function() {
+            BRS.bookmarkAllUserAssets()
+        });
+        
         $("#asset_exchange_sidebar").on("click", "a", BRS.evAssetExchangeSidebarClick);
-        $("#ae_show_my_trades_only").on("change", BRS.evAssetExchangeSidebarClick);
+        $("#ae_show_my_trades_only").on("change", BRS.updateMiniTradeHistory);
         $("#asset_exchange_search").on("submit", function(e) {
             e.preventDefault();
             $("#asset_exchange_search input[name=q]").trigger("input");
@@ -700,7 +699,7 @@
         });
 
         // from brs.modals.transaction.js
-        $("#transactions_table, #dashboard_transactions_table, #transfer_history_table").on("click", "a[data-transaction]", function(e) {
+        $("#transactions_table, #dashboard_transactions_table, #transfer_history_table, #asset_exchange_trade_history_table").on("click", "a[data-transaction]", function(e) {
             e.preventDefault();
             const transactionId = $(this).data("transaction");
             BRS.showTransactionModal(transactionId);

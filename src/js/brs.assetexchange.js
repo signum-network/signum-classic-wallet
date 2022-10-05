@@ -3,32 +3,15 @@
  */
 var BRS = (function(BRS, $, undefined) {
     BRS.assets = [];
-    BRS.assetIds = [];
     BRS.closedGroups = [];
     BRS.assetSearch = false;
-    BRS.lastIssuerCheck = false;
-    BRS.viewingAsset = false; //viewing non-bookmarked asset
     BRS.currentAsset = {};
-    BRS.assetTradeHistoryType = "everyone";
     BRS.currentAssetID = "undefined";
 
     BRS.pages.asset_exchange = function(callback) {
         $(".content.content-stretch:visible").width($(".page:visible").width());
 
-        if (!BRS.databaseSupport) {
-            bookmarkUserAssets(callback);
-            return;
-        }
-        BRS.assets = [];
-        BRS.assetIds = [];
-        BRS.database.select("assets", null, function(error, assets) {
-            //select already bookmarked assets
-            $.each(assets, function(index, asset) {
-                BRS.cacheAsset(asset);
-            });
-
-            bookmarkUserAssets(callback);
-        });
+        BRS.loadAssetExchangeSidebar(callback);
     }
 
     BRS.loadCachedAssets = function () {
@@ -37,7 +20,6 @@ var BRS = (function(BRS, $, undefined) {
             return;
         }
         BRS.assets = [];
-        BRS.assetIds = [];
         BRS.database.select("assets", null, function(error, assets) {
             //select already bookmarked assets
             if (error === null) {
@@ -75,46 +57,51 @@ var BRS = (function(BRS, $, undefined) {
         });
     }
 
-    function bookmarkUserAssets(callback) {
-        //check owned assets, see if any are not yet in bookmarked assets
+    BRS.bookmarkAllUserAssets = function () {
+        //check owned assets, adding all to bookmarks
+        const assetsToBookmark = []
+        const idsToFetchAndBookmark = []
+
         if (!BRS.accountInfo.unconfirmedAssetBalances) {
-            BRS.loadAssetExchangeSidebar(callback);
             return;
         }
-        const newAssetIds = [];
-        $.each(BRS.accountInfo.unconfirmedAssetBalances, function(key, assetBalance) {
-            if (BRS.assetIds.indexOf(assetBalance.asset) == -1) {
-                newAssetIds.push(assetBalance.asset);
-                BRS.assetIds.push(assetBalance.asset);
+        for (const userAsset of BRS.accountInfo.unconfirmedAssetBalances) {
+            const foundAsset = BRS.assets.find(tkn => tkn.asset === userAsset.asset)
+            if (foundAsset) {
+                assetsToBookmark.push(foundAsset)
+            } else {
+                idsToFetchAndBookmark.push(userAsset.asset)
             }
-        });
-        //add to bookmarked assets
-        if (newAssetIds.length === 0) {
-            BRS.loadAssetExchangeSidebar(callback);
+        }
+        if (assetsToBookmark.length + idsToFetchAndBookmark.length === 0) {
             return;
         }
-        for (const eachAsset of newAssetIds) {
+        let assetsToFetch = idsToFetchAndBookmark.length
+        if (assetsToFetch === 0) {
+            BRS.saveAssetBookmarks(assetsToBookmark, BRS.forms.addAssetBookmarkComplete);
+            return;
+        }
+        for (const eachAsset of idsToFetchAndBookmark) {
             BRS.sendRequest("getAsset+", {
                 "asset": eachAsset
             }, function(response) {
-                if (response.errorCode) {
-                    BRS.loadAssetExchangeSidebar(callback);
-                    return;
+                assetsToFetch--;
+                if (!response.errorCode) {
+                    assetsToBookmark.push(response)
                 }
-                BRS.saveAssetBookmarks([response], function() {
-                    BRS.loadAssetExchangeSidebar(callback);
-                });
+                if (assetsToFetch === 0) {
+                    BRS.saveAssetBookmarks(assetsToBookmark, BRS.forms.addAssetBookmarkComplete);
+                }
             });
         }
     }
 
     BRS.cacheAsset = function(asset) {
-        if (BRS.assetIds.indexOf(asset.asset) != -1) {
-            BRS.assets.quantityCirculatingQNT = String(asset.quantityCirculatingQNT)
+        const foundAsset = BRS.assets.find((tkn) => tkn.asset === asset.asset)
+        if (foundAsset) {
+            foundAsset.quantityCirculatingQNT = String(asset.quantityCirculatingQNT)
             return;
         }
-
-        BRS.assetIds.push(asset.asset);
 
         if (!asset.groupName) {
             asset.groupName = "";
@@ -129,7 +116,8 @@ var BRS = (function(BRS, $, undefined) {
             "accountRS": String(asset.accountRS),
             "quantityQNT": String(asset.quantityQNT),
             "quantityCirculatingQNT":  String(asset.quantityCirculatingQNT),
-            "decimals": parseInt(asset.decimals, 10)
+            "decimals": parseInt(asset.decimals, 10),
+            bookmarked: Boolean(asset.bookmarked)
         };
 
         BRS.assets.push(asset);
@@ -207,13 +195,11 @@ var BRS = (function(BRS, $, undefined) {
                         y: 60
                         }
             });
-            $("#asset_exchange_sidebar a.active").removeClass("active");
-            $("#asset_exchange_sidebar a[data-asset=" + submittedAssets[0].asset + "]").addClass("active").trigger("click");
-            return;
+            BRS.goToAsset(submittedAssets[0].asset)
         } else {
             BRS.closeModal();
 
-            var message = $.t("success_asset_bookmarked", {
+            let message = $.t("success_asset_bookmarked", {
                 "count": newAssets.length
             });
 
@@ -229,19 +215,15 @@ var BRS = (function(BRS, $, undefined) {
                         }
             });
 
-            BRS.loadAssetExchangeSidebar(function(callback) {
-                $("#asset_exchange_sidebar a.active").removeClass("active");
-                $("#asset_exchange_sidebar a[data-asset=" + newAssets[0].asset + "]").addClass("active").trigger("click");
-            });
+            BRS.goToAsset(newAssets[0].asset)
         }
     };
 
     BRS.saveAssetBookmarks = function(assets, callback) {
-        var newAssetIds = [];
-        var newAssets = [];
+        const newAssets = [];
 
-        $.each(assets, function(key, asset) {
-            var newAsset = {
+        for (const asset of assets) {
+            const newAsset = {
                 "asset": String(asset.asset),
                 "name": String(asset.name),
                 "description": String(asset.description),
@@ -250,63 +232,44 @@ var BRS = (function(BRS, $, undefined) {
                 "quantityQNT": String(asset.quantityQNT),
                 "quantityCirculatingQNT":  String(asset.quantityCirculatingQNT),
                 "decimals": parseInt(asset.decimals, 10),
-                "groupName": ""
+                "groupName": "",
+                "bookmarked": true
             };
 
             newAssets.push(newAsset);
 
-            if (BRS.databaseSupport) {
-                newAssetIds.push({
-                    "asset": String(asset.asset)
-                });
-            } else if (BRS.assets.findIndex(Obj => Obj.asset === asset.asset) == -1) {
-                BRS.assetIds.push(asset.asset);
-                newAsset.name = newAsset.name.toLowerCase();
-                BRS.assets.push(newAsset);
-            }
-        });
-
-        if (!BRS.databaseSupport) {
-            if (callback) {
-                callback(newAssets, assets);
-            }
-            return;
-        }
-
-        BRS.database.select("assets", newAssetIds, function(error, existingAssets) {
-            var existingIds = [];
-
-            if (existingAssets.length) {
-                $.each(existingAssets, function(index, asset) {
-                    existingIds.push(asset.asset);
-                });
-
-                newAssets = $.grep(newAssets, function(v) {
-                    return (existingIds.indexOf(v.asset) === -1);
-                });
-            }
-
-            if (newAssets.length === 0) {
-                if (callback) {
-                    callback([], assets);
+            const foundAsset = BRS.assets.find(Obj => Obj.asset === asset.asset)
+            if (foundAsset) {
+                if (foundAsset.bookmarked === true) {
+                    // asset already bookmarked
+                    newAssets.pop()
+                } else {
+                    foundAsset.bookmarked = true;
                 }
             } else {
-                BRS.database.insert("assets", newAssets, function(error) {
-                    $.each(newAssets, function(key, asset) {
-                        asset.name = asset.name.toLowerCase();
-                        BRS.assetIds.push(asset.asset);
-                        BRS.assets.push(asset);
-                    });
-
-                    if (callback) {
-                        //for some reason we need to wait a little or DB won't be able to fetch inserted record yet..
-                        setTimeout(function() {
-                            callback(newAssets, assets);
-                        }, 50);
-                    }
-                });
+                BRS.assets.push(newAsset);
             }
-        });
+            if (BRS.databaseSupport) {
+                BRS.database.select("assets", [{ asset: newAsset.asset}], function (error, assets) {
+                    if (error !== null) {
+                        return
+                    }
+                    if (assets.length === 0) {
+                        BRS.database.insert("assets", [newAsset], null)
+                    } else {
+                        BRS.database.update("assets", {
+                            "bookmarked": true
+                        }, [{
+                            "asset": newAsset.asset
+                        }], null);
+                    }
+                })
+            }
+        };
+
+        if (callback) {
+            callback(newAssets, assets);
+        }
     };
 
     BRS.positionAssetSidebar = function() {
@@ -317,22 +280,14 @@ var BRS = (function(BRS, $, undefined) {
 
     //called on opening the asset exchange page and automatic refresh
     BRS.loadAssetExchangeSidebar = function(callback) {
-        if (!BRS.assets.length) {
-            BRS.pageLoaded(callback);
-            $("#asset_exchange_sidebar_content").empty();
-            $("#no_asset_selected, #loading_asset_data, #no_asset_search_results, #asset_details").hide();
-            $("#no_assets_available").show();
-            $("#asset_exchange_page").addClass("no_assets");
-            return;
-        }
-
-        var rows = "";
+        const bookmarkedAssets = BRS.assets.filter(token => token.bookmarked === true);
+        let rows = "";
 
         $("#asset_exchange_page").removeClass("no_assets");
 
         BRS.positionAssetSidebar();
 
-        BRS.assets.sort(function(a, b) {
+        bookmarkedAssets.sort(function(a, b) {
             if (!a.groupName && !b.groupName) {
                 if (a.name > b.name) {
                     return 1;
@@ -360,15 +315,14 @@ var BRS = (function(BRS, $, undefined) {
             }
         });
 
-        var lastGroup = "";
-        var ungrouped = true;
-        var isClosedGroup = false;
+        let lastGroup = "";
+        let ungrouped = true;
+        let isClosedGroup = false;
 
-        var isSearch = BRS.assetSearch !== false;
-        var searchResults = 0;
+        const isSearch = BRS.assetSearch !== false;
+        let searchResults = 0;
 
-        for (var i = 0; i < BRS.assets.length; i++) {
-            var asset = BRS.assets[i];
+        for (const asset of bookmarkedAssets) {
 
             if (isSearch) {
                 if (BRS.assetSearch.indexOf(asset.asset) == -1) {
@@ -414,7 +368,6 @@ var BRS = (function(BRS, $, undefined) {
             rows += "<a href='#' class='list-group-item list-group-item-"
                 + (ungrouped ? "ungrouped" : "grouped")
                 + (ownsAsset ? " owns_asset" : " not_owns_asset")
-                + "' data-cache='" + i
                 + "' data-asset='" + String(asset.asset).escapeHTML() + "'"
                 + (!ungrouped ? " data-groupname='" + asset.groupName.escapeHTML() + "'" : "")
                 + (isClosedGroup ? " style='display:none'" : "")
@@ -447,7 +400,7 @@ var BRS = (function(BRS, $, undefined) {
             $("#asset_exchange_sidebar a[data-asset=" + active + "]").addClass("active");
         }
 
-        if (isSearch || BRS.assets.length >= 10) {
+        if (isSearch || bookmarkedAssets.length >= 10) {
             $("#asset_exchange_sidebar_search").show();
         } else {
             $("#asset_exchange_sidebar_search").hide();
@@ -456,6 +409,9 @@ var BRS = (function(BRS, $, undefined) {
         if (isSearch && BRS.assetSearch.length === 0) {
             $("#no_asset_search_results").show();
             $("#asset_details, #no_asset_selected, #no_assets_available").hide();
+        } else if (!bookmarkedAssets.length) {
+            $("#no_asset_selected, #loading_asset_data, #no_asset_search_results, #asset_details").hide();
+            $("#no_assets_available").show();
         } else if (!$("#asset_exchange_sidebar a.active").length) {
             $("#no_asset_selected").show();
             $("#asset_details, #no_assets_available, #no_asset_search_results").hide();
@@ -463,28 +419,15 @@ var BRS = (function(BRS, $, undefined) {
             $("#no_assets_available, #no_asset_selected, #no_asset_search_results").hide();
         }
 
-        if (BRS.viewingAsset) {
-            $("#asset_exchange_bookmark_this_asset").show();
-        } else {
-            $("#asset_exchange_bookmark_this_asset").hide();
-        }
+        $("#asset_exchange_bookmark_this_asset").hide();
+
+        showHideBookmarkAllAssetsButton()
 
         BRS.pageLoaded(callback);
     };
 
     BRS.incoming.asset_exchange = function() {
-        if (!BRS.viewingAsset) {
-            //refresh active asset
-            var $active = $("#asset_exchange_sidebar a.active");
-
-            if ($active.length) {
-                $active.trigger("click", [{
-                    "refresh": true
-                }]);
-            }
-        } else {
-            BRS.loadAsset(BRS.viewingAsset, true);
-        }
+        BRS.loadAsset(BRS.currentAsset.asset, true);
 
         //update assets owned (colored)
         $("#asset_exchange_sidebar a.list-group-item.owns_asset").removeClass("owns_asset").addClass("not_owns_asset");
@@ -576,10 +519,12 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.loadAsset = function(asset, refresh) {
-        var assetId = asset.asset;
+        if (!asset?.asset) {
+            return
+        }
+        const assetId = asset.asset;
 
         BRS.currentAsset = asset;
-        BRS.currentSubPage = assetId;
 
         if (!refresh) {
             $("#asset_exchange_sidebar a.active").removeClass("active");
@@ -647,12 +592,9 @@ var BRS = (function(BRS, $, undefined) {
                             }], function() {
                                 setTimeout(function() {
                                     BRS.loadPage("asset_exchange");
-                                    $.notify("Invalid asset.", {
+                                    $.notify($.t("invalid_asset"), {
                                         type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
+                                        offset: { x: 5, y: 60 }
                                     });
                                 }, 50);
                             });
@@ -668,24 +610,21 @@ var BRS = (function(BRS, $, undefined) {
                     } else {
                         $("#no_asset_selected").show();
                         $("#asset_details, #no_assets_available, #no_asset_search_results").hide();
-                        $.notify("Invalid asset.", {
+                        $.notify($.t("invalid_asset"), {
                             type: 'danger',
-                            offset: {
-                                x: 5,
-                                y: 60
-                            }
+                            offset: { x: 5, y: 60 }
                         });
                     }
                 });
             }
 
-            if (asset.viewingAsset) {
-                $("#asset_exchange_bookmark_this_asset").show();
-                BRS.viewingAsset = asset;
-            } else {
+            if (asset.bookmarked) {
                 $("#asset_exchange_bookmark_this_asset").hide();
-                BRS.viewingAsset = false;
+            } else {
+                $("#asset_exchange_bookmark_this_asset").show();
+                $('#asset_exchange_bookmark_this_asset').data('assetId', assetId);
             }
+            showHideBookmarkAllAssetsButton()
         }
 
         if (BRS.accountInfo.unconfirmedBalanceNQT == "0") {
@@ -721,36 +660,53 @@ var BRS = (function(BRS, $, undefined) {
         BRS.loadAssetOrders("ask", assetId, refresh);
         BRS.loadAssetOrders("bid", assetId, refresh);
 
+        BRS.updateMiniTradeHistory();
+
+    };
+
+    function showHideBookmarkAllAssetsButton() {
+        let show = false
+        for (const userAsset of BRS.accountInfo.unconfirmedAssetBalances) {
+            if (BRS.assets.findIndex((tkn) => tkn.asset === userAsset.asset && tkn.bookmarked === true) === -1) {
+                show = true
+                break;
+            }
+        }
+        if (show) $("#asset_exchange_add_all_assets_bookmark").show();
+        else $("#asset_exchange_add_all_assets_bookmark").hide();
+    }
+
+    BRS.updateMiniTradeHistory = function () {
         //todo BRS.currentSubPageID ??...
-        BRS.sendRequest("getTrades+" + assetId, {
-            "asset": assetId,
+        BRS.sendRequest("getTrades+" + BRS.currentAsset.asset, {
+            "asset": BRS.currentAsset.asset,
             "account": ($("#ae_show_my_trades_only").is(":checked")) ? $("#account_id").text() : "",
             "firstIndex": 0,
             "lastIndex": 49
         }, function(response, input) {
             if (response.trades && response.trades.length) {
-                var trades = response.trades;
-
-                var rows = "";
-
-                for (var i = 0; i < trades.length; i++) {
-                    trades[i].priceNQT = new BigInteger(trades[i].priceNQT);
-                    trades[i].quantityQNT = new BigInteger(trades[i].quantityQNT);
-                    trades[i].totalNQT = new BigInteger(BRS.calculateOrderTotalNQT(trades[i].priceNQT, trades[i].quantityQNT));
-
-                    rows += "<tr><td>" + BRS.formatTimestamp(trades[i].timestamp) + "</td><td>" + BRS.formatQuantity(trades[i].quantityQNT, BRS.currentAsset.decimals) + "</td><td class='asset_price'>" + BRS.formatOrderPricePerWholeQNT(trades[i].priceNQT, BRS.currentAsset.decimals) + "</td><td>" + BRS.formatAmount(trades[i].totalNQT) + "</td><td>" + String(trades[i].askOrder).escapeHTML() + "</td><td>" + String(trades[i].bidOrder).escapeHTML() + "</td></tr>";
+                let rows = "";
+                for (const trade of response.trades) {
+                    trade.priceNQT = new BigInteger(trade.priceNQT);
+                    trade.quantityQNT = new BigInteger(trade.quantityQNT);
+                    trade.totalNQT = new BigInteger(BRS.calculateOrderTotalNQT(trade.priceNQT, trade.quantityQNT));
+                    rows += "<tr>";
+                    rows += "<td>" + BRS.formatTimestamp(trade.timestamp) + "</td>"
+                    rows += "<td>" + BRS.formatQuantity(trade.quantityQNT, BRS.currentAsset.decimals) + "</td>"
+                    rows += "<td class='asset_price'>" + BRS.formatOrderPricePerWholeQNT(trade.priceNQT, BRS.currentAsset.decimals) + "</td>"
+                    rows += "<td>" + BRS.formatAmount(trade.totalNQT) + "</td>"
+                    rows += "<td><a href='#' data-transaction='" + String(trade.askOrder).escapeHTML() +"'>" + String(trade.askOrder).escapeHTML() + "</a></td>"
+                    rows += "<td><a href='#' data-transaction='" + String(trade.bidOrder).escapeHTML() +"'>" + String(trade.bidOrder).escapeHTML() + "</a></td>"
+                    rows += "</tr>";
                 }
-
                 $("#asset_exchange_trade_history_table tbody").empty().append(rows);
-                BRS.dataLoadFinished($("#asset_exchange_trade_history_table"), !refresh);
+                BRS.dataLoadFinished($("#asset_exchange_trade_history_table"), true);
             } else {
                 $("#asset_exchange_trade_history_table tbody").empty();
-                BRS.dataLoadFinished($("#asset_exchange_trade_history_table"), !refresh);
+                BRS.dataLoadFinished($("#asset_exchange_trade_history_table"), true);
             }
         });
-    };
-
-
+    }
 
     BRS.loadAssetOrders = function(type, assetId, refresh) {
         type = type.toLowerCase();
@@ -1309,8 +1265,8 @@ var BRS = (function(BRS, $, undefined) {
     BRS.evAssetExchangeSidebarContextClick =  function(e) {
         e.preventDefault();
 
-        var assetId = BRS.selectedContext.data("asset");
-        var option = $(this).data("option");
+        const assetId = BRS.selectedContext.data("asset");
+        const option = $(this).data("option");
 
         BRS.closeContextMenu();
 
@@ -1325,15 +1281,13 @@ var BRS = (function(BRS, $, undefined) {
                 $("#asset_exchange_group_title").html(String(asset.name).escapeHTML());
 
                 BRS.database.select("assets", [], function(error, assets) {
-                    var groupNames = [];
+                    const groupNames = [];
 
                     $.each(assets, function(index, asset) {
                         if (asset.groupName && $.inArray(asset.groupName, groupNames) == -1) {
                             groupNames.push(asset.groupName);
                         }
                     });
-
-                    assets = [];
 
                     groupNames.sort(function(a, b) {
                         if (a.toLowerCase() > b.toLowerCase()) {
@@ -1345,7 +1299,7 @@ var BRS = (function(BRS, $, undefined) {
                         }
                     });
 
-                    var groupSelect = $("#asset_exchange_group_group");
+                    const groupSelect = $("#asset_exchange_group_group");
 
                     groupSelect.empty();
 
@@ -1353,13 +1307,17 @@ var BRS = (function(BRS, $, undefined) {
                         groupSelect.append("<option value='" + groupName.escapeHTML() + "'" + (asset.groupName && asset.groupName.toLowerCase() == groupName.toLowerCase() ? " selected='selected'" : "") + ">" + groupName.escapeHTML() + "</option>");
                     });
 
-                    groupSelect.append("<option value='0'" + (!asset.groupName ? " selected='selected'" : "") + ">None</option>");
-                    groupSelect.append("<option value='-1'>New group</option>");
+                    groupSelect.append("<option value='0'" + (!asset.groupName ? " selected='selected'" : "") + "></option>");
+                    groupSelect.append(`<option value='-1'>${$.t("new_group")}</option>`);
 
                     $("#asset_exchange_group_modal").modal("show");
                 });
             });
         } else if (option == "remove_from_group") {
+            const foundAsset = BRS.assets.find((tkn) => tkn.asset === assetId)
+            if (foundAsset) {
+                foundAsset.groupName = "";
+            }
             BRS.database.update("assets", {
                 "groupName": ""
             }, [{
@@ -1369,61 +1327,44 @@ var BRS = (function(BRS, $, undefined) {
                     BRS.loadPage("asset_exchange");
                     $.notify($.t("success_asset_group_removal"), {
                         type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
+                        offset: { x: 5, y: 60 }
                     });
                 }, 50);
             });
         } else if (option == "remove_from_bookmarks") {
-            var ownsAsset = false;
-
-            if (BRS.accountInfo.unconfirmedAssetBalances) {
-                $.each(BRS.accountInfo.unconfirmedAssetBalances, function(key, assetBalance) {
-                    if (assetBalance.asset == assetId) {
-                        ownsAsset = true;
-                        return false;
-                    }
-                });
+            const foundAsset = BRS.assets.find((tkn) => tkn.asset === assetId)
+            if (foundAsset) {
+                foundAsset.bookmarked = false;
             }
-
-            if (ownsAsset) {
-                $.notify($.t("error_owned_asset_no_removal"), {
-                    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
-            } else {
-                //todo save delteed asset ids from accountissuers
-                BRS.database.delete("assets", [{
-                    "asset": assetId
-                }], function(error, affected) {
-                    setTimeout(function() {
-                        BRS.loadPage("asset_exchange");
-                        $.notify($.t("success_asset_bookmark_removal"), {
-                            type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                        });
-                    }, 50);
-                });
-            }
+            BRS.database.update("assets", {
+                "bookmarked": false
+            }, [{
+                "asset": assetId
+            }], function(error, affected) {
+                setTimeout(function() {
+                    BRS.loadPage("asset_exchange");
+                    $.notify($.t("success_asset_bookmark_removal"), {
+                        type: 'success',
+                        offset: { x: 5, y: 60 }
+                    });
+                }, 50);
+            });
         }
     };
 
     BRS.forms.assetExchangeGroup = function($modal) {
-        var assetId = $("#asset_exchange_group_asset").val();
-        var groupName = $("#asset_exchange_group_group").val();
+        const assetId = $("#asset_exchange_group_asset").val();
+        let groupName = $("#asset_exchange_group_group").val();
 
-        if (groupName === 0) {
+        if (groupName === "0") {
             groupName = "";
-        } else if (groupName == -1) {
+        } else if (groupName === "-1") {
             groupName = $("#asset_exchange_group_new_group").val();
+        }
+
+        const foundAsset = BRS.assets.find((tkn) => tkn.asset === assetId)
+        if (foundAsset) {
+            foundAsset.groupName = groupName;
         }
 
         BRS.database.update("assets", {
@@ -1436,18 +1377,12 @@ var BRS = (function(BRS, $, undefined) {
                 if (!groupName) {
                     $.notify($.t("success_asset_group_removal"), {
                         type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
+                        offset: { x: 5, y: 60 }
                     });
                 } else {
-                    $.notify($.t("sucess_asset_group_add"), {
+                    $.notify($.t("success_asset_group_add"), {
                         type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
+                        offset: { x: 5, y: 60 }
                     });
                 }
             }, 50);
@@ -1808,6 +1743,13 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.goToAsset = function(asset) {
+
+        if (BRS.currentPage !== "asset_exchange") {
+            BRS.goToPage("asset_exchange")
+        }
+
+        const foundAsset = BRS.assets.find((tkn) => tkn.asset === asset)
+
         BRS.assetSearch = false;
         $("#asset_exchange_sidebar_search input[name=q]").val("");
         $("#asset_exchange_clear_search").hide();
@@ -1816,35 +1758,9 @@ var BRS = (function(BRS, $, undefined) {
         $("#no_asset_selected, #asset_details, #no_assets_available, #no_asset_search_results").hide();
         $("#loading_asset_data").show();
 
-        $("ul.sidebar-menu a[data-page=asset_exchange]").last().trigger("click", [{
-            callback: function() {
-                var assetLink = $("#asset_exchange_sidebar a[data-asset=" + asset + "]");
-
-                if (assetLink.length) {
-                    assetLink.click();
-                } else {
-                    BRS.sendRequest("getAsset", {
-                        "asset": asset
-                    }, function(response) {
-                        if (!response.errorCode) {
-                            BRS.loadAssetExchangeSidebar(function() {
-                                response.groupName = "";
-                                response.viewingAsset = true;
-                                BRS.loadAsset(response);
-                            });
-                        } else {
-                            $.notify($.t("error_asset_not_found"), {
-                                type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                            });
-                        }
-                    });
-                }
-            }
-        }]);
+        BRS.loadAssetExchangeSidebar(function() {
+            BRS.loadAsset(foundAsset);
+        });
     };
 
     /* OPEN ORDERS PAGE */
