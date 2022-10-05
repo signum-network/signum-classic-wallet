@@ -332,7 +332,7 @@ var BRS = (function(BRS, $, undefined) {
                 }
             }
 
-            if (asset.groupName.toLowerCase() != lastGroup) {
+            if (asset.groupName != lastGroup) {
                 var to_check = (asset.groupName ? asset.groupName : "undefined");
 
                 if (BRS.closedGroups.indexOf(to_check) != -1) {
@@ -343,13 +343,13 @@ var BRS = (function(BRS, $, undefined) {
 
                 if (asset.groupName) {
                     ungrouped = false;
-                    rows += "<a href='#' class='list-group-item list-group-item-header" + (asset.groupName == "Ignore List" ? " no-context" : "") + "'" + (asset.groupName != "Ignore List" ? " data-context='asset_exchange_sidebar_group_context' " : "data-context=''") + " data-groupname='" + asset.groupName.escapeHTML() + "' data-closed='" + isClosedGroup + "'><h4 class='list-group-item-heading'>" + asset.groupName.toUpperCase().escapeHTML() + "</h4><i class='fas fa-angle-" + (isClosedGroup ? "right" : "down") + " group_icon'></i></h4></a>";
+                    rows += "<a href='#' class='list-group-item list-group-item-header" + (asset.groupName == "Ignore List" ? " no-context" : "") + "'" + (asset.groupName != "Ignore List" ? " data-context='asset_exchange_sidebar_group_context' " : "data-context=''") + " data-groupname='" + asset.groupName.escapeHTML() + "' data-closed='" + isClosedGroup + "'><h4 class='list-group-item-heading'>" + asset.groupName.escapeHTML() + "</h4><i class='fas fa-angle-" + (isClosedGroup ? "right" : "down") + " group_icon'></i></h4></a>";
                 } else {
                     ungrouped = true;
                     rows += "<a href='#' class='list-group-item list-group-item-header no-context' data-closed='" + isClosedGroup + "'><h4 class='list-group-item-heading'>UNGROUPED <i class='fa pull-right fa-angle-" + (isClosedGroup ? "right" : "down") + "'></i></h4></a>";
                 }
 
-                lastGroup = asset.groupName.toLowerCase();
+                lastGroup = asset.groupName;
             }
 
             var ownsAsset = false;
@@ -572,7 +572,7 @@ var BRS = (function(BRS, $, undefined) {
             var nrDuplicates = 0;
 
             $.each(BRS.assets, function(key, singleAsset) {
-                if (String(singleAsset.name).toLowerCase() == String(asset.name).toLowerCase() && singleAsset.asset != assetId) {
+                if (String(singleAsset.name) == String(asset.name) && singleAsset.asset != assetId) {
                     nrDuplicates++;
                 }
             });
@@ -796,7 +796,7 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.evAssetExchangeSearchInput = function(e) {
-        var input = $.trim($(this).val()).toLowerCase();
+        const input = $.trim($(this).val()).toUpperCase();
 
         if (!input) {
             BRS.assetSearch = false;
@@ -805,23 +805,15 @@ var BRS = (function(BRS, $, undefined) {
         } else {
             BRS.assetSearch = [];
 
-            if (/BURST\-/i.test(input)) {
-                $.each(BRS.assets, function(key, asset) {
-                    if (asset.accountRS.toLowerCase() == input || asset.accountRS.toLowerCase().indexOf(input) !== -1) {
-                        BRS.assetSearch.push(asset.asset);
-                    }
-                });
-            } else {
-                $.each(BRS.assets, function(key, asset) {
-                    if (asset.account == input || asset.asset == input || asset.name.toLowerCase().indexOf(input) !== -1) {
-                        BRS.assetSearch.push(asset.asset);
-                    }
-                });
-            }
+            for (const asset of BRS.assets) {
+                if (asset.bookmarked === true &&
+                    (asset.account == input || asset.asset == input || asset.name.toUpperCase().includes(input) || asset.accountRS.includes(input))) {
+                    BRS.assetSearch.push(asset.asset);
+                }
+            };
 
             BRS.loadAssetExchangeSidebar();
             $("#asset_exchange_clear_search").show();
-            $("#asset_exchange_show_type").hide();
         }
     };
 
@@ -1304,7 +1296,7 @@ var BRS = (function(BRS, $, undefined) {
                     groupSelect.empty();
 
                     $.each(groupNames, function(index, groupName) {
-                        groupSelect.append("<option value='" + groupName.escapeHTML() + "'" + (asset.groupName && asset.groupName.toLowerCase() == groupName.toLowerCase() ? " selected='selected'" : "") + ">" + groupName.escapeHTML() + "</option>");
+                        groupSelect.append("<option value='" + groupName.escapeHTML() + "'" + (asset.groupName && asset.groupName == groupName ? " selected='selected'" : "") + ">" + groupName.escapeHTML() + "</option>");
                     });
 
                     groupSelect.append("<option value='0'" + (!asset.groupName ? " selected='selected'" : "") + "></option>");
