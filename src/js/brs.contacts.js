@@ -61,143 +61,120 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.forms.addContact = function($modal) {
-	var data = BRS.getFormData($modal.find("form:first"));
+        const data = BRS.getFormData($modal.find("form:first"));
+        data.account_id = String(data.account_id);
+        if (!data.name) {
+            return {
+                "error": $.t("error_contact_name_required")
+            };
+        }
+        if (!data.account_id) {
+            return {
+                "error": $.t("error_account_id_required")
+            };
+        }
+        if (BRS.idRegEx.test(data.name) || BRS.rsRegEx.test(data.name)) {
+            return {
+                "error": $.t("error_contact_name_alpha")
+            };
+        }
+        if (data.email && !/@/.test(data.email)) {
+            return {
+                "error": $.t("error_email_address")
+            };
+        }
+        if (data.account_id.charAt(0) == '@') {
+            const convertedAccountId = $modal.find("input[name=converted_account_id]").val();
+            if (convertedAccountId) {
+                data.account_id = convertedAccountId;
+            } else {
+                return {
+                    "error": $.t("error_account_id")
+                };
+            }
+        }
+        const address = new NxtAddress(BRS.prefix);
+        if (address.set(data.account_id)) {
+            data.account = address.account_id();
+            data.account_rs = address.toString();
+        } else {
+            return {
+                "error": $.t("error_account_id")
+            };
+        }
+        BRS.sendRequest("getAccount", {
+            "account": data.account_id
+        }, function(response) {
+            if (!response.errorCode) {
+                if (response.account != data.account || response.accountRS != data.account_rs) {
+                    return {
+                        "error": $.t("error_account_id")
+                    };
+                }
+            }
+        }, false);
+        const $btn = $modal.find("button.btn-primary:not([data-dismiss=modal], .ignore)");
+        for (const Contact in BRS.contacts) {
+            if (BRS.contacts[Contact].account === data.account_id) {
+                $modal.find(".error_message").html($.t("error_contact_account_id_exists")).show();
+                $btn.button("reset");
+                $modal.modal("unlock");
+                return;
+            }
+            if (BRS.contacts[Contact].name == data.name) {
+                $modal.find(".error_message").html($.t("error_contact_name_exists")).show();
+                $btn.button("reset");
+                $modal.modal("unlock");
+                return;
+            }
+        }
 
-	data.account_id = String(data.account_id);
-
-	if (!data.name) {
-	    return {
-		"error": $.t("error_contact_name_required")
-	    };
-	}
-        else if (!data.account_id) {
-	    return {
-		"error": $.t("error_account_id_required")
-	    };
-	}
-
-	if (/^\d+$/.test(data.name) || /^(BURST|S)\-/i.test(data.name)) {
-	    return {
-		"error": $.t("error_contact_name_alpha")
-	    };
-	}
-
-	if (data.email && !/@/.test(data.email)) {
-	    return {
-		"error": $.t("error_email_address")
-	    };
-	}
-
-	if (data.account_id.charAt(0) == '@') {
-	    var convertedAccountId = $modal.find("input[name=converted_account_id]").val();
-	    if (convertedAccountId) {
-		data.account_id = convertedAccountId;
-	    }
-            else {
-		return {
-		    "error": $.t("error_account_id")
-		};
-	    }
-	}
-
-	if (/^(BURST|S)\-/i.test(data.account_id)) {
-	    data.account_rs = data.account_id;
-
-	    var address = new NxtAddress();
-
-	    if (address.set(data.account_rs)) {
-		data.account = address.account_id();
-	    }
-            else {
-		return {
-		    "error": $.t("error_account_id")
-		};
-	    }
-	}
-        else {
-	    var address = new NxtAddress();
-
-	    if (address.set(data.account_id)) {
-		data.account_rs = address.toString();
-	    }
-            else {
-		return {
-		    "error": $.t("error_account_id")
-		};
-	    }
-	}
-
-	BRS.sendRequest("getAccount", {
-	    "account": data.account_id
-	}, function(response) {
-	    if (!response.errorCode) {
-		if (response.account != data.account || response.accountRS != data.account_rs) {
-		    return {
-			"error": $.t("error_account_id")
-		    };
-		}
-	    }
-	}, false);
-
-	var $btn = $modal.find("button.btn-primary:not([data-dismiss=modal], .ignore)");
-
-	BRS.database.select("contacts", [{
-	    "account": data.account_id
-	}, {
-	    "name": data.name
-	}], function(error, contacts) {
-	    if (contacts && contacts.length) {
-		if (contacts[0].name == data.name) {
-		    $modal.find(".error_message").html($.t("error_contact_name_exists")).show();
-		}
-                else {
-		    $modal.find(".error_message").html($.t("error_contact_account_id_exists")).show();
-		}
-		$btn.button("reset");
-		$modal.modal("unlock");
-	    }
-            else {
-		BRS.database.insert("contacts", {
-		    name: data.name,
-		    email: data.email,
-		    account: data.account_id,
-		    accountRS: data.account_rs,
-		    description: data.description
-		}, function(error) {
-		    BRS.contacts[data.account_id] = {
-			name: data.name,
-			email: data.email,
-			account: data.account_id,
-			accountRS: data.account_rs,
-			description: data.description
-		    };
-
-		    setTimeout(function() {
-			$btn.button("reset");
-			$modal.modal("unlock");
-			$modal.modal("hide");
-			$.notify($.t("success_contact_add"), {
-			    type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-			});
-
-			if (BRS.currentPage == "contacts") {
-			    BRS.loadPage("contacts");
-			}
-                        else if (BRS.currentPage == "messages" && BRS.selectedContext) {
-			    var heading = BRS.selectedContext.find("h4.list-group-item-heading");
-			    if (heading.length) {
-				heading.html(data.name.escapeHTML());
-			    }
-			    BRS.selectedContext.data("context", "messages_sidebar_update_context");
-			}
-		    }, 50);
-		});
-	    }
-	});
+        // It is OK to insert into database!
+        const record = {
+            name: data.name,
+            email: data.email,
+            account: data.account_id,
+            accountRS: data.account_rs,
+            description: data.description
+        }
+        if (!BRS.databaseSupport) {
+            BRS.contacts[data.account_id] = record;
+            $btn.button("reset");
+            $modal.modal("unlock");
+            $modal.modal("hide");
+            $.notify($.t("success_contact_add") + " " + $.t("contacts_no_db_warning"), {
+                type: 'warning',
+                offset: { x: 5, y: 60 }
+            });
+            return;
+        } 
+        BRS.database.insert("contacts", record, function(error) {
+            if (error) {
+                $modal.find(".error_message").html($.t("error_save_db")).show();
+                $btn.button("reset");
+                $modal.modal("unlock");
+                return;
+            }
+            BRS.contacts[data.account_id] = record;
+            setTimeout(function() {
+                $btn.button("reset");
+                $modal.modal("unlock");
+                $modal.modal("hide");
+                $.notify($.t("success_contact_add"), {
+                    type: 'success',
+                    offset: { x: 5, y: 60 }
+                });
+                if (BRS.currentPage == "contacts") {
+                    BRS.loadPage("contacts");
+                } else if (BRS.currentPage == "messages" && BRS.selectedContext) {
+                    const heading = BRS.selectedContext.find("h4.list-group-item-heading");
+                    if (heading.length) {
+                        heading.html(data.name.escapeHTML());
+                    }
+                    BRS.selectedContext.data("context", "messages_sidebar_update_context");
+                }
+            }, 50);
+        });
     };
 
     BRS.evUpdateContactModalOnShowBsModal = function(e) {
