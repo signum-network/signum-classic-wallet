@@ -1,4 +1,6 @@
 "Property","en","pt-br","pt","pl","nl","lt","ja","it","id","hr","hi","gl","fr","fi","es-es","el","de-de","cs","ca","bg","sk","sh","ru","sr","sr-cs","ro","uk","tr","zh-tw","zh-cn"
+"name_not_in_contacts","'__name__' not found in the contacts.",,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"error_save_db","Error saving the database.",,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 "at_payment","Contract Payment","Pagamento de contrato",,,,,,,,,,,,,,,,,,,,,,,,,,,,
 "add_commitment","Add Commitment","Depósito de empenho",,,,,,,,,,,,,,,,,,,,,,,,,,,,
 "remove_commitment","Remove Commitment","Retirada de empenho",,,,,,,,,,,,,,,,,,,,,,,,,,,,

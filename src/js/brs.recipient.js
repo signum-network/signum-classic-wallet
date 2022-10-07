@@ -67,7 +67,7 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.sendMoneyShowAccountInformation = function(accountId) {
-        BRS.getAccountError(accountId, function(response) {
+        BRS.getAccountTypeAndMessage(accountId, function(response) {
             if (response.type === "success") {
                 $("#send_money_account_info").hide();
             } else {
@@ -77,8 +77,21 @@ var BRS = (function(BRS, $, undefined) {
         });
     };
 
-    BRS.getAccountError = function(accountId, callback) {
-        if (accountId === "0") {
+    BRS.getAccountTypeAndMessage = function(accountId, callback) {
+        // accountId sometimes comes with an RS-Address
+        let sureItIsId = accountId
+        if (BRS.rsRegEx.test(accountId)) {
+            sureItIsId = BRS.convertRSAccountToNumeric(accountId)
+            if (sureItIsId === "") {
+                callback({
+                    "type": "danger",
+                    "message": $.t("recipient_malformed"),
+                    "account": null
+                });
+                return;
+            }
+        }
+        if (sureItIsId === "0") {
             callback({
                 "type": "warning",
                 "message": $.t("recipient_burning_address"),
@@ -89,7 +102,7 @@ var BRS = (function(BRS, $, undefined) {
         }
         // first guess it is an AT
         BRS.sendRequest("getAT", {
-            "at": accountId
+            "at": sureItIsId
         }, function (newResponse) {
             if (newResponse.errorCode === undefined) {
                 callback({
@@ -106,7 +119,7 @@ var BRS = (function(BRS, $, undefined) {
 
             // It is not an AT, get account
             BRS.sendRequest("getAccount", {
-                "account": accountId
+                "account": sureItIsId
             }, function(response) {
                 switch (response.errorCode) {
                 case undefined:
@@ -115,7 +128,7 @@ var BRS = (function(BRS, $, undefined) {
                 case 4:
                     callback({
                         "type": "danger",
-                        "message": $.t("recipient_malformed") + (!/^(BURST\-)/i.test(accountId) ? " " + $.t("recipient_alias_suggestion") : ""),
+                        "message": $.t("recipient_malformed"),
                         "account": null
                     });
                     return;
@@ -179,38 +192,44 @@ var BRS = (function(BRS, $, undefined) {
 
         const accountParts = BRS.rsRegEx.exec(account)
         if (accountParts !== null) {
+            // Account seems to be RS Address
             let address = new NxtAddress(BRS.prefix);
-
             if (address.set(accountParts[2])) {
+                // Account is RS Address
                 if(accountParts[3] !== undefined) {
-                    // Verify the public key
+                    // Account is extended RS Address. Verify the public key
                     let publicKey = new BigNumber(accountParts[3], 36).toString(16);
                     let checkRS = BRS.getAccountIdFromPublicKey(publicKey, true);
                     
                     if(!checkRS.includes(accountParts[2])){
+                        // Public key does not match RS Address
                         callout.removeClass(classes).addClass("callout-danger").html($.t("recipient_malformed")).show();
                     }
                     else {
+                        // Address verified
                         callout.removeClass(classes).addClass("callout-info").html($.t("recipient_info_extended")).show();
                     }
-                }
-                else {
-                  BRS.getAccountError(address.account_id(), function(response) {
-                      modal.find("input[name=recipientPublicKey]").val("");
-                      modal.find(".recipient_public_key").hide();
-                      if (response.account && response.account.description) {
-                          checkForMerchant(response.account.description, modal);
-                      }
-                      // let message = response.message.escapeHTML();
-                      callout.removeClass(classes).addClass("callout-" + response.type).html(response.message).show();
+                } else {
+                    // Account is RS Address and it isn't extended
+                    BRS.getAccountTypeAndMessage(address.account_id(), function(response) {
+                        modal.find("input[name=recipientPublicKey]").val("");
+                        modal.find(".recipient_public_key").hide();
+                        if (response.account && response.account.description) {
+                            checkForMerchant(response.account.description, modal);
+                        }
+                        // let message = response.message.escapeHTML();
+                        callout.removeClass(classes).addClass("callout-" + response.type).html(response.message).show();
                   });
                 }
             } else {
+                // Account seems to be RS Address but there is an error
                 if (address.guess.length === 1) {
+                    // There is only one option of error correction suggestion.
                     callout.removeClass(classes).addClass("callout-danger").html($.t("recipient_malformed_suggestion", {
                         "recipient": "<span class='malformed_address' data-address='" + String(address.guess[0]).escapeHTML() + "' onclick='BRS.correctAddressMistake(this);'>" + address.format_guess(address.guess[0], account) + "</span>"
                     })).show();
                 } else if (address.guess.length > 1) {
+                    // There are many options of error correction suggestion.
                     let html = $.t("recipient_malformed_suggestion", {
                         "count": address.guess.length
                     }) + "<ul>";
@@ -219,50 +238,48 @@ var BRS = (function(BRS, $, undefined) {
                     }
                     callout.removeClass(classes).addClass("callout-danger").html(html).show();
                 } else {
+                    // There is no error correction suggestion
                     callout.removeClass(classes).addClass("callout-danger").html($.t("recipient_malformed")).show();
                 }
             }
-        } else if (!(/^\d+$/.test(account))) {
-            if (BRS.databaseSupport && account.charAt(0) !== '@') {
-                BRS.database.select("contacts", [{
-                    "name": account
-                }], function(error, contact) {
-                    if (!error && contact.length) {
-                        contact = contact[0];
-                        BRS.getAccountError(contact.account, function(response) {
-                            modal.find("input[name=recipientPublicKey]").val("");
-                            modal.find(".recipient_public_key").hide();
-                            if (response.account && response.account.description) {
-                                checkForMerchant(response.account.description, modal);
-                            }
-
-                            callout.removeClass(classes).addClass("callout-" + response.type).html($.t("contact_account_link", {
-                                "account_id": BRS.getAccountFormatted(contact, "account")
-                            }) + " " + response.message.escapeHTML()).show();
-
-                            if (response.type === "info" || response.type === "warning") {
-                                accountInputField.val(contact.accountRS);
-                            }
-                        });
-                    } else if (/^[a-z0-9]+$/i.test(account)) {
-                        BRS.checkRecipientAlias(account, modal);
-                    } else {
-                        callout.removeClass(classes).addClass("callout-danger").html($.t("recipient_malformed")).show();
-                    }
-                });
-            } else if (/^[a-z0-9@]+$/i.test(account)) {
-                if (account.charAt(0) === '@') {
-                    account = account.substring(1);
-                    BRS.checkRecipientAlias(account, modal);
-                }
-            } else {
-                callout.removeClass(classes).addClass("callout-danger").html($.t("recipient_malformed")).show();
-            }
-        } else {
-            BRS.getAccountError(account, function(response) {
+            return;
+        }
+        if (BRS.idRegEx.test(account)) {
+            // Account matches numeric ID
+            BRS.getAccountTypeAndMessage(account, function(response) {
                 callout.removeClass(classes).addClass("callout-" + response.type).html(response.message.escapeHTML()).show();
             });
+            return;
         }
+        if (account.charAt(0) === '@') {
+            // Suposed to be an alias
+            BRS.checkRecipientAlias(account.substring(1), modal);
+            return;
+        }
+        let contact = undefined
+        for (const rsAddress in BRS.contacts) {
+            if (BRS.contacts[rsAddress].name === account) {
+                contact = BRS.contacts[rsAddress]
+                break
+            }
+        }
+        if (contact) {
+            BRS.getAccountTypeAndMessage(contact.account, function(response) {
+                modal.find("input[name=recipientPublicKey]").val("");
+                modal.find(".recipient_public_key").hide();
+                if (response.account && response.account.description) {
+                    checkForMerchant(response.account.description, modal);
+                }
+                callout.removeClass(classes).addClass("callout-" + response.type).html($.t("contact_account_link", {
+                    "account_id": BRS.getAccountFormatted(contact, "account")
+                }) + " " + response.message.escapeHTML()).show();
+                if (response.type === "info" || response.type === "warning") {
+                    accountInputField.val(contact.accountRS);
+                }
+            });
+            return;
+        }
+        callout.removeClass(classes).addClass("callout-danger").html($.t("name_not_in_contacts", { name: account }) + " " + $.t("recipient_alias_suggestion")).show();
     };
 
     BRS.checkRecipientAlias = function(account, modal) {
@@ -276,7 +293,7 @@ var BRS = (function(BRS, $, undefined) {
             "aliasName": account
         }, function(response) {
             if (response.errorCode) {
-                callout.removeClass(classes).addClass("callout-danger").html($.t("error_invalid_account_id")).show();
+                callout.removeClass(classes).addClass("callout-danger").html($.t("error_invalid_alias_name")).show();
             } else {
                 if (response.aliasURI) {
                     var alias = String(response.aliasURI);
@@ -298,7 +315,7 @@ var BRS = (function(BRS, $, undefined) {
                             callout.html("Invalid account alias.");
                         }
 
-                        BRS.getAccountError(address.account_id(), function(response) {
+                        BRS.getAccountTypeAndMessage(address.account_id(), function(response) {
                             modal.find("input[name=recipientPublicKey]").val("");
                             modal.find(".recipient_public_key").hide();
                             if (response.account && response.account.description) {

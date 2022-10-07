@@ -1,4 +1,6 @@
 {
+    "name_not_in_contacts": "'__name__' not found in the contacts.",
+    "error_save_db": "Error saving the database.",
     "at_payment": "Contract Payment",
     "add_commitment": "Add Commitment",
     "remove_commitment": "Remove Commitment",
