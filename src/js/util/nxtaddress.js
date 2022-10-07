@@ -17,7 +17,7 @@ function NxtAddress(prefix) {
 		prefix = "S-";
 	}
 	// must match js/brs.js
-	const rsRegEx = /^(BURST-|S-|TS-)([0-9A-Z]{3,5}-[0-9A-Z]{3,5}-[0-9A-Z]{3,5}-[0-9A-Z]{4,6})-?([0-9A-Z]+)?$/;
+	const rsRegEx = /^(BURST-|S-|TS-)([0-9A-Z]{3,5}-[0-9A-Z]{3,5}-[0-9A-Z]{3,5}-[0-9A-Z]{4,6})?(?:-([0-9A-Z]+))?$/;
 
 	var alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
 

@@ -32,7 +32,7 @@ var BRS = (function(BRS, $, undefined) {
     BRS.minimumFee = 0.01;
 
     // must match js/util/nxtaddress.js
-    BRS.rsRegEx = /^(BURST-|S-|TS-)([0-9A-Z]{3,5}-[0-9A-Z]{3,5}-[0-9A-Z]{3,5}-[0-9A-Z]{4,6})-?([0-9A-Z]+)?$/;
+    BRS.rsRegEx = /^(BURST-|S-|TS-)([0-9A-Z]{3,5}-[0-9A-Z]{3,5}-[0-9A-Z]{3,5}-[0-9A-Z]{4,6})?(?:-([0-9A-Z]+))?$/;
     BRS.idRegEx = /^[0-9]{1,20}$/;
 
     BRS.account = "";
