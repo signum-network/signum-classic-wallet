@@ -1740,8 +1740,6 @@ var BRS = (function(BRS, $, undefined) {
             BRS.goToPage("asset_exchange")
         }
 
-        const foundAsset = BRS.assets.find((tkn) => tkn.asset === asset)
-
         BRS.assetSearch = false;
         $("#asset_exchange_sidebar_search input[name=q]").val("");
         $("#asset_exchange_clear_search").hide();
@@ -1750,8 +1748,29 @@ var BRS = (function(BRS, $, undefined) {
         $("#no_asset_selected, #asset_details, #no_assets_available, #no_asset_search_results").hide();
         $("#loading_asset_data").show();
 
-        BRS.loadAssetExchangeSidebar(function() {
-            BRS.loadAsset(foundAsset);
+        const foundAsset = BRS.assets.find((tkn) => tkn.asset === asset)
+        if (foundAsset) {
+            BRS.loadAssetExchangeSidebar(function() {
+                BRS.loadAsset(foundAsset);
+            });
+            return
+        }
+        BRS.sendRequest("getAsset+", {
+            "asset": asset
+        }, function(response) {
+            if (!response.errorCode) {
+                BRS.cacheAsset(response)
+                BRS.loadAssetExchangeSidebar(function() {
+                    BRS.loadAsset(response);
+                });
+                return
+            }
+            $.notify($.t("error_asset_not_found"), {
+                type: 'danger',
+                offset: { x: 5, y: 60 }
+            });
+            BRS.loadAssetExchangeSidebar();
+            $("#loading_asset_data").hide();
         });
     };
 
