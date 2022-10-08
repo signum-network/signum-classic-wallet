@@ -300,6 +300,8 @@ var BRS = (function(BRS, $, undefined) {
                 callback();
             }
         });
+
+        BRS.saveCachedAssets();
     };
 
     BRS.logoSidebarClick = function (e, data) {

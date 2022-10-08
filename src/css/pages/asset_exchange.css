@@ -58,13 +58,6 @@
   color: #000;
 }
 
-#asset_exchange_sidebar_content .group_icon {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  color: #000;
-}
-
 #asset_exchange_sidebar_content .list-group-item.active .glyphicon {
   color: #fff;
 }
