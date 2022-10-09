@@ -356,7 +356,7 @@ var BRS = (function(BRS, $, undefined) {
      * Get transaction details.
      * @param transaction to get the name
      * @param viewingAccount Use this account as point of view. Default to current user
-     * @returns the transaction name in the configured language.
+     * @returns Object with many transaction details to be shown.
     */
     BRS.getTransactionDetails = function (transaction, viewingAccount) {
         if (!viewingAccount) {
@@ -372,9 +372,13 @@ var BRS = (function(BRS, $, undefined) {
         if (toFromViewer && transaction.sender == viewingAccount) {
             senderOrRecipientOrMultiple = 'recipient'
         }
-        let amount = transaction.amountNQT;
-        let amountText = BRS.formatAmount(amount)
+        let amountToFromViewer = transaction.amountNQT;
+        let amountToFromViewerHTML = BRS.formatAmount(amountToFromViewer) + " " + BRS.valueSuffix
         let foundAsset, newAmountText;
+        let hasAssets = false;
+
+        let recipientHTML = BRS.getAccountLink(transaction, 'recipient')
+        let senderHTML = BRS.getAccountLink(transaction, 'sender')
 
         // process transactions exceptions and names
         switch (transaction.type) {
@@ -389,31 +393,49 @@ var BRS = (function(BRS, $, undefined) {
                     senderOrRecipientOrMultiple = "multiple"
                     break;
                 }
-                transaction.attachment.recipients.find( Tuple => {
-                    if (Tuple[0] === viewingAccount) {
+                recipientHTML = ''
+                nxtAddress = new NxtAddress(BRS.prefix)
+                for (const recipient of transaction.attachment.recipients) {
+                    const nxtAddress = new NxtAddress(BRS.prefix)
+                    nxtAddress.set(recipient[0])
+                    const RSAddress = nxtAddress.toString()
+                    const amountEach = BRS.formatAmount(recipient[1]) + ' ' + BRS.valueSuffix
+                    if (recipient[0] === viewingAccount) {
+                        recipientHTML += `<strong>${RSAddress}: ${amountEach}</strong>`
                         toFromViewer = true;
                         senderOrRecipientOrMultiple = "sender"
-                        amount = Tuple[1];
-                        amountText = BRS.formatAmount(amount)
-                        return true;
+                        amountToFromViewer = recipient[1];
+                        amountToFromViewerHTML = BRS.formatAmount(amountToFromViewer) + " " + BRS.valueSuffix
+                    } else {
+                        recipientHTML += `${RSAddress}: ${amountEach}`
                     }
-                })
+                    recipientHTML += '<br />'
+                }
                 break;
             case 2:
                 nameOfTransaction = $.t("multi_out_same_payment");
                 if (transaction.sender == viewingAccount) {
                     senderOrRecipientOrMultiple = "multiple"
-                    break;
                 }
-                transaction.attachment.recipients.find( rec => {
-                    if (rec === viewingAccount) {
+
+                var amountEach = (parseInt(transaction.amountNQT) / transaction.attachment.recipients.length).toString();
+                recipientHTML = ''
+                
+                for (const recipient of transaction.attachment.recipients) {
+                    const nxtAddress = new NxtAddress(BRS.prefix)
+                    nxtAddress.set(recipient)
+                    const address = nxtAddress.toString()
+                    if (recipient === viewingAccount) {
+                        recipientHTML += '<strong>' + address + '</strong>'
                         toFromViewer = true;
                         senderOrRecipientOrMultiple = "sender"
-                        amount = (parseInt(transaction.amountNQT) / transaction.attachment.recipients.length).toString();
-                        amountText = BRS.formatAmount(amount)
-                        return true;
+                        amountToFromViewer = amountEach;
+                        amountToFromViewerHTML = BRS.formatAmount(amountToFromViewer) + " " + BRS.valueSuffix
+                    } else {
+                        recipientHTML += address
                     }
-                })
+                    recipientHTML += '<br />'
+                }
             }
             break;
         case 1:
@@ -444,6 +466,7 @@ var BRS = (function(BRS, $, undefined) {
                 nameOfTransaction = $.t("alias_buy");
                 break;
             }
+            break;
         case 2: // "Colored coins"
             switch (transaction.subtype) {
             case 0:
@@ -458,10 +481,11 @@ var BRS = (function(BRS, $, undefined) {
                 } else {
                     newAmountText = `${transaction.attachment.quantityQNT} [QNT]`;
                 }
-                if (amountText !== "0") {
-                    newAmountText += `<br>${amountText} ${BRS.valueSuffix}`
+                if (amountToFromViewer !== "0") {
+                    newAmountText += `<br>${amountToFromViewerHTML}`
                 }
-                amountText = newAmountText
+                amountToFromViewerHTML = newAmountText
+                hasAssets = true
                 break;
             case 2:
                 nameOfTransaction = $.t("ask_order_placement");
@@ -485,7 +509,7 @@ var BRS = (function(BRS, $, undefined) {
                 senderOrRecipientOrMultiple = "sender"
                 if (transaction.sender != viewingAccount) {
                     // amount is unknow only if current user is in recipient list
-                    amountText = "(" + amountText + ")";    
+                    amountToFromViewerHTML = "(" + amountToFromViewerHTML + ")";    
                 } else {
                     senderOrRecipientOrMultiple = "multiple"
                 }
@@ -535,14 +559,14 @@ var BRS = (function(BRS, $, undefined) {
             case 1: // "Add Commitment"
                 nameOfTransaction = $.t("add_commitment");
                 senderOrRecipientOrMultiple = "recipient";
-                amount = transaction.attachment.amountNQT.toString();
-                amountText = BRS.formatAmount(amount)
+                amountToFromViewer = transaction.attachment.amountNQT.toString();
+                amountToFromViewerHTML = BRS.formatAmount(amountToFromViewer) + " " + BRS.valueSuffix
                 break;
             case 2: // "Remove Commitment"
                 nameOfTransaction = $.t("remove_commitment");
                 senderOrRecipientOrMultiple = "sender";
-                amount = transaction.attachment.amountNQT.toString();
-                amountText = BRS.formatAmount(amount)
+                amountToFromViewer = transaction.attachment.amountNQT.toString();
+                amountToFromViewerHTML = BRS.formatAmount(amountToFromViewer) + " " + BRS.valueSuffix
                 break;
             }
             break;
@@ -592,7 +616,7 @@ var BRS = (function(BRS, $, undefined) {
 
         let circleText = ""
         let colorClass = ""
-        if (toFromViewer && amountText !== "0") {
+        if (toFromViewer && (amountToFromViewer !== "0" || hasAssets)) {
             if (senderOrRecipientOrMultiple === "sender") {
                 circleText = "<i class='fas fa-plus-circle' style='color:#65C62E'></i>"
             } else {
@@ -607,9 +631,11 @@ var BRS = (function(BRS, $, undefined) {
             nameOfTransaction,
             accountLink,
             accountTitle,
+            recipientHTML,
+            senderHTML,
             toFromViewer,
-            amount,
-            amountText,
+            // amount: amountToFromViewer,
+            amountToFromViewerHTML,
             foundAsset,
             hasMessage,
             circleText,
@@ -632,7 +658,7 @@ var BRS = (function(BRS, $, undefined) {
         rowStr += "<td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "' data-timestamp='" + String(transaction.timestamp).escapeHTML() + "'>" + BRS.formatTimestamp(transaction.timestamp) + "</a></td>"
         rowStr += "<td>" + details.nameOfTransaction + (details.hasMessage ? " + <i class='far fa-envelope-open'></i>&nbsp;" : "") + "</td>"
         rowStr += "<td>" + details.circleText + "</td>"
-        rowStr += `<td ${details.colorClass}>${details.amountText}</td>`
+        rowStr += `<td ${details.colorClass}>${details.amountToFromViewerHTML}</td>`
         rowStr += `<td>${details.accountLink}</td>`
         rowStr += `<td>${confirmationHTML}</td>`
         rowStr += "</tr>";
@@ -654,7 +680,7 @@ var BRS = (function(BRS, $, undefined) {
         rowStr += "<td>" + BRS.formatTimestamp(transaction.timestamp) + "</td>"
         rowStr += "<td>" + details.nameOfTransaction + "</td>"
         rowStr += "<td>" + details.circleText + "</td>"
-        rowStr += `<td ${details.colorClass}>${details.amountText}</td>`
+        rowStr += `<td ${details.colorClass}>${details.amountToFromViewerHTML}</td>`
         rowStr += "<td>" + BRS.formatAmount(transaction.feeNQT) + "</td>"
         rowStr += `<td>${details.accountLink}</td>`
         rowStr += "<td>" + confirmationHTML + "</td>"

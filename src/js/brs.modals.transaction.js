@@ -64,6 +64,141 @@ var BRS = (function(BRS, $, undefined) {
             $('#transaction_info_actions_tab button').data('account', accountButton)
         }
     
+        const details = BRS.getTransactionDetails(transaction)
+        const amount_formatted = BRS.formatAmount(new BigInteger(String(transaction.amountNQT))) + " " + BRS.valueSuffix;
+        data = {
+            type: details.nameOfTransaction,
+            amount_formatted,
+            amountToFromYou_formatted_html: details.amountToFromViewerHTML,
+            fee: transaction.feeNQT,
+            sender_formatted_html: details.senderHTML,
+            recipient_formatted_html: details.recipientHTML
+        }
+        if (amount_formatted === details.amountToFromViewerHTML) {
+            delete data.amountToFromYou_formatted_html
+        }
+        if (transaction.amountNQT === '0') {
+            delete data.amount_formatted
+        }
+
+        switch (transaction.type + '-' + transaction.subtype) {
+        case '1-1':
+            // alias assignment
+            data.alias = transaction.attachment.alias;
+            data.data_formatted_html = transaction.attachment.uri.autoLink()
+            delete data.recipient_formatted_html
+            break;
+        case '1-6':
+            // alias sale/transfer/sale cancelation
+            data.alias_name = transaction.attachment.alias
+            if (details.nameOfTransaction === $.t('alias_sale')) {
+                data.price = transaction.attachment.priceNQT
+            }
+            if (details.nameOfTransaction === $.t('alias_sale')) {
+                let message = ''
+                let messageStyle = 'info'
+
+                BRS.sendRequest('getAlias', {
+                    aliasName: transaction.attachment.alias
+                }, function (response) {
+                    BRS.fetchingModalData = false
+                    if (!response.errorCode) {
+                        if (transaction.recipient != response.buyer || transaction.attachment.priceNQT != response.priceNQT) {
+                            message = $.t('alias_sale_info_outdated')
+                            messageStyle = 'danger'
+                        } else if (transaction.recipient == BRS.account) {
+                            message = $.t('alias_sale_direct_offer', {
+                                burst: BRS.formatAmount(transaction.attachment.priceNQT)
+                            }) + " <a href='#' data-alias='" + String(transaction.attachment.alias).escapeHTML() + "' data-toggle='modal' data-target='#buy_alias_modal'>" + $.t('buy_it_q') + '</a>'
+                        } else if (typeof transaction.recipient === 'undefined') {
+                            message = $.t('alias_sale_indirect_offer', {
+                                burst: BRS.formatAmount(transaction.attachment.priceNQT)
+                            }) + " <a href='#' data-alias='" + String(transaction.attachment.alias).escapeHTML() + "' data-toggle='modal' data-target='#buy_alias_modal'>" + $.t('buy_it_q') + '</a>'
+                        } else if (transaction.senderRS == BRS.accountRS) {
+                            if (transaction.attachment.priceNQT != '0') {
+                                message = $.t('your_alias_sale_offer') + " <a href='#' data-alias='" + String(transaction.attachment.alias).escapeHTML() + "' data-toggle='modal' data-target='#cancel_alias_sale_modal'>" + $.t('cancel_sale_q') + '</a>'
+                            }
+                        } else {
+                            message = $.t('error_alias_sale_different_account')
+                        }
+                    }
+                }, false)
+
+                if (message) {
+                    $('#transaction_info_bottom').html("<div class='callout callout-bottom callout-" + messageStyle + "'>" + message + '</div>').show()
+                }
+            }
+            break;
+        case '1-7':
+            // alias buy
+            data.alias_name = transaction.attachment.alias
+            data.price = transaction.amountNQT
+            break
+        }
+
+        $('#transaction_info_table tbody').append(BRS.createInfoTable(data))
+
+        // Decode message
+        if (transaction.attachment) {
+            const $output = $('#transaction_info_output_bottom')
+            $output.html('');
+            let showMessage = false;
+            if (transaction.attachment.message) {
+                if (!transaction.attachment['version.Message']) {
+                    try {
+                        message = converters.hexStringToString(transaction.attachment.message)
+                    } catch (err) {
+                        // legacy
+                        if (transaction.attachment.message.indexOf('feff') === 0) {
+                            message = BRS.convertFromHex16(transaction.attachment.message)
+                        } else {
+                            message = BRS.convertFromHex8(transaction.attachment.message)
+                        }
+                    }
+                } else {
+                    message = String(transaction.attachment.message)
+                }
+                $output.append("<div style='color:#999999;padding-bottom:10px'><i class='fas fa-unlock'></i> " + $.t('public_message') + "</div><div class='modal-text-box'>" + String(message).escapeHTML().nl2br() + '</div>')
+                showMessage = true
+            }
+
+            if (transaction.attachment.encryptedMessage || (transaction.attachment.encryptToSelfMessage && BRS.account == transaction.sender)) {
+                $output.append("<div id='transaction_info_decryption_form'></div><div id='transaction_info_decryption_output' style='display:none;'></div>")
+                showMessage = true
+
+                if (BRS.account == transaction.recipient || BRS.account == transaction.sender) {
+                    const fieldsToDecrypt = {}
+
+                    if (transaction.attachment.encryptedMessage) {
+                        fieldsToDecrypt.encryptedMessage = $.t('encrypted_message')
+                    }
+                    if (transaction.attachment.encryptToSelfMessage && BRS.account == transaction.sender) {
+                        fieldsToDecrypt.encryptToSelfMessage = $.t('note_to_self')
+                    }
+
+                    BRS.tryToDecrypt(transaction, fieldsToDecrypt, (transaction.recipient == BRS.account ? transaction.sender : transaction.recipient), {
+                        noPadding: true,
+                        formEl: '#transaction_info_decryption_form',
+                        outputEl: '#transaction_info_decryption_output'
+                    })
+                } else {
+                    $output.append("<div>" + $.t('encrypted_message_no_permission') + '</div>')
+                }
+            }
+
+            if (showMessage) {
+                $output.show();
+            }
+        }
+
+        $('#transaction_info_modal').modal('show')
+        $('#transaction_info_table').show()
+
+        BRS.fetchingModalData = false
+    }
+
+    function TO_BE_DELETED () {
+
         if (transaction.type == 0) {
             switch (transaction.subtype) {
             case 0:
