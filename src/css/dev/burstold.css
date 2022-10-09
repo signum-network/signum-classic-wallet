@@ -538,3 +538,9 @@ background-color:#FFFAF0!important
 .bold{
     font-weight:bold;
 }
+.modal-text-box {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 1ch;
+    margin-bottom: 10px;
+}

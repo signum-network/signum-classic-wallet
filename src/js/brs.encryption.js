@@ -388,7 +388,7 @@ var BRS = (function(BRS, $, undefined) {
 		}
 
 		if (key in decryptedTransaction) {
-		    output += "<div style='" + (!options.noPadding && title ? "padding-left:5px;" : "") + "'>" + (title ? "<label" + (nrFields > 1 ? " style='margin-top:5px'" : "") + "><i class='fas fa-lock'></i> " + String(title).escapeHTML() + "</label>" : "") + "<div>" + String(decryptedTransaction[key]).escapeHTML().nl2br() + "</div></div>";
+		    output += "<div style='" + (!options.noPadding && title ? "padding-left:5px;" : "") + "'>" + (title ? "<label" + (nrFields > 1 ? " style='margin-top:5px'" : "") + "><i class='fas fa-lock'></i> " + String(title).escapeHTML() + "</label>" : "") + "<div class='modal-text-box'>" + String(decryptedTransaction[key]).escapeHTML().nl2br() + "</div></div>";
 		}
                 else {
 		    //if a specific key was not found, the cache is outdated..
@@ -464,7 +464,7 @@ var BRS = (function(BRS, $, undefined) {
 			}
 		    }
 
-		    output += "<div style='" + (!options.noPadding && title ? "padding-left:5px;" : "") + "'>" + (title ? "<label" + (nrFields > 1 ? " style='margin-top:5px'" : "") + "><i class='fas fa-lock'></i> " + String(title).escapeHTML() + "</label>" : "") + "<div>" + String(data).escapeHTML().nl2br() + "</div></div>";
+		    output += "<div style='" + (!options.noPadding && title ? "padding-left:5px;" : "") + "'>" + (title ? "<label" + (nrFields > 1 ? " style='margin-top:5px'" : "") + "><i class='fas fa-lock'></i> " + String(title).escapeHTML() + "</label>" : "") + "<div class='modal-text-box'>" + String(data).escapeHTML().nl2br() + "</div></div>";
 		}
 	    });
 	}
@@ -570,9 +570,13 @@ var BRS = (function(BRS, $, undefined) {
 		}
 
 		try {
+            let destinationAccount = otherAccount
+            if (key === "encryptToSelfMessage") {
+                destinationAccount = BRS.account
+            }
 		    data = BRS.decryptNote(encrypted, {
 			"nonce": nonce,
-			"account": otherAccount
+			"account": destinationAccount
 		    }, password);
 
 		    decryptedFields[key] = data;
@@ -584,7 +588,7 @@ var BRS = (function(BRS, $, undefined) {
 		    return false;
 		}
 
-		output += "<div style='" + (!_encryptedNote.options.noPadding && title ? "padding-left:5px;" : "") + "'>" + (title ? "<label" + (nrFields > 1 ? " style='margin-top:5px'" : "") + "><i class='fas fa-lock'></i> " + String(title).escapeHTML() + "</label>" : "") + "<div>" + String(data).escapeHTML().nl2br() + "</div></div>";
+		output += "<div style='" + (!_encryptedNote.options.noPadding && title ? "padding-left:5px;" : "") + "'>" + (title ? "<label" + (nrFields > 1 ? " style='margin-top:5px'" : "") + "><i class='fas fa-lock'></i> " + String(title).escapeHTML() + "</label>" : "") + "<div class='modal-text-box'>" + String(data).escapeHTML().nl2br() + "</div></div>";
 	    }
 	});
 
