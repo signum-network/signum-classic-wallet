@@ -581,6 +581,7 @@ var BRS = (function(BRS, $, undefined) {
             case "setAccountInfo":
             case "setAlias":
             case "sellAlias":
+            case "buyAlias":
             case "sendMoneyMultiSame":
             case "subscriptionCancel":
                 pos = 185;
