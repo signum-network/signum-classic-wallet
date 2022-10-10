@@ -1,4 +1,7 @@
 {
+    "assets_transferred": "Tokens transferred",
+    "mintable": "Mintable",
+    "amount_to_from_you": "Amount to/from you",
     "name_not_in_contacts": "'__name__' not found in the contacts.",
     "error_save_db": "Error saving the database.",
     "at_payment": "Contract Payment",
