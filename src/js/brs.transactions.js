@@ -445,13 +445,15 @@ var BRS = (function(BRS, $, undefined) {
                 break;
             case 1:
                 nameOfTransaction = $.t("alias_assignment");
+                senderOrRecipientOrMultiple = "sender"
                 break;
             case 5:
                 nameOfTransaction = $.t("account_info");
+                senderOrRecipientOrMultiple = "sender"
                 break;
             case 6:
                 if (transaction.attachment.priceNQT == "0") {
-                    if (transaction.sender == viewingAccount && transaction.recipient == viewingAccount) {
+                    if (transaction.sender === transaction.recipient) {
                         nameOfTransaction = $.t("alias_sale_cancellation");
                     }
                     else {
@@ -460,6 +462,7 @@ var BRS = (function(BRS, $, undefined) {
                 }
                 else {
                     nameOfTransaction = $.t("alias_sale");
+                    senderOrRecipientOrMultiple = "sender"
                 }
                 break;
             case 7:
@@ -471,13 +474,24 @@ var BRS = (function(BRS, $, undefined) {
             switch (transaction.subtype) {
             case 0:
                 nameOfTransaction = $.t("asset_issuance");
+                senderOrRecipientOrMultiple = "sender"
+                amountToFromViewerHTML = `${BRS.formatQuantity(transaction.attachment.quantityQNT, transaction.attachment.decimals)} ${transaction.attachment.name}`;
+                if (transaction.attachment.quantityQNT !== "0") {
+                    hasAssets = true;
+                }
                 break;
             case 1:
-                nameOfTransaction = $.t("asset_transfer");
-                foundAsset = BRS.assets.find((tkn) => tkn.asset === transaction.attachment.asset)
+            case 6:
+                if (transaction.subtype === 1) {
+                    nameOfTransaction = $.t("asset_transfer");
+                } else {
+                    nameOfTransaction = $.t("asset_mint");
+                    senderOrRecipientOrMultiple = "sender"
+                }
+                foundAsset = BRS.getAssetDetails(transaction.attachment.asset)
                 newAmountText = ''
                 if (foundAsset) {
-                    newAmountText = `${BRS.formatQuantity(transaction.attachment.quantityQNT, foundAsset.decimals)} ${foundAsset.name.toUpperCase()}`;
+                    newAmountText = `${BRS.formatQuantity(transaction.attachment.quantityQNT, foundAsset.decimals)} ${foundAsset.name}`;
                 } else {
                     newAmountText = `${transaction.attachment.quantityQNT} [QNT]`;
                 }
@@ -501,6 +515,9 @@ var BRS = (function(BRS, $, undefined) {
             case 5:
                 nameOfTransaction = $.t("bid_order_cancellation");
                 break;
+            case 7:
+                nameOfTransaction = $.t("asset_add_treasury_account");
+                break;
             case 8:
                 nameOfTransaction = $.t("asset_distribute_to_holders");
                 // Actually there is no way to know if viewingAccount is in recipients without another query.
@@ -513,6 +530,26 @@ var BRS = (function(BRS, $, undefined) {
                 } else {
                     senderOrRecipientOrMultiple = "multiple"
                 }
+                break;
+            case 9:
+                nameOfTransaction = $.t("asset_multi_transfer");
+                if (amountToFromViewer === "0") {
+                    amountToFromViewerHTML = ''
+                } else {
+                    amountToFromViewerHTML += '<br>'
+                }
+                for (let i=0; i< transaction.attachment.assetIds.length; i++) {
+                    if (i !== 0) {
+                        amountToFromViewerHTML += '<br>'
+                    }
+                    foundAsset = BRS.getAssetDetails(transaction.attachment.assetIds[i])
+                    if (foundAsset) {
+                        amountToFromViewerHTML += `${BRS.formatQuantity(transaction.attachment.quantitiesQNT[i], foundAsset.decimals)} ${foundAsset.name}`;
+                    } else {
+                        amountToFromViewerHTML += `${transaction.attachment.quantityQNT} [QNT]`;
+                    }
+                }
+                hasAssets = true
                 break;
             }
             break;
