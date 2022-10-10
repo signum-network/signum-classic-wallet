@@ -713,7 +713,7 @@ var BRS = (function(BRS, $, undefined) {
 
     function showHideBookmarkAllAssetsButton() {
         let show = false
-        for (const userAsset of BRS.accountInfo.unconfirmedAssetBalances) {
+        for (const userAsset of BRS.accountInfo.assetBalances) {
             if (BRS.assets.findIndex((tkn) => tkn.asset === userAsset.asset && tkn.bookmarked === true) === -1) {
                 show = true
                 break;

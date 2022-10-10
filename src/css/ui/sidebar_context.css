@@ -9,6 +9,7 @@
   -moz-border-radius: 3px;
   border-radius: 3px;
   display: none;
+  z-index: 1;
 }
 
 #show_console {
