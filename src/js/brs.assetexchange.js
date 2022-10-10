@@ -86,6 +86,27 @@ var BRS = (function(BRS, $, undefined) {
         });
     }
 
+    /** Try to fetch details from cache. If not found, send a sync request.
+     * @param assetId {String}
+     * @returns {assetDetails}
+     * @error returns undefined
+     */
+    BRS.getAssetDetails = function (assetId) {
+        const async = false;
+        let asset = BRS.assets.find((tkn) => tkn.asset === assetId)
+        if (!asset) {
+            BRS.sendRequest("getAsset", {
+                "asset": assetId
+            }, function(response) {
+                if (!response.errorCode) {
+                    BRS.cacheAsset(response);
+                    asset = response
+                }
+            }, async);
+        }
+        return asset
+    }
+
     BRS.cacheUserAssets = function () {
         if (BRS.accountInfo.assetBalances === undefined) {
             return

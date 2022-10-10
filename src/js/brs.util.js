@@ -768,6 +768,30 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
+    BRS.getAssetLink = function(asset) {
+        if (!asset || !asset.asset) {
+            return "/"
+        }
+        return `${asset.name} <a href='#' data-goto-asset='${asset.asset}'>${asset.asset}</a>`;
+    };
+
+    BRS.fullHashToId = function(fullHash) {
+        if (fullHash.length < 16) {
+            fullHash = fullHash.padEnd(16, '0')
+        }
+        let ret = new BigInteger("0");
+        let base = new BigInteger("1");
+        const bi256 = new BigInteger("256");
+        for (let i = 0; i < 16; i += 2) {
+            if (i !== 0) {
+                base = base.multiply(bi256)
+            }
+            const d1 = new BigInteger(fullHash.slice(i, i + 2), 16)
+            ret = ret.add(base.multiply(d1))
+        }
+        return ret.toString(10)
+    };
+
     BRS.getAccountTitle = function(object, acc) {
         var type = typeof object;
 
