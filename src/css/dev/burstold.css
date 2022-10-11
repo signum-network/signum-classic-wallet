@@ -543,4 +543,5 @@ background-color:#FFFAF0!important
     border-radius: 4px;
     padding: 1ch;
     margin-bottom: 10px;
+    word-wrap: break-word;
 }

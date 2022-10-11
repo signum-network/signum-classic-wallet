@@ -1,4 +1,6 @@
 {
+    "bytes": "Bytes",
+    "text": "Text",
     "assets_transferred": "Tokens transferred",
     "mintable": "Mintable",
     "amount_to_from_you": "Amount to/from you",
