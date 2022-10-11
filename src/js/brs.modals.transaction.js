@@ -81,23 +81,17 @@ var BRS = (function(BRS, $, undefined) {
             const amount_formatted = BRS.formatAmount(new BigInteger(String(transaction.amountNQT))) + " " + BRS.valueSuffix;
             data = {
                 type: details.nameOfTransaction,
+                timestamp: BRS.formatTimestamp(transaction.timestamp),
                 amount_formatted,
-                amountToFromYou_formatted_html: details.amountToFromViewerHTML,
                 fee: transaction.feeNQT,
                 sender_formatted_html: details.senderHTML,
                 recipient_formatted_html: details.recipientHTML
-            }
-            if (amount_formatted === details.amountToFromViewerHTML) {
-                delete data.amountToFromYou_formatted_html
             }
             if (transaction.amountNQT === '0') {
                 delete data.amount_formatted
             }
             if (details.recipientHTML === '/') {
                 delete data.recipient_formatted_html
-            }
-            if (transaction.type === 2) {
-                delete data.amountToFromYou_formatted_html
             }
         }
 
@@ -110,6 +104,9 @@ var BRS = (function(BRS, $, undefined) {
 
         function processExceptionProperties () {
             switch (transaction.type) {
+            case 0:
+                pePayment();
+                return
             case 1:
                 peMessaging();
                 return
@@ -124,6 +121,65 @@ var BRS = (function(BRS, $, undefined) {
                     // balance leasing
                     data['period'] = transaction.attachment.period
                 }
+                return
+            case 20:
+                peMining();
+                return;
+            case 21:
+                peAdvancedPayment()
+                break;
+            case 22:
+                peAutomatedTransactions()
+            }
+        }
+
+        function pePayment () {
+            let recipientHTML
+            let youReceived = false
+            let amountToYou
+            switch (transaction.subtype) {
+            case 1:
+                // Multi-out Payment
+                recipientHTML = ''
+                for (let i = 0; i < transaction.attachment.recipients.length; i++) {
+                    const rsAddress = BRS.convertNumericToRSAccountFormat(transaction.attachment.recipients[i][0])
+                    const amount = BRS.formatAmount(transaction.attachment.recipients[i][1]) + " " + BRS.valueSuffix;
+                    if (i !== 0) {
+                        recipientHTML += "<br />";
+                    }
+                    if (rsAddress === BRS.accountRS) {
+                        recipientHTML += `<strong class="mono-font">${rsAddress}</strong>: ${amount}`;
+                        youReceived = true
+                        amountToYou = amount
+                    } else {
+                        recipientHTML += `<span class="mono-font">${rsAddress}</span>: ${amount}`;
+                    }
+                }
+                delete data.recipient_formatted_html
+                data["you_received"] = youReceived ? $.t('yes') : $.t('no')
+                if (youReceived)  data['amount_to_you'] = amountToYou
+                data['recipient_formatted_html'] = recipientHTML
+                return
+            case 2:
+                // Multi-out same
+                const amountEach = parseInt(transaction.amountNQT) / transaction.attachment.recipients.length;
+                recipientHTML = '';
+                for (let i = 0; i < transaction.attachment.recipients.length; i++) {
+                    const rsAddress = BRS.convertNumericToRSAccountFormat(transaction.attachment.recipients[i])
+                    if (i !== 0) {
+                        recipientHTML += "<br />";
+                    }
+                    if (rsAddress === BRS.accountRS) {
+                        recipientHTML += `<strong class="mono-font">${rsAddress}</strong>`;
+                        youReceived = true
+                    } else {
+                        recipientHTML += `<span class="mono-font">${rsAddress}</span>`;
+                    }
+                }
+                delete data.recipient_formatted_html
+                data["you_received"] = youReceived ? $.t('yes') : $.t('no')
+                data["amount_each_formatted_html"] = BRS.formatAmount(amountEach.toString()) + " " + BRS.valueSuffix,
+                data['recipient_formatted_html'] = recipientHTML
                 return
             }
         }
@@ -559,6 +615,62 @@ var BRS = (function(BRS, $, undefined) {
                     transactionEndLoad()
                 })
             })
+        }
+
+        function peMining() {
+            switch (transaction.subtype) {
+            case 1:
+            case 2:
+                // add / remove commitment
+                data.amount_formatted = BRS.formatAmount(new BigInteger(String(transaction.attachment.amountNQT))) + " " + BRS.valueSuffix;
+                return;
+            }
+        }
+
+        function peAdvancedPayment() {
+            let signers = ''
+            switch (transaction.subtype) {
+            case 0:
+                data["amountNQT"] = transaction.attachment.amountNQT
+                data["deadline"] = transaction.attachment.deadline
+                data["deadlineAction"] = $.t("refund")
+                data["requiredSigners"] = transaction.attachment.requiredSigners
+                for (let i=0; i < transaction.attachment.signers.length; i++) {
+                    if (i!==0) {
+                        signers+="<br />"
+                    }
+                    signers += BRS.convertNumericToRSAccountFormat(transaction.attachment.signers[i])
+                }
+                data["signers"] = signers
+                return;
+            case 1:
+            case 2:
+                // TODO get details from escrow creation
+                data["decision"] = $.t(transaction.attachment.decision)
+                data["escrowId"] = transaction.attachment.escrowId
+                return;
+            case 3:
+                // TODO add languages / human readable format
+                data['frequency'] = transaction.attachment.frequency + " seconds"
+                return
+            case 4:
+            case 5:
+                // TODO get details from subscription
+                data['subscriptionId'] = transaction.attachment.subscriptionId
+                return;
+            }
+        }
+
+        function peAutomatedTransactions() {
+            let contractAddress
+            switch (transaction.subtype) {
+            case 0:
+                contractAddress = BRS.convertNumericToRSAccountFormat(transaction.transaction)
+                data["at_created_formatted_html"] = `<a href='#' data-user='${contractAddress}"' class='user-info'>${BRS.getAccountTitle(contractAddress)}</a>`
+                data["name"] =  transaction.attachment.name
+                data["description_formatted_html"] = transaction.attachment.description.escapeHTML()
+                return
+            }
         }
 
         function processMessage () {

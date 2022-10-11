@@ -545,3 +545,7 @@ background-color:#FFFAF0!important
     margin-bottom: 10px;
     word-wrap: break-word;
 }
+.mono-font {
+    font-family: monospace,monospace;
+    font-size:1em
+}
