@@ -584,6 +584,8 @@ var BRS = (function(BRS, $, undefined) {
             case "buyAlias":
             case "sendMoneyMultiSame":
             case "subscriptionCancel":
+            case "sendMoneyEscrow":
+            case "escrowSign":
                 pos = 185;
                 break;
             default:
@@ -870,7 +872,7 @@ var BRS = (function(BRS, $, undefined) {
                 "type":    21,
                 "subtype": 0,
                 "parse":   function () { return [
-                    [ "Long", "Int", "Byte", "Byte", "Byte", "Long*$3"],
+                    [ "Long", "Int", "Byte", "Byte", "Byte", "Long*$4"],
                     [
                         data.amountNQT,
                         data.escrowDeadline,

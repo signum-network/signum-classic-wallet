@@ -611,6 +611,8 @@ var BRS = (function(BRS, $, undefined) {
             switch (transaction.subtype) {
             case 0:
                 nameOfTransaction = "Escrow Creation";
+                amountToFromViewer = transaction.attachment.amountNQT.toString();
+                amountToFromViewerHTML = BRS.formatAmount(amountToFromViewer) + " " + BRS.valueSuffix
                 break;
             case 1:
                 nameOfTransaction = "Escrow Signing";

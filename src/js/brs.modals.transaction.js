@@ -631,9 +631,10 @@ var BRS = (function(BRS, $, undefined) {
             let signers = ''
             switch (transaction.subtype) {
             case 0:
-                data["amountNQT"] = transaction.attachment.amountNQT
-                data["deadline"] = transaction.attachment.deadline
-                data["deadlineAction"] = $.t("refund")
+                // TODO add languages / human readable format
+                data["amount_formatted"] = BRS.formatAmount(new BigInteger(String(transaction.attachment.amountNQT))) + " " + BRS.valueSuffix;
+                data["deadline"] = transaction.attachment.deadline + " seconds"
+                data["deadlineAction"] = $.t(transaction.attachment.deadlineAction)
                 data["requiredSigners"] = transaction.attachment.requiredSigners
                 for (let i=0; i < transaction.attachment.signers.length; i++) {
                     if (i!==0) {
@@ -641,7 +642,7 @@ var BRS = (function(BRS, $, undefined) {
                     }
                     signers += BRS.convertNumericToRSAccountFormat(transaction.attachment.signers[i])
                 }
-                data["signers"] = signers
+                data["signers_formatted_html"] = signers
                 return;
             case 1:
             case 2:
