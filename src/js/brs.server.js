@@ -367,9 +367,9 @@ var BRS = (function(BRS, $, undefined) {
                         }
                         return;
                     } else {
-                        var payload = BRS.verifyAndSignTransactionBytes(response.unsignedTransactionBytes, signature, requestType, data);
+                        const payload = BRS.verifyAndSignTransactionBytes(response.unsignedTransactionBytes, signature, requestType, data);
 
-                        if (!payload) {
+                        if (payload.length === 0) {
                             if (callback) {
                                 callback({
                                     "errorCode": 1,
@@ -472,655 +472,499 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
     BRS.verifyAndSignTransactionBytes = function(transactionBytes, signature, requestType, data) {
-        if (requestType == "sendMoney" || requestType == "sendMoneyMulti"
-          || requestType == "addCommitment" || requestType == "removeCommitment" || requestType == "sendMoneySubscription") {
-            // Something is broken and I hate this code and I just want it to work.
-            // I can't reproduce the bug but with a multi out this will quite a lot of the
-            // time fail to verify. This code will soon be replaced anyway and it horrible to maintain.
-            // So I'm "fixing" it. -harry1453
+        // this will be the reconstructed base transaction
+        const transaction = {};
+        // position to start attachment (if any)
+        let pos = 184;
+        const byteArray = converters.hexStringToByteArray(transactionBytes);
+        // This will bring the info to check type, subtype and attachment for a given requestType
+        let attachmentSpec
+        const ERROR = true
+        const SUCCESS = false
+
+        function verifyAndSignTransactionBytesMain () {
+            createBaseTransaction()
+            prepareData()
+            attachmentSpec = getAttachmentSpec(requestType)
+            if (checkBaseTransaction()) return ''
+            if (checkAttachment()) return ''
+            if (checkMessage()) return ''
+            if (checkEncryptedMessage()) return ''
+            if (checkRecipientPublicKey()) return ''
+            if (checkEncryptToSelfMessage()) return ''
             return transactionBytes.substr(0, 192) + signature + transactionBytes.substr(320);
         }
-        var transaction = {};
-        var pos;
-        var byteArray = converters.hexStringToByteArray(transactionBytes);
 
-        transaction.type = byteArray[0];
-
-        transaction.version = (byteArray[1] & 0xF0) >> 4;
-        transaction.subtype = byteArray[1] & 0x0F;
-
-        transaction.timestamp = String(converters.byteArrayToSignedInt32(byteArray, 2));
-        transaction.deadline = String(converters.byteArrayToSignedShort(byteArray, 6));
-        transaction.publicKey = converters.byteArrayToHexString(byteArray.slice(8, 40));
-        transaction.recipient = String(converters.byteArrayToBigInteger(byteArray, 40));
-        transaction.amountNQT = String(converters.byteArrayToBigInteger(byteArray, 48));
-        transaction.feeNQT = String(converters.byteArrayToBigInteger(byteArray, 56));
-
-        var refHash = byteArray.slice(64, 96);
-        transaction.referencedTransactionFullHash = converters.byteArrayToHexString(refHash);
-        if (transaction.referencedTransactionFullHash == "0000000000000000000000000000000000000000000000000000000000000000") {
-            transaction.referencedTransactionFullHash = "";
-        }
-        //transaction.referencedTransactionId = converters.byteArrayToBigInteger([refHash[7], refHash[6], refHash[5], refHash[4], refHash[3], refHash[2], refHash[1], refHash[0]], 0);
-
-        transaction.flags = 0;
-
-        if (transaction.version > 0) {
-            transaction.flags = converters.byteArrayToSignedInt32(byteArray, 160);
-            transaction.ecBlockHeight = String(converters.byteArrayToSignedInt32(byteArray, 164));
-            transaction.ecBlockId = String(converters.byteArrayToBigInteger(byteArray, 168));
-        }
-
-        if (!("amountNQT" in data)) {
-            data.amountNQT = "0";
-        }
-
-        if (!("recipient" in data)) {
-            //recipient == genesis
-            data.recipient = "0";
-            data.recipientRS = "S-2222-2222-2222-22222";
-        }
-
-        if (BRS.rsRegEx.test(data.recipient)) {
-            // wrong data type... Fix
-            const parts = BRS.rsRegEx.exec(data.recipient)
-            const address = new NxtAddress(BRS.prefix)
-            if (address.set(parts[1] + parts[2]) === false) {
-                return false
+        function createBaseTransaction () {
+            transaction.type = byteArray[0];
+            transaction.version = (byteArray[1] & 0xF0) >> 4;
+            transaction.subtype = byteArray[1] & 0x0F;
+            transaction.timestamp = String(converters.byteArrayToSignedInt32(byteArray, 2));
+            transaction.deadline = String(converters.byteArrayToSignedShort(byteArray, 6));
+            transaction.publicKey = converters.byteArrayToHexString(byteArray.slice(8, 40));
+            transaction.recipient = String(converters.byteArrayToBigInteger(byteArray, 40));
+            transaction.amountNQT = String(converters.byteArrayToBigInteger(byteArray, 48));
+            transaction.feeNQT = String(converters.byteArrayToBigInteger(byteArray, 56));
+            transaction.referencedTransactionFullHash = converters.byteArrayToHexString(byteArray.slice(64, 96));
+            if (transaction.referencedTransactionFullHash == "0000000000000000000000000000000000000000000000000000000000000000") {
+                transaction.referencedTransactionFullHash = "";
             }
-            data.recipient = address.account_id();
-            data.recipientRS = address.toString();
-        }
-
-        if (transaction.publicKey != BRS.accountInfo.publicKey) {
-            return false;
-        }
-
-        if (transaction.deadline !== data.deadline) {
-            return false;
-        }
-
-        requestTypeWithoutRecipientInData = ["buyAlias", "dgsPurchase", "dgsRefund", "dgsDelivery", "dgsFeedback"]
-        if ( ! ( requestTypeWithoutRecipientInData.indexOf(requestType) + 1) && transaction.recipient !== data.recipient) {
-            if (data.recipient == "1739068987193023818" && transaction.recipient == "0") {
-                // deleterium: what a crazy rule?
-                //ok
-            } else {
-                return false;
+            transaction.flags = 0;
+            if (transaction.version > 0) {
+                transaction.flags = converters.byteArrayToSignedInt32(byteArray, 160);
+                transaction.ecBlockHeight = String(converters.byteArrayToSignedInt32(byteArray, 164));
+                transaction.ecBlockId = String(converters.byteArrayToBigInteger(byteArray, 168));
             }
         }
 
-        requestTypeWithSeperatedAmountNQTCalculation = ["sendMoneyMulti", "sendMoneyMultiSame", "sendMoneyEscrow" ];
-        if ( transaction.feeNQT !== data.feeNQT || ( ! (requestTypeWithSeperatedAmountNQTCalculation.indexOf(requestType)+1) && transaction.amountNQT !== data.amountNQT ) ) {
-            return false;
-        }
-
-        if ("referencedTransactionFullHash" in data) {
-            if (transaction.referencedTransactionFullHash !== data.referencedTransactionFullHash) {
-                return false;
+        function prepareData() {
+            if (!("amountNQT" in data)) {
+                data.amountNQT = "0";
             }
-        } else if (transaction.referencedTransactionFullHash !== "") {
-            return false;
+            if (!("recipient" in data)) {
+                data.recipient = "0";
+                data.recipientRS = BRS.prefix + "2222-2222-2222-22222";
+            }
+            if (BRS.rsRegEx.test(data.recipient)) {
+                // wrong data type... Fix
+                const parts = BRS.rsRegEx.exec(data.recipient)
+                const address = new NxtAddress(BRS.prefix)
+                if (address.set(parts[1] + parts[2]) === false) {
+                    return
+                }
+                data.recipient = address.account_id();
+                data.recipientRS = address.toString();
+            }
         }
 
-        if (transaction.version > 0) {
-            //has empty attachment, so no attachmentVersion byte...
-            switch (requestType) {
+        function checkBaseTransaction () {
+            if (transaction.publicKey != BRS.accountInfo.publicKey ||
+                transaction.deadline !== data.deadline ||
+                transaction.feeNQT !== data.feeNQT ||
+                transaction.version === 0 ||
+                transaction.type !== attachmentSpec.type ||
+                transaction.subtype !== attachmentSpec.subtype)
+            {
+                return ERROR;
+            }
+            if (transaction.recipient !== data.recipient) {
+                const requestTypeWithoutRecipientInData = ["buyAlias"]
+                if (requestTypeWithoutRecipientInData.indexOf(requestType) == -1) {
+                    return ERROR;
+                }
+            }
+            if ( transaction.amountNQT !== data.amountNQT) {
+                // These transactions check data.amountNQT in attachment or thru postCheck()
+                const requestTypeWithSeperatedAmountNQTCalculation = ["sendMoneyMulti", "sendMoneyMultiSame", "sendMoneyEscrow", "addCommitment", "removeCommitment" ];
+                if (requestTypeWithSeperatedAmountNQTCalculation.indexOf(requestType) === -1) {
+                    return ERROR;
+                }
+            }
+            if ("referencedTransactionFullHash" in data) {
+                if (transaction.referencedTransactionFullHash !== data.referencedTransactionFullHash) {
+                    return ERROR;
+                }
+            } else if (transaction.referencedTransactionFullHash !== "") {
+                return ERROR;
+            }
+            return SUCCESS
+        }
+
+        function getAttachmentSpec(rqType) {
+            switch (rqType) {
             case "sendMoney":
-                pos = 176;
-                break;
-            case "sendMessage":
-                pos = 184;
-                break;
-            case "transferAsset":
-            case "placeBidOrder":
-            case "placeAskOrder":
-            case "cancelBidOrder":
-            case "cancelAskOrder":
-            case "issueAsset":
-            case "setAccountInfo":
-            case "setAlias":
-            case "sellAlias":
-            case "buyAlias":
+                return { "type": 0, "subtype": 0 }
+            case "sendMoneyMulti":
+                return {
+                    "type":    0,
+                    "subtype": 1,
+                    "attachmentInfo": [
+                        { type: "Byte*1", value: [data.recipients.split(";").length] },
+                        { type: "Long:Long*$0", value: data.recipients.split(";") }
+                    ],
+                    postCheck () {
+                        let sum = 0n;
+                        for (const eachRecipient of data.recipients.split(";")) {
+                            sum += BigInt(eachRecipient.split(":")[1])
+                        }
+                        if (transaction.amountNQT !== sum.toString(10)) return ERROR;
+                        return SUCCESS
+                    }
+                }
             case "sendMoneyMultiSame":
-            case "subscriptionCancel":
-            case "sendMoneyEscrow":
+                return {
+                    "type":    0,
+                    "subtype": 2,
+                    "attachmentInfo": [
+                        { type: "Byte*1", value: [data.recipients.split(";").length]},
+                        { type: "Long*$0", value: data.recipients.split(";") }
+                    ],
+                    postCheck () {
+                        const totalAmount = BigInt(data.recipients.split(";").length) *  BigInt(data.amountNQT)
+                        if (transaction.amountNQT !== totalAmount.toString(10)) return ERROR
+                        return SUCCESS
+                    }
+                }
+            case "sendMessage":
+                return { "type": 1, "subtype": 0 }
+            case "setAlias":
+                return {
+                    "type":    1,
+                    "subtype": 1,
+                    "attachmentInfo": [
+                        { type: "ByteString*1", value: [data.aliasName] },
+                        { type: "ShortString*1", value: [data.aliasURI] }
+                    ]
+                }
+            case "setAccountInfo": 
+                return {
+                    "type":    1,
+                    "subtype": 5,
+                    "attachmentInfo":  [
+                        { type: "ByteString*1", value: [data.name] },
+                        { type: "ShortString*1", value: [data.description] }
+                    ]
+                }
+            case "sellAlias":
+                return {
+                    "type":    1,
+                    "subtype": 6,
+                    "attachmentInfo": [
+                        { type: "ByteString*1", value: [data.aliasName] },
+                        { type: "Long*1", value: [data.priceNQT] }
+                    ]
+                }
+            case "buyAlias":
+                return {
+                    "type":    1,
+                    "subtype": 7,
+                    "attachmentInfo": [
+                        { type: "ByteString*1", value: [data.aliasName] }
+                    ]
+                }
+            case "issueAsset": 
+                return {
+                    "type":    2,
+                    "subtype": 0,
+                    "attachmentInfo":   [
+                        { type: "ByteString*1", value: [data.name] },
+                        { type: "ShortString*1", value: [data.description] },
+                        { type: "Long*1", value: [data.quantityQNT] },
+                        { type: "Byte*1", value: [data.decimals] }
+                    ]
+                }
+            case "transferAsset":
+                    return {
+                    "type":    2,
+                    "subtype": 1,
+                    "attachmentInfo":   [
+                        { type: "Long*1", value: [data.asset] },
+                        { type: "Long*1", value: [data.quantityQNT] }
+                    ]
+                }
+            case "placeAskOrder":
+                return {
+                    "type":    2,
+                    "subtype": 2,
+                    "attachmentInfo":   [
+                        { type: "Long*1", value: [data.asset] },
+                        { type: "Long*1", value: [data.quantityQNT] },
+                        { type: "Long*1", value: [data.priceNQT] }
+                    ]
+                }
+            case "placeBidOrder":
+                return {
+                    "type":    2,
+                    "subtype": 3,
+                    "attachmentInfo":   [
+                        { type: "Long*1", value: [data.asset] },
+                        { type: "Long*1", value: [data.quantityQNT] },
+                        { type: "Long*1", value: [data.priceNQT] }
+                    ]
+                }
+            case "cancelAskOrder":
+                return {
+                    "type":    2,
+                    "subtype": 4,
+                    "attachmentInfo":   [
+                        { type: "Long*1", value:  [data.order] }
+                    ]
+                }
+            case "cancelBidOrder":
+                return {
+                    "type":    2,
+                    "subtype": 5,
+                    "attachmentInfo":   [
+                        { type: "Long*1", value:  [data.order] }
+                    ]
+                }
+            case "setRewardRecipient":
+                return { "type": 20, "subtype": 0 }
+            case "addCommitment": 
+                return {
+                    "type": 20,
+                    "subtype": 1,
+                    "attachmentInfo": [
+                        { type: "Long*1", value: [data.amountNQT] }
+                    ]
+                }
+            case "removeCommitment":
+                return  {
+                    "type": 20,
+                    "subtype": 2,
+                    "attachmentInfo": [
+                        { type: "Long*1", value: [data.amountNQT] }
+                    ]
+                }
+            case "sendMoneyEscrow": 
+                return {
+                    "type":    21,
+                    "subtype": 0,
+                    "attachmentInfo": [
+                        { type: "Long*1", value: [data.amountNQT] },
+                        { type: "Int*1", value: [data.escrowDeadline] },
+                        { type: "Byte*1", value: [["undecided", "release", "refund", "split"].indexOf(data.deadlineAction)] },
+                        { type: "Byte*1", value: [data.requiredSigners] },
+                        { type: "Byte*1", value: [data.signers.split(";").length] },
+                        { type: "Long*$4", value: data.signers.split(";") }
+                    ]
+                }
             case "escrowSign":
-                pos = 185;
-                break;
+                return {
+                    "type":    21,
+                    "subtype": 1,
+                    "attachmentInfo": [
+                        { type: "Long*1", value: [data.escrow] },
+                        { type: "Byte*1", value: [["undecided", "release", "refund", "split"].indexOf(data.decision)] }
+                    ]
+                }
+            case "sendMoneySubscription":
+                return {
+                    "type":    21,
+                    "subtype": 3,
+                    "attachmentInfo":   [
+                        { type: "Int*1", value: [data.frequency] }
+                    ]
+                }
+            case "subscriptionCancel":
+                return {
+                    "type":    21,
+                    "subtype": 4,
+                    "attachmentInfo":   [
+                        { type: "Long*1", value: [data.subscription] }
+                    ]
+                }
             default:
-                console.log("BRS.verifyAndSignTransactionBytes(): Using default 'pos' for " + requestType);
-                pos = 177;
-            }
-        } else {
-            pos = 160;
-        }
-
-        var requestTypeOf = {
-            "sendMoney": { "type": 0, "subtype": 0 },
-            "sendMoneyMulti": {
-                "type":    0,
-                "subtype": 1,
-                "parse":   function () { return [
-                    [ "Byte", "Long*$0", "Long*$0"],
-                    [
-                        data.recipients.split(";").length,
-                        data.recipients.split(";").splice(0, data.recipients.split(";").length / 2).join("").replace(":", ""),
-                        data.recipients.split(";").splice(data.recipients.split(";").length / 2).join("").replace(":", "")
-                    ]
-                ];}
-            },
-            "sendMoneyMultiSame": {
-                "type":    0,
-                "subtype": 2,
-                "parse":   function () { return [
-                    [ "Byte", "Long*$0"],
-                    [
-                        data.recipients.split(";").length,
-                        data.recipients.split(";").join("")
-                    ]
-                ];},
-                "postCheck": function(parsedValues) {
-                    return transaction.amountNQT === "" + ( parsedValues[0] * data.amountNQT );
+                return {
+                    "type":    -1,
+                    "subtype": -1,
                 }
-            },
-            "sendMessage": { "type": 1, "subtype": 0 },
-            "setAlias": {
-                "type":    1,
-                "subtype": 1,
-                "parse":   function () { return [
-                    [
-                        "Byte", "String*$0",
-                        "Short", "String*$2"
-                    ],
-                    [
-                        data.aliasName.length, data.aliasName,
-                        data.aliasURI.length, data.aliasURI
-                    ],
-                    [
-                        false, "aliasName",
-                        false, "aliasURI"
-                    ]
-                ];}
-            },
-            "setAccountInfo": {
-                "type":    1,
-                "subtype": 5,
-                "parse":   function () { return [
-                    [
-                        "Byte", "String*$0",
-                        "Short", "String*$2"
-                    ],
-                    [
-                        data.name.length, data.name,
-                        data.description.length, data.description
-                    ],
-                    [
-                        false, "name",
-                        false, "description"
-                    ]
-                ];}
-            },
-            "sellAlias": {
-                "type":    1,
-                "subtype": 6,
-                "parse":   function () { return [
-                    [ "Byte", "String*$0", "Long" ],
-                    [ data.aliasName.length, data.aliasName, data.priceNQT ],
-                    [ false, "alias", "priceNQT" ]
-                ];}
-            },
-            "buyAlias": {
-                "type":    1,
-                "subtype": 7,
-                "parse":   function () { return [
-                    [ "Byte", "String*$0" ],
-                    [ data.aliasName.length, data.aliasName ],
-                    [ false, "alias" ]
-                ];}
-            },
-
-            "issueAsset": {
-                "type":    2,
-                "subtype": 0,
-                "parse":   function () { return [
-                    [
-                        "Byte", "String*$0",
-                        "Short", "String*$2",
-                        "Long",
-                        "Byte"
-                    ],
-                    [
-                        data.name.length, data.name,
-                        data.description.length, data.description,
-                        data.quantityQNT,
-                        data.decimals
-                    ],
-                    [
-                        false, "name",
-                        false, "description",
-                        "quantityQNT",
-                        "decimals"
-                    ]
-                ];}
-            },
-            "transferAsset": {
-                "type":    2,
-                "subtype": 1,
-                "parse":   [
-                    [ "Long", "Long" ],
-                    [ data.asset, data.quantityQNT ],
-                    [ "asset", "quantityQNT" ]
-                ]
-            },
-            "placeAskOrder": {
-                "type":    2,
-                "subtype": 2,
-                "parse":   [
-                    [ "Long", "Long", "Long" ],
-                    [ data.asset, data.quantityQNT, data.priceNQT ],
-                    [ "asset", "quantityQNT", "priceNQT" ]
-                ]
-            },
-            "placeBidOrder": {
-                "type":    2,
-                "subtype": 3,
-                "parse":   [
-                    [ "Long", "Long", "Long" ],
-                    [ data.asset, data.quantityQNT, data.priceNQT ],
-                    [ "asset", "quantityQNT", "priceNQT" ]
-                ]
-            },
-            "cancelAskOrder": {
-                "type":    2,
-                "subtype": 4,
-                "parse":   [
-                    [ "Long" ],
-                    [ data.order ],
-                    [ "order" ]
-                ]
-            },
-            "cancelBidOrder": {
-                "type":    2,
-                "subtype": 5,
-                "parse":   [
-                    [ "Long" ],
-                    [ data.order ],
-                    [ "order" ]
-                ]
-            },
-
-            "dgsListing": {
-                "type":    3,
-                "subtype": 0,
-                "parse":   function () { return [
-                    [
-                        "Short", "String*$0",
-                        "Short", "String*$2",
-                        "Short", "String*$4",
-                        "Int",
-                        "Long"
-                    ],
-                    [
-                        data.name.length, data.name,
-                        data.description.length, data.description,
-                        data.tags.length, data.tags,
-                        data.quantity,
-                        data.priceNQT
-                    ],
-                    [
-                        false, "name",
-                        false, "description",
-                        false, "tags",
-                        "quantity",
-                        "priceNQT"
-                    ]
-                ];}
-            },
-            "dgsDelisting": {
-                "type":    3,
-                "subtype": 1,
-                "parse":   [
-                    [ "Long" ],
-                    [ data.goods ],
-                    [ "goods" ]
-                ]
-            },
-            "dgsPriceChange": {
-                "type":    3,
-                "subtype": 2,
-                "parse":   [
-                    [ "Long", "Long" ],
-                    [ data.goods, data.priceNQT ],
-                    [ "goods", "priceNQT" ]
-                ]
-            },
-            "dgsQuantityChange": {
-                "type":    3,
-                "subtype": 3,
-                "parse":   [
-                    [ "Long", "Int" ],
-                    [ data.goods, data.deltaQuantity ],
-                    [ "goods", "deltaQuantity" ]
-                ]
-            },
-            "dgsPurchase": {
-                "type":    3,
-                "subtype": 4,
-                "parse":   [
-                    [ "Long", "Int", "Long", "Int" ],
-                    [ data.goods, data.quantity, data.priceNQT, data.deliveryDeadlineTimestamp ],
-                    [ "goods", "quantity", "priceNQT", "deliveryDeadlineTimestamp" ]
-                ]
-            },
-           "dgsDelivery": {
-                "type":    3,
-                "subtype": 5,
-                "parse":   function () {
-                    // very ugly hack - I do not know, what horse was ridden during designing this transaction type
-                    var encryptedGoodsLength = converters.byteArrayToSignedShort(byteArray, pos + 8);
-                    var goodsLength          = converters.byteArrayToSignedInt32(byteArray, pos + 8);
-                    transaction.goodsIsText  = goodsLength < 0;
-
-                    return [
-                        [ "Long", "Int", "Hex*" + encryptedGoodsLength, "Hex*32", "Long" ],
-                        [
-
-                            data.purchase,
-                            ( transaction.goodsIsText ? ( data.goodsData.length / 2 ) | -2147483648 : data.goodsData.length / 2 ),
-                            data.goodsData,
-                            data.goodsNonce,
-                            data.discountNQT,
-
-                        ],
-                        [ "purchase", "goodsLength", "goodsData", "goodsNonce", "discountNQT" ]
-                    ];
-                },
-                "postCheck": function(parsedValues) {
-                    return ( transaction.goodsIsText ? "true" : "false" ) === data.goodsIsText;
-                }
-            },
-            "dgsFeedback": {
-                "type":    3,
-                "subtype": 6,
-                "parse":   [
-                    [ "Long" ],
-                    [ data.purchase ],
-                    [ "purchase" ]
-                ]
-            },
-            "dgsRefund": {
-                "type":    3,
-                "subtype": 7,
-                "parse":   [
-                    [ "Long", "Long" ],
-                    [ data.purchase, data.refundNQT ],
-                    [ "purchase", "refundNQT" ]
-                ]
-            },
-            "leaseBalance": {
-                "type":    4,
-                "subtype": 0,
-                "parse":   [
-                    [ "Short"],
-                    [ data.period ],
-                    [ "period" ]
-                ]
-            },
-            "setRewardRecipient": { "type": 20, "subtype": 0 },
-            "sendMoneyEscrow": {
-                "type":    21,
-                "subtype": 0,
-                "parse":   function () { return [
-                    [ "Long", "Int", "Byte", "Byte", "Byte", "Long*$4"],
-                    [
-                        data.amountNQT,
-                        data.escrowDeadline,
-                        ["undecided", "release", "refund", "split"].indexOf(data.deadlineAction),
-                        data.requiredSigners,
-                        data.signers.split(";").length,
-                        data.signers.split(";").join("")
-                    ]
-                ];}
-            },
-            "escrowSign": {
-                "type":    21,
-                "subtype": 1,
-                "parse":   function () { return [
-                    [ "Long", "Byte"],
-                    [
-                        data.escrow,
-                        ["undecided", "release", "refund", "split"].indexOf(data.decision)
-                    ]
-                ];}
-            },
-            "sendMoneySubscription": {
-                "type":    21,
-                "subtype": 3,
-                "parse":   [
-                    [ "Int" ],
-                    [ data.frequency ]
-                ]
-            },
-            "subscriptionCancel": {
-                "type":    21,
-                "subtype": 4,
-                "parse":   [
-                    [ "Long" ],
-                    [ data.subscription ]
-                ]
             }
         };
 
-        if ( requestTypeOf[requestType] ) {
-            var spec = requestTypeOf[requestType];
-            if (transaction.type !== spec.type || transaction.subtype !== spec.subtype ) {
-                return false;
+        function checkAttachment () {
+            const pastValues = [];
+            if ( attachmentSpec.attachmentInfo === undefined) {
+                return SUCCESS
             }
-            var parsedValues = [];
-            if ( spec.parse ) {
-                var parse = Array.isArray(spec.parse) ? spec.parse : spec.parse();
-                for (var i = 0; i < parse[0].length; i++) {
-                    // typeSpec contains the type and a possible factor found by index
-                    var typeSpec = parse[0][i].split("*");
-                    typeSpec[1] = parseInt(
-                        typeSpec[1]
-                            ? (
-                                typeSpec[1].replace("$", "") == typeSpec[1]
-                                    ? typeSpec[1]                            // fixed length
-                                    : parsedValues[typeSpec[1].replace("$", "")] // variable length, depending on other element
-                            )
-                            : 1
-                    );
-
-                    var currentParsed = "";
-                    switch (typeSpec[0]) {
-                        case "String":
-                            currentParsed = converters.byteArrayToString(byteArray, pos, typeSpec[1]);
-                            pos += typeSpec[1];
-                            break;
-                        case "Hex":
-                            currentParsed = converters.byteArrayToHexString(byteArray.slice(pos, pos + typeSpec[1]));
-                            pos += typeSpec[1];
-                            break;
-                        default:
-                            for ( var amount = 0; amount < typeSpec[1]; amount++ ) {
-                                switch (typeSpec[0]) {
-                                    case "Long":
-                                        currentParsed += converters.byteArrayToBigInteger(byteArray, pos).toString();
-                                        pos += 8;
-                                        break;
-                                    case "Int":
-                                        currentParsed += String(converters.byteArrayToSignedInt32(byteArray, pos));
-                                        pos += 4;
-                                        break;
-                                    case "Short":
-                                        currentParsed += String(converters.byteArrayToSignedShort(byteArray, pos));
-                                        pos += 2;
-                                        break;
-                                    case "Byte":
-                                        currentParsed += String(parseInt(byteArray[pos++], 10));
-                                        break;
-                                    default:
-                                        return false;
-                                }
-                            }
-                    }
-                    if ( String(currentParsed) !== String(parse[1][i]) ) {
-                        return false;
-                    }
-                    if ( parse[2] && parse[2][i] ) {
-                        transaction[parse[2][i]] = String(currentParsed);
-                    }
-                    parsedValues.push(currentParsed);
-                }
-            }
-            if ( spec.postCheck ) {
-                if ( ! ( spec.postCheck(parsedValues) ) ) {
-                    return false;
-                }
-            }
-        }
-        else {
-            //invalid requestType..
-            return false;
-        }
-
-        var position = 1;
-
-        //non-encrypted message
-        if ((transaction.flags & position) !== 0 || (requestType == "sendMessage" && data.message)) {
-            var attachmentVersion = byteArray[pos];
-
+            const attachmentVersion = byteArray[pos]
             pos++;
+            if (attachmentVersion !== 1) {
+                return ERROR
+            }
+            for (const item of attachmentSpec.attachmentInfo) {
+                const itemType = item.type.split("*")
+                const typeSpec = itemType[0];
+                const repetitionSpec = itemType[1]
+                let repetition
+                if (repetitionSpec.startsWith("$")) {
+                    // variable repetition, depending on previous element
+                    repetition = parseInt(pastValues[repetitionSpec.substring(1)][0])
+                } else {
+                    // fixed repetition
+                    repetition = parseInt(repetitionSpec)
+                }
+                const currentValues = [];
+                let sizeOfString
+                for (let amount = 0; amount < repetition; amount++ ) {
+                    switch (typeSpec) {
+                    case "ByteString":
+                        sizeOfString = parseInt(byteArray[pos++], 10)
+                        currentValues.push(converters.byteArrayToString(byteArray, pos, sizeOfString));
+                        pos += sizeOfString
+                        break;
+                    case "ShortString":
+                        sizeOfString = converters.byteArrayToSignedShort(byteArray, pos)
+                        pos += 2
+                        currentValues.push(converters.byteArrayToString(byteArray, pos, sizeOfString));
+                        pos += sizeOfString
+                        break;
+                    case "Long:Long":
+                        currentValues.push(
+                            converters.byteArrayToBigInteger(byteArray, pos).toString() +
+                            ":" +
+                            converters.byteArrayToBigInteger(byteArray, pos + 8).toString()
+                        );
+                        pos += 16;
+                        break;
+                    case "Long":
+                        currentValues.push(converters.byteArrayToBigInteger(byteArray, pos).toString());
+                        pos += 8;
+                        break;
+                    case "Int":
+                        currentValues.push(converters.byteArrayToSignedInt32(byteArray, pos).toString());
+                        pos += 4;
+                        break;
+                    case "Short":
+                        currentValues.push(converters.byteArrayToSignedShort(byteArray, pos).toString());
+                        pos += 2;
+                        break;
+                    case "Byte":
+                        currentValues.push(byteArray[pos].toString());
+                        pos++;
+                        break;
+                    default:
+                        return ERROR;
+                    }
+                }
+                for (const eachVal of item.value) {
+                    // Maybe the order was changed. Search all items...
+                    if (currentValues.find(eachParsed => eachParsed === String(eachVal)) === undefined) {
+                        return ERROR
+                    }
+                }
+                // ... and ensure no item was added
+                if (item.value.length !== currentValues.length) {
+                    return ERROR
+                }
+                pastValues.push(currentValues);
+            }
+            if ( attachmentSpec.postCheck ) {
+                return attachmentSpec.postCheck()
+            }
+            return SUCCESS;
+        }
 
-            var messageLength = converters.byteArrayToSignedInt32(byteArray, pos);
-
-            transaction.messageIsText = messageLength < 0; // ugly hack??
-
+        function checkMessage() {
+            // flag for non-encrypted message
+            const flagBit = 0b1;
+            if ((transaction.flags & flagBit) === 0) {
+                if (data.message) return ERROR
+                else return SUCCESS
+            }
+            const attachmentVersion = byteArray[pos];
+            pos++;
+            if (attachmentVersion !== 1) {
+                return ERROR
+            }
+            let messageLength = converters.byteArrayToSignedInt32(byteArray, pos);
+            pos += 4;
+            transaction.messageIsText = messageLength < 0;
             if (messageLength < 0) {
                 messageLength &= 2147483647;
             }
-
-            pos += 4;
-
             if (transaction.messageIsText) {
                 transaction.message = converters.byteArrayToString(byteArray, pos, messageLength);
             } else {
-                var slice = byteArray.slice(pos, pos + messageLength);
+                const slice = byteArray.slice(pos, pos + messageLength);
                 transaction.message = converters.byteArrayToHexString(slice);
             }
-
             pos += messageLength;
-
-            var messageIsText = (transaction.messageIsText ? "true" : "false");
-
+            const messageIsText = (transaction.messageIsText ? "true" : "false");
             if (messageIsText != data.messageIsText) {
-                return false;
+                return ERROR;
             }
-
             if (transaction.message !== data.message) {
-                return false;
+                return ERROR;
             }
-        } else if (data.message) {
-            return false;
+            return SUCCESS
         }
 
-        position <<= 1;
-
-        //encrypted note
-        if ((transaction.flags & position) !== 0) {
-            var attachmentVersion = byteArray[pos];
-
+        function checkEncryptedMessage() {
+            // flag for encrypted note
+            const flagBit = 0b10;
+            if ((transaction.flags & flagBit) === 0) {
+                if (data.encryptedMessageData) return ERROR
+                else return SUCCESS
+            }
+            const attachmentVersion = byteArray[pos];
             pos++;
-
-            var encryptedMessageLength = converters.byteArrayToSignedInt32(byteArray, pos);
-
+            if (attachmentVersion !== 1) {
+                return ERROR
+            }
+            let encryptedMessageLength = converters.byteArrayToSignedInt32(byteArray, pos);
+            pos += 4;
             transaction.messageToEncryptIsText = encryptedMessageLength < 0;
-
             if (encryptedMessageLength < 0) {
                 encryptedMessageLength &= 2147483647;
             }
-
-            pos += 4;
-
             transaction.encryptedMessageData = converters.byteArrayToHexString(byteArray.slice(pos, pos + encryptedMessageLength));
-
             pos += encryptedMessageLength;
-
             transaction.encryptedMessageNonce = converters.byteArrayToHexString(byteArray.slice(pos, pos + 32));
-
             pos += 32;
-
-            var messageToEncryptIsText = (transaction.messageToEncryptIsText ? "true" : "false");
-
+            const messageToEncryptIsText = (transaction.messageToEncryptIsText ? "true" : "false");
             if (messageToEncryptIsText != data.messageToEncryptIsText) {
-                return false;
+                return ERROR;
             }
-
-            if (transaction.encryptedMessageData !== data.encryptedMessageData || transaction.encryptedMessageNonce !== data.encryptedMessageNonce) {
-                return false;
+            if (transaction.encryptedMessageData !== data.encryptedMessageData ||
+                transaction.encryptedMessageNonce !== data.encryptedMessageNonce) {
+                return ERROR;
             }
-        } else if (data.encryptedMessageData) {
-            return false;
+            return SUCCESS
         }
 
-        position <<= 1;
-
-        if ((transaction.flags & position) !== 0) {
-            var attachmentVersion = byteArray[pos];
-
-            pos++;
-
-            var recipientPublicKey = converters.byteArrayToHexString(byteArray.slice(pos, pos + 32));
-
-            if (recipientPublicKey != data.recipientPublicKey) {
-                return false;
+        function checkRecipientPublicKey () {
+            const flagBit = 0b100;
+            if ((transaction.flags & flagBit) === 0) {
+                if (data.recipientPublicKey) return ERROR
+                else return SUCCESS
             }
+            const attachmentVersion = byteArray[pos];
+            pos++;
+            if (attachmentVersion !== 1) {
+                return ERROR
+            }
+            const recipientPublicKey = converters.byteArrayToHexString(byteArray.slice(pos, pos + 32));
             pos += 32;
-        } else if (data.recipientPublicKey) {
-            return false;
+            if (recipientPublicKey != data.recipientPublicKey) {
+                return ERROR;
+            }
+            return SUCCESS
         }
 
-        position <<= 1;
-
-        if ((transaction.flags & position) !== 0) {
-            var attachmentVersion = byteArray[pos];
-
+        function checkEncryptToSelfMessage() {
+            const flagBit = 0b1000;
+            if ((transaction.flags & flagBit) === 0) {
+                if (data.encryptToSelfMessageData) return ERROR
+                else return false
+            }
+            const attachmentVersion = byteArray[pos];
             pos++;
-
-            var encryptedToSelfMessageLength = converters.byteArrayToSignedInt32(byteArray, pos);
-
+            if (attachmentVersion !== 1) {
+                return ERROR
+            }
+            let encryptedToSelfMessageLength = converters.byteArrayToSignedInt32(byteArray, pos);
             transaction.messageToEncryptToSelfIsText = encryptedToSelfMessageLength < 0;
-
             if (encryptedToSelfMessageLength < 0) {
                 encryptedToSelfMessageLength &= 2147483647;
             }
-
             pos += 4;
-
             transaction.encryptToSelfMessageData = converters.byteArrayToHexString(byteArray.slice(pos, pos + encryptedToSelfMessageLength));
-
             pos += encryptedToSelfMessageLength;
-
             transaction.encryptToSelfMessageNonce = converters.byteArrayToHexString(byteArray.slice(pos, pos + 32));
-
             pos += 32;
-
-            var messageToEncryptToSelfIsText = (transaction.messageToEncryptToSelfIsText ? "true" : "false");
-
+            const messageToEncryptToSelfIsText = (transaction.messageToEncryptToSelfIsText ? "true" : "false");
             if (messageToEncryptToSelfIsText != data.messageToEncryptToSelfIsText) {
-                return false;
+                return ERROR;
             }
-
-            if (transaction.encryptToSelfMessageData !== data.encryptToSelfMessageData || transaction.encryptToSelfMessageNonce !== data.encryptToSelfMessageNonce) {
-                return false;
+            if (transaction.encryptToSelfMessageData !== data.encryptToSelfMessageData ||
+                transaction.encryptToSelfMessageNonce !== data.encryptToSelfMessageNonce) {
+                return ERROR;
             }
-        } else if (data.encryptToSelfMessageData) {
-            return false;
+            return SUCCESS
         }
 
-        return transactionBytes.substr(0, 192) + signature + transactionBytes.substr(320);
+        return verifyAndSignTransactionBytesMain()
     };
 
     BRS.broadcastTransactionBytes = function(transactionData, callback, originalResponse, originalData) {
