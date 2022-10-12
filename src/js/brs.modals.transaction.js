@@ -33,6 +33,7 @@ var BRS = (function(BRS, $, undefined) {
         let data
         let async = false
         let assetDetails, helperStr
+        let details
 
         function processTransactionModalDataMain() {
             processInfoDetails()
@@ -77,7 +78,7 @@ var BRS = (function(BRS, $, undefined) {
         }
     
         function processDefaultProperties () {
-            const details = BRS.getTransactionDetails(transaction)
+            details = BRS.getTransactionDetails(transaction)
             const amount_formatted = BRS.formatAmount(new BigInteger(String(transaction.amountNQT))) + " " + BRS.valueSuffix;
             data = {
                 type: details.nameOfTransaction,
