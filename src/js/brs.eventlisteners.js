@@ -10,6 +10,35 @@
         $("#prefered_node").on("blur", function() {
             BRS.getState(null);
         });
+        $("#automatic_node_selection").change(function() {
+            if(this.checked) {
+                BRS.autoSelectServer()
+                BRS.updateSettings("automatic_node_selection", 1);
+            } else {
+                BRS.updateSettings("automatic_node_selection", 0);
+                BRS.getState(null)
+            }
+        });
+        $("span.node_selector button").on("click", function(e) {
+            const $list = $(this).parent().find("ul");
+            $list.empty();
+            if (BRS.settings.automatic_node_selection) {
+                $list.append("<li class='divider'></li>");
+                return;
+            }
+            for (const server of BRS.nodes.filter( obj => obj.testnet === false)) {
+                $list.append("<li><a href='#' data-server='" + server.address + "'>" + server.address + "</a></li>");
+            }
+            $list.append("<li class='divider'></li>");
+            for (const server of BRS.nodes.filter( obj => obj.testnet === true)) {
+                $list.append("<li><a href='#' data-server='" + server.address + "'>" + server.address + "</a></li>");
+            }
+        });
+        $("span.node_selector").on("click", "ul li a", function(e) {
+            e.preventDefault();
+            $(this).closest("div").find("input[name=prefered_node]").val("");
+            $(this).closest("div").find("input[name=prefered_node]").val($(this).data("server")).trigger("blur");
+        });
         $("#start_settings_language").on("change", function(e) {
             e.preventDefault();
             const value = $(this).val();

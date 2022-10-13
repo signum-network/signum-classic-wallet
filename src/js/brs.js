@@ -78,6 +78,23 @@ var BRS = (function(BRS, $, undefined) {
     var stateIntervalSeconds = 30;
     var isScanning = false;
 
+    BRS.nodes = [
+        // First must be localhost mainnet!
+        { address: 'http://localhost:8125', testnet: false },
+        { address: 'https://uk.signum.network', testnet: false },
+        { address: 'https://latam.signum.network', testnet: false },
+        { address: 'https://us-east.signum.network', testnet: false },
+        { address: 'https://singapore.signum.network', testnet: false },
+        { address: 'https://australia.signum.network', testnet: false },
+        { address: 'https://europe.signum.network', testnet: false },
+        { address: 'https://brazil.signum.network', testnet: false },
+        { address: 'https://europe1.signum.network', testnet: false },
+        { address: 'https://europe2.signum.network', testnet: false },
+        { address: 'https://canada.signum.network', testnet: false },
+        { address: 'https://europe3.testnet.signum.network', testnet: true },
+        { address: 'http://localhost:6876', testnet: true }
+      ]
+
     BRS.init = function() {
         try {
             window.localStorage;
@@ -93,7 +110,12 @@ var BRS = (function(BRS, $, undefined) {
 
         // Give some more time to loading settings
         setTimeout(function (){
-            BRS.getState();
+            if (BRS.settings.automatic_node_selection) {
+                BRS.autoSelectServer()
+            } else {
+                // use user saved choice
+                BRS.getState();
+            }
             BRS.showLockscreen();
         }, 250);
 
@@ -207,12 +229,6 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.checkSelectedNode = function() {
         let preferedNode = $("#prefered_node").val();
-        if (preferedNode.length === 0) {
-            preferedNode = window.location.protocol + "//" + window.location.hostname
-            if (window.location.port.length !== 0) {
-                preferedNode += ":" + window.location.port
-            }
-        }
         if (preferedNode != BRS.server) {
             // Server changed, get new network details
             BRS.server = preferedNode;
@@ -235,16 +251,59 @@ var BRS = (function(BRS, $, undefined) {
         }
     }
 
+    BRS.autoSelectServer = function () {
+        if (!BRS.multiQueue) {
+            BRS.multiQueue = $.ajaxMultiQueue(8);
+        }
+        const ajaxCall = BRS.multiQueue.queue;
+        // shuffleArray but keep localhost as first one
+        const mainnetServers = BRS.nodes.filter( obj => obj.testnet === false).slice(1);
+        for (let i = mainnetServers.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [mainnetServers[i], mainnetServers[j]] = [mainnetServers[j], mainnetServers[i]];
+        }
+        mainnetServers.unshift(BRS.nodes[0])
+        const responses = []
+        setTimeout(() => {
+            // choose winner
+            responses.sort((a, b) => b[2] - a[2])
+            $("#prefered_node").val(responses[0][0])
+            BRS.getState();
+        }, 2100)
+        for (const server of mainnetServers) {
+            ajaxCall({
+                url: `${server.address}/burst?requestType=getBlock`,
+                crossDomain: true,
+                dataType: "json",
+                type: "GET",
+                timeout: 2000,
+                async: true
+            }).done(function(response, status, xhr) {
+                if (status === "success" && response.errorCode === undefined) {
+                    const fasterResponse = responses.find(row => row[1] === response.block)
+                    if (fasterResponse) {
+                        fasterResponse[2] = fasterResponse[2] + 1
+                        return
+                    }
+                    responses.push([server.address, response.block, 1])
+                }
+            })
+        }
+    }
+
     BRS.getState = function(callback) {
         BRS.checkSelectedNode();
 
         BRS.sendRequest("getBlockchainStatus", function(response) {
             if (response.errorCode) {
                 if (response.errorCode == -1) {
+                    if (BRS.settings.automatic_node_selection) {
+                        BRS.autoSelectServer()
+                        return;
+                    }
                     $("#node_alert").show();
                     $("#brs_version, #brs_version_dashboard").html(BRS.loadingDotsHTML).addClass("loading_dots");
                 }
-                //todo
                 return;
             }
             $("#node_alert").hide();

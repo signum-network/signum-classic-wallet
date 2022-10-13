@@ -1,4 +1,5 @@
 {
+    "automatic_node_selection": "Automatic node selection",
     "at_created": "Contract created",
     "subscription_id": "Subscription ID",
     "frequency": "Frequency",

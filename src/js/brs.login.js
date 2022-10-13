@@ -127,7 +127,9 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.loginCommon = function () {
 
-        BRS.updateSettings("prefered_node", BRS.server);
+        if (!BRS.settings.automatic_node_selection) {
+            BRS.updateSettings("prefered_node", BRS.server);
+        }
 
         const $valueSufix=document.querySelectorAll('[data-value-suffix]');
         for (const $each of $valueSufix){

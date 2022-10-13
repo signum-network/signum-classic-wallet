@@ -12,6 +12,7 @@ var BRS = (function(BRS, $, undefined) {
         "24_hour_format": 1,
         "remember_passphrase": 0,
         "remember_account": 0,
+        "automatic_node_selection": 1,
         "page_size": 25,
         "prefered_node": "",
         "language": "en"
@@ -106,10 +107,18 @@ var BRS = (function(BRS, $, undefined) {
                     $("#show_console").show();
                 }
             }
-            }
+        }
 
-        if (!key || key == "prefered_node") {
-            $("#prefered_node").val(BRS.settings.prefered_node);
+        if (!key || key == "automatic_node_selection") {
+            if (BRS.settings.automatic_node_selection) {
+                $("#automatic_node_selection").prop("checked", true);
+                $("#prefered_node").val(BRS.server);
+                $('#prefered_node').prop('readonly', true);
+            } else {
+                $("#automatic_node_selection").prop("checked", false);
+                $('#prefered_node').prop('readonly', false);
+                $("#prefered_node").val(BRS.settings.prefered_node);
+            }
         }
 
         if (!key || key == "page_size") {

@@ -13,13 +13,14 @@
                 <label for="prefered_node" data-i18n="node_to_connect_text" style="color: #c4c4c4;">Connect to node:</label>
                 <i id="testnet_login" style="display: none;color: red;" class="fas fa-question-circle show_popover" data-content="Log in with your <strong>TestNet</strong> account - not your real one!" data-i18n="[data-content]testnet_login_warning" data-container="body" style="color:red" data-original-title="" title=""></i>
                 <br />
-                <input type="text" class="form-control" list="nodes" placeholder="Prefered node" data-i18n="[placeholder]prefered_node" name="prefered_node" id="prefered_node" /> 
-                <datalist id="nodes">
-                    <option>http://localhost:8125</option>
-                    <option>http://localhost:6876</option>
-                    <option>https://europe.signum.network</option>
-                    <option>https://europe3.testnet.signum.network</option>
-                </datalist>
+                <div class="input-group">
+                  <input type="text" class="form-control" list="nodes" placeholder="Prefered node" data-i18n="[placeholder]prefered_node" name="prefered_node" id="prefered_node" />
+                  <span class="input-group-btn btn-group node_selector">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fas fa-server text-muted"></span></button>
+                    <ul class="dropdown-menu" role="menu" style="right:0;left:auto;"></ul>
+                  </span>
+                </div>
+                <input type="checkbox" name="automatic_node_selection" id="automatic_node_selection" /> <label for="automatic_node_selection" data-i18n="automatic_node_selection" style="color: #c4c4c4;font-weight: normal;">automatic_node_selection</label>
             </div>
         </div>
         <div id="login_panel">
