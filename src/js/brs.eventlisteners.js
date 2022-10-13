@@ -56,6 +56,7 @@
             BRS.goToPageNumber($(this).data("page"));
         });
         $("#id_search").on("submit", BRS.evIdSearchSubmit);
+        $("#login_button").on("click", BRS.evLoginButtonClick);
 
         // from brs.forms.js
         $(".modal form input").keydown(function(e) {

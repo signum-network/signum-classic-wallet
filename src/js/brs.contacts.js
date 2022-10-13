@@ -14,6 +14,14 @@ var BRS = (function(BRS, $, undefined) {
 	});
     };
 
+    BRS.getContactByName = function (nameToFind) {
+        for (const accountId in BRS.contacts) {
+            if (BRS.contacts[accountId].name === nameToFind) {
+                return BRS.contacts[accountId]
+            }
+        }
+    }
+
     BRS.pages.contacts = function() {
 	if (!BRS.databaseSupport) {
 	    $("#contact_page_database_error").show();

@@ -192,12 +192,27 @@ var BRS = (function(BRS, $, undefined) {
 
             BRS.state = response;
 
+            let login
+            if (BRS.rsRegEx.test(account) || BRS.idRegEx.test(account)) {
+                login = account
+            } else {
+                const foundContact = BRS.getContactByName(account)
+                if (foundContact) login = foundContact.accountRS
+            }
+            if (!login) {
+                $.notify(
+                    $.t("name_not_in_contacts", { name: account }),
+                    { type: 'danger', offset: 10 }
+                );
+                return
+            }
+
             // Get the account information for the given address
             BRS.sendRequest("getAccount", {
-                "account": account
+                "account": login
             }, function(response) {
                 if (response.errorCode) {
-                    if (BRS.rsRegEx.test(account) || BRS.idRegEx.test(account)) {
+                    if (BRS.rsRegEx.test(login) || BRS.idRegEx.test(login)) {
                         $.notify($.t("error_account_unknow_watch_only"), {
                             type: 'danger',
                             offset: { x: 5, y: 60 }
@@ -319,6 +334,18 @@ var BRS = (function(BRS, $, undefined) {
             });
         });
     };
+
+    BRS.evLoginButtonClick =  function (e) {
+        e.preventDefault();
+
+        const passwd = $("#login_password").val()
+        if (passwd !== '') {
+            BRS.loginWithPassphrase(passwd)
+            return;
+        }
+        const account = $("#login_account").val()
+        BRS.loginWithAccount(account)
+    }
 
     BRS.showLockscreen = function() {
         if (BRS.hasLocalStorage && localStorage.getItem("logged_in")) {

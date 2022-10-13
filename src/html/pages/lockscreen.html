@@ -28,9 +28,10 @@
             <div class="form-group">
               <label for="login_account" data-i18n="login_with_account">Login as watcher (no pass needed):</label><br />
               <div class="input-group">
-                <input type="text" class="form-control" id="login_account" name="login_account" placeholder="S-AAAA-BBBB-CCCC-DDDDD" />
+                <input type="text" class="form-control" id="login_account" name="account_id" placeholder="S-____-____-____-_____" />
                 <span class="input-group-btn btn-group recipient_selector">
-                  <button type="button" class="btn btn-default" onclick="BRS.loginWithAccount($('#login_account').val()); return false;" ><span class="fas fa-arrow-right text-muted"></span></button>
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fas fa-user text-muted"></span></button>
+                  <ul class="dropdown-menu" role="menu" style="right:0;left:auto;"></ul>
                 </span>
               </div>
               <input type="checkbox" name="remember_account" id="remember_account" /> <label for="remember_account" class="checkbox-label" data-i18n="remember_account">Remember this account</label>
@@ -39,8 +40,8 @@
               <label for="login_password" data-i18n="login_with_passphrase">Login with passphrase:</label><br />
               <div class="input-group">
                 <input type="password" class="form-control" id="login_password" name="login_password" placeholder="Your Passphrase" data-i18n="[placeholder]your_passphrase" autocomplete="" autofocus />
-                <span iv class="input-group-btn btn-group recipient_selector">
-                  <button class="btn btn-login" onclick="BRS.loginWithPassphrase($('#login_password').val()); return false;"><span class="fas fa-arrow-right text-muted"></span></button>
+                <span class="input-group-btn btn-group">
+                  <button class="btn btn-login" id="login_button"><span class="fas fa-arrow-right text-muted"></span></button>
                 </span>
               </div>
               <input type="checkbox" name="remember_password" id="remember_password" /> <label for="remember_password" class="checkbox-label" data-i18n="remember_passphrase_during_session">Remember passphrase on during session</label>
