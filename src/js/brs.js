@@ -101,7 +101,10 @@ var BRS = (function(BRS, $, undefined) {
         } catch (err) {
             BRS.hasLocalStorage = false;
         }
-
+        $.notifyDefaults({
+            placement:{ from:"bottom", align:"right" },
+            offset: 10
+        })
         BRS.theme();
 
         BRS.createDatabase(function() {
@@ -1030,76 +1033,90 @@ var BRS = (function(BRS, $, undefined) {
     
     BRS.evIdSearchSubmit = function(e) {
         e.preventDefault();
-
-        var id = $.trim($("#id_search input[name=q]").val());
-
-        if (/BURST\-/i.test(id)) {
+        const searchText = $.trim($("#id_search input[name=q]").val());
+        if (BRS.rsRegEx.test(searchText)) {
             BRS.sendRequest("getAccount", {
-                "account": id
+                "account": searchText
             }, function(response, input) {
-                if (!response.errorCode) {
-                    response.account = input.account;
-                    BRS.showAccountModal(response);
+                if (response.errorCode) {
+                    $.notify($.t("error_search_no_results"), { type: 'danger' });
+                    return
                 }
-                else {
-                    $.notify($.t("error_search_no_results"), {
-                        type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                    });
-                }
+                response.account = input.account;
+                BRS.showAccountModal(response);
             });
+            return;
         }
-        else {
-            if (!/^\d+$/.test(id)) {
-                $.notify($.t("error_search_invalid"), {
-                    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
-                return;
-            }
+        if (BRS.idRegEx.test(searchText)) {
             BRS.sendRequest("getTransaction", {
-                "transaction": id
+                "transaction": searchText
+            }, function(response, input) {
+                if (response.errorCode) {
+                    $.notify($.t("error_search_no_results"), { type: 'danger' })
+                    return
+                }
+                response.transaction = input.transaction;
+                BRS.showTransactionModal(response);
+            })
+            return;
+        }
+        const splitted = searchText.split(":")
+        if (splitted.length !== 2) {
+            $.notify($.t("error_search_invalid"), { type: 'danger' });
+            return
+        }
+        switch (splitted[0]) {
+        case 'a':
+        case 'address':
+            BRS.sendRequest("getAccount", {
+                "account": splitted[1].trim()
+            }, function(response, input) {
+                if (response.errorCode) {
+                    $.notify($.t("error_search_no_results"), { type: 'danger' })
+                    return
+                }
+                response.account = input.account;
+                BRS.showAccountModal(response);
+            });
+            return;
+        case 'b':
+        case 'block':
+            BRS.sendRequest("getBlock", {
+                "block": splitted[1].trim(),
+                "includeTransactions": "true"
             }, function(response, input) {
                 if (!response.errorCode) {
-                    response.transaction = input.transaction;
-                    BRS.showTransactionModal(response);
-                }
-                else {
-                    BRS.sendRequest("getAccount", {
-                        "account": id
+                    // response.block = input.block;
+                    BRS.showBlockModal(response);
+                } else {
+                    BRS.sendRequest("getBlock", {
+                        "height": splitted[1].trim(),
+                        "includeTransactions": "true"
                     }, function(response, input) {
                         if (!response.errorCode) {
-                            response.account = input.account;
-                            BRS.showAccountModal(response);
+                            // response.block = input.block;
+                            BRS.showBlockModal(response);
                         }
                         else {
-                            BRS.sendRequest("getBlock", {
-                                "block": id
-                            }, function(response, input) {
-                                if (!response.errorCode) {
-                                    response.block = input.block;
-                                    BRS.showBlockModal(response);
-                                }
-                                else {
-                                    $.notify($.t("error_search_no_results"), {
-                                        type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                                    });
-                                }
-                            });
+                            $.notify($.t("error_search_no_results"), { type: 'danger' })
                         }
                     });
                 }
             });
+            return
+        case 'alias':
+            BRS.sendRequest("getAlias", {
+                "aliasName": splitted[1].trim()
+            }, function(response) {
+                if (response.errorCode) {
+                    $.notify($.t("error_search_no_results"), { type: 'danger' })
+                    return
+                }
+                BRS.evAliasShowSearchResult(response);
+            });
+            return;
+        default:
+            $.notify($.t("error_search_invalid"), { type: 'danger' });
         }
     };
 

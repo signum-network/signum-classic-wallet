@@ -905,8 +905,6 @@ BRS = (function (BRS, $, undefined) {
 
         var alias = $.trim($("#alias_search input[name=q]").val());
 
-        $("#alias_info_table tbody").empty();
-
         BRS.sendRequest("getAlias", {
             "aliasName": alias
         }, function (response, input) {
@@ -922,42 +920,41 @@ BRS = (function (BRS, $, undefined) {
                         }
                 });
                 BRS.fetchingModalData = false;
+                return
             }
-            else {
-                $("#alias_info_modal_alias").html(String(response.aliasName).escapeHTML());
-
-                var data = {
-                    "account": BRS.getAccountTitle(response, "account"),
-                    "last_updated": BRS.formatTimestamp(response.timestamp),
-                    "data_formatted_html": String(response.aliasURI).autoLink()
-                };
-
-                if ("priceNQT" in response) {
-                    if (response.buyer === BRS.account) {
-                        $("#alias_sale_callout").html($.t("alias_sale_direct_offer", {
-                            "burst": BRS.formatAmount(response.priceNQT)
-                        }) + " <a href='#' data-alias='" + String(response.aliasName).escapeHTML() + "' data-toggle='modal' data-target='#buy_alias_modal'>" + $.t("buy_it_q") + "</a>").show();
-                    }
-                    else if (typeof response.buyer === "undefined") {
-                        $("#alias_sale_callout").html($.t("alias_sale_indirect_offer", {
-                            "burst": BRS.formatAmount(response.priceNQT)
-                        }) + " <a href='#' data-alias='" + String(response.aliasName).escapeHTML() + "' data-toggle='modal' data-target='#buy_alias_modal'>" + $.t("buy_it_q") + "</a>").show();
-                    }
-                    else {
-                        $("#alias_sale_callout").html($.t("error_alias_sale_different_account")).show();
-                    }
-                }
-                else {
-                    $("#alias_sale_callout").hide();
-                }
-
-                $("#alias_info_table tbody").append(BRS.createInfoTable(data));
-
-                $("#alias_info_modal").modal("show");
-                BRS.fetchingModalData = false;
-            }
+            BRS.evAliasShowSearchResult(response)
         });
     };
+
+    BRS.evAliasShowSearchResult = function (response) {
+        $("#alias_info_table tbody").empty();
+        $("#alias_info_modal_alias").html(String(response.aliasName).escapeHTML());
+        const data = {
+            "account": BRS.getAccountTitle(response, "account"),
+            "last_updated": BRS.formatTimestamp(response.timestamp),
+            "data_formatted_html": String(response.aliasURI).autoLink()
+        };
+        if ("priceNQT" in response) {
+            if (response.buyer === BRS.account) {
+                $("#alias_sale_callout").html($.t("alias_sale_direct_offer", {
+                    "burst": BRS.formatAmount(response.priceNQT),
+                    "value_suffix": BRS.valueSuffix
+                }) + " <a href='#' data-alias='" + String(response.aliasName).escapeHTML() + "' data-toggle='modal' data-target='#buy_alias_modal'>" + $.t("buy_it_q") + "</a>").show();
+            } else if (typeof response.buyer === "undefined") {
+                $("#alias_sale_callout").html($.t("alias_sale_indirect_offer", {
+                    "burst": BRS.formatAmount(response.priceNQT),
+                    "value_suffix": BRS.valueSuffix
+                }) + " <a href='#' data-alias='" + String(response.aliasName).escapeHTML() + "' data-toggle='modal' data-target='#buy_alias_modal'>" + $.t("buy_it_q") + "</a>").show();
+            } else {
+                $("#alias_sale_callout").html($.t("error_alias_sale_different_account")).show();
+            }
+        } else {
+            $("#alias_sale_callout").hide();
+        }
+        $("#alias_info_table tbody").append(BRS.createInfoTable(data));
+        $("#alias_info_modal").modal("show");
+        BRS.fetchingModalData = false;
+    }
 
     return BRS;
 }(BRS || {}, jQuery));

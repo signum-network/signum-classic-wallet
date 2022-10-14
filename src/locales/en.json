@@ -1,4 +1,5 @@
 {
+    "search_help": "Simple search examples:\nS-AAAA-BBBB-CCCC-DDDD-EEEEE\n893019826376478234\n\nAdvanced search examples:\naddress: S-AAAA-BBBB-CCCC-DDDD-EEEEE\nblock: 1000\nalias: myalias",
     "automatic_node_selection": "Automatic node selection",
     "at_created": "Contract created",
     "subscription_id": "Subscription ID",
@@ -424,7 +425,7 @@
     "error_recipient_no_public_key_announcement": "Recipient account does not have a public key, must attach a public key announcement.",
     "error_refund_already_sent": "Refund already sent.",
     "error_request_timeout": "The request timed out. Warning: This does not mean the request did not go through. You should wait a couple of blocks and see if your request has been processed.",
-    "error_search_invalid": "Invalid input. Search by ID only.",
+    "error_search_invalid": "Invalid input.",
     "error_search_no_results": "Nothing found, please try another query.",
     "error_sell_alias": "An unknown error occured! Alias sale offer may or may not be created.",
     "error_send_encrypted_note": "An unknown error occured! Message may or may not be sent.",
@@ -762,7 +763,7 @@
     "same_out": "Same Amount",
     "search_aliases": "Search Aliases...",
     "search_assets": "Search Tokens...",
-    "search_by_id": "Search By ID...",
+    "search": "Search…",
     "search_by_seller": "Search By Seller...",
     "search_marketplace": "Search Marketplace",
     "seeded": "Seeded",
