@@ -366,6 +366,23 @@ var BRS = (function(BRS, $, undefined) {
             $(".multi-out-nav").removeClass("active");
         }
 
+        // Multi-transfers
+        $(".multi-transfer").hide();
+        $(".transfer-asset").fadeIn();
+        if (!$(".transfer-asset-nav").hasClass("active")) {
+            $(".transfer-asset-nav").addClass("active");
+        }
+        if ($(".multi-transfer-nav").toggleClass("active")) {
+            $(".multi-transfer-nav").removeClass("active");
+        }
+        $(this).find("span[name=transfer_asset_available]").each(function() {
+            $(this).html('');
+        })
+        $(this).find("span[name=asset-name]").each(function() {
+            $(this).html('?');
+        })
+        // End multi-transfers
+
         $(this).find("input[name=recipient], input[name=account_id]").not("[type=hidden]").trigger("unmask");
 
         $(this).find(":input:not(button)").each(function(index) {

@@ -698,6 +698,15 @@ var BRS = (function(BRS, $, undefined) {
                         { type: "Long*1", value:  [data.order] }
                     ]
                 }
+            case "transferAssetMulti":
+                return {
+                    "type":    2,
+                    "subtype": 9,
+                    "attachmentInfo":   [
+                        { type: "Byte*1", value: [data.assetIdsAndQuantities.split(";").length] },
+                        { type: "Long:Long*$0", value: data.assetIdsAndQuantities.split(";") }
+                    ]
+                }
             case "setRewardRecipient":
                 return { "type": 20, "subtype": 0 }
             case "addCommitment": 

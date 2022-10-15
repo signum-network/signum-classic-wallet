@@ -715,7 +715,13 @@ var BRS = (function(BRS, $, undefined) {
         var data = {};
 
         for (var s in serialized) {
-            data[serialized[s].name] = serialized[s].value;
+            if (data[serialized[s].name] === undefined) {
+                data[serialized[s].name] = serialized[s].value;
+            } else if (typeof data[serialized[s].name] !== 'object') {
+                data[serialized[s].name] = [data[serialized[s].name], serialized[s].value]
+            } else {
+                data[serialized[s].name].push(serialized[s].value)
+            }
         }
 
         if (!unmodified) {

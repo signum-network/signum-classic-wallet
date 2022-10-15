@@ -1672,47 +1672,48 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.evTransferAssetModalOnShowBsModal = function(e) {
-        var $invoker = $(e.relatedTarget);
+        let $invoker = $(e.relatedTarget);
         if (e.relatedTarget === null) {
             $invoker = $(e.currentTarget);
         }
-
-        var assetId = $invoker.data("asset") ?? "";
-        var assetName = $invoker.data("name") ?? "?";
-        var decimals = $invoker.data("decimals") ?? "";
-
-        $("#transfer_asset_asset").val(assetId);
-        $("#transfer_asset_decimals").val(decimals);
-        $("#transfer_asset_quantity_name").html(String(assetName).escapeHTML());
-        $("#transer_asset_available").html("");
-        if (assetId !== "") {
-            $("#transfer_asset_name_plus_asset").val(assetName + " - " + assetId);
+        const assetId = $invoker.data("asset") ?? "";
+        const assetName = $invoker.data("name") ?? "?";
+        const decimals = $invoker.data("decimals") ?? "";
+        if (assetId === '') {
+            return
+        }
+        let $formGroup = $invoker.closest(".form-group")
+        if ($formGroup.length === 0) {
+            // click was not in dropdown-menu... Assume new "transfer asset"
+            $formGroup = $("#form-transfer-asset")
         }
 
-        var confirmedBalance = 0;
-        var unconfirmedBalance = 0;
+        $formGroup.find("input[name=asset]").val(assetId);
+        $formGroup.find("input[name=decimals]").val(decimals);
+        $formGroup.find("span[name=asset-name]").html(String(assetName).escapeHTML());
+        $formGroup.find("input[name=name_plus_asset]").val(assetName + " - " + assetId);
+        $("#transfer_asset_name_plus_asset").val(assetName + " - " + assetId);
 
+        let confirmedBalance = '';
+        let unconfirmedBalance = '';
         if (BRS.accountInfo.assetBalances) {
-            $.each(BRS.accountInfo.assetBalances, function(key, assetBalance) {
-                if (assetBalance.asset == assetId) {
-                    confirmedBalance = assetBalance.balanceQNT;
-                    return false;
+            BRS.accountInfo.assetBalances.find( assetBalance => {
+                if (assetBalance.asset === assetId) {
+                    confirmedBalance = assetBalance.balanceQNT
+                    return true
                 }
-            });
+            })
         }
-
         if (BRS.accountInfo.unconfirmedAssetBalances) {
-            $.each(BRS.accountInfo.unconfirmedAssetBalances, function(key, assetBalance) {
-                if (assetBalance.asset == assetId) {
-                    unconfirmedBalance = assetBalance.unconfirmedBalanceQNT;
-                    return false;
+            BRS.accountInfo.unconfirmedAssetBalances.find( assetBalance => {
+                if (assetBalance.asset === assetId) {
+                    unconfirmedBalance = assetBalance.unconfirmedBalanceQNT
+                    return true
                 }
-            });
+            })
         }
-
-        var availableAssetsMessage = "";
-
-        if (confirmedBalance == unconfirmedBalance) {
+        let availableAssetsMessage = "";
+        if (confirmedBalance === unconfirmedBalance) {
             availableAssetsMessage = $.t("available_for_transfer", {
                 "qty": BRS.formatQuantity(confirmedBalance, decimals)
             });
@@ -1721,8 +1722,63 @@ var BRS = (function(BRS, $, undefined) {
                 "qty": BRS.formatQuantity(unconfirmedBalance, decimals)
             }) + " (" + BRS.formatQuantity(confirmedBalance, decimals) + " " + $.t("total_lowercase") + ")";
         }
+        $formGroup.find("span[name=transfer_asset_available]").html(availableAssetsMessage);
+    };
 
-        $("#transfer_asset_available").html(availableAssetsMessage);
+    BRS.forms.transferAssetMulti = function($form) {
+        const data = BRS.getFormData($form);
+        data['assetIdsAndQuantities'] = ''
+        let items = 0;
+        let showWarning = false;
+        for (let i = 0; i < 4; i++) {
+            if (data.asset[i] === '' || Number(data.quantity[i]) === 0) {
+                continue;
+            }
+            if (items > 0) {
+                data.assetIdsAndQuantities += ';'
+            }
+            items++
+            if (Number(data.quantity[i]) > BRS.settings.asset_transfer_warning &&
+                BRS.settings.asset_transfer_warning !== 0) {
+                showWarning = true;
+            }
+            try {
+                data.assetIdsAndQuantities += data.asset[i] + ':' +
+                    BRS.convertToQNT(data.quantity[i], data.decimals[i]);
+            } catch (e) {
+                return {
+                    "error": $.t("error_incorrect_quantity_plus", {
+                        "err": e.escapeHTML()
+                    })
+                };
+            }
+        }
+        if (items < 2) {
+            return { "error": $.t("error_multi_transfer_minimum") };
+        }
+        delete data.asset
+        delete data.quantity
+        delete data.decimals
+        delete data.name_plus_asset
+        if (!data.amountNXT) {
+            data.amountNXT = "0";
+        }
+        if (!BRS.showedFormWarning && showWarning) {
+            BRS.showedFormWarning = true;
+            return {
+                "error": $.t("error_max_asset_transfer_warning", {
+                    "qty": String(BRS.settings.asset_transfer_warning).escapeHTML()
+                })
+            };
+        }
+        if (!data.add_message) {
+            delete data.add_message;
+            delete data.message;
+            delete data.encrypt_message;
+        }
+        return {
+            "data": data
+        };
     };
 
     BRS.forms.transferAsset = function($modal) {

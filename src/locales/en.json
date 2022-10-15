@@ -1,4 +1,6 @@
 {
+    "transfer_assets": "Transfer Tokens",
+    "error_multi_transfer_minimum": "Tokens multi-tranfer must have at least two tokens.",
     "search_help": "Simple search examples:\nS-AAAA-BBBB-CCCC-DDDD-EEEEE\n893019826376478234\n\nAdvanced search examples:\naddress: S-AAAA-BBBB-CCCC-DDDD-EEEEE\nblock: 1000\nalias: myalias",
     "automatic_node_selection": "Automatic node selection",
     "at_created": "Contract created",

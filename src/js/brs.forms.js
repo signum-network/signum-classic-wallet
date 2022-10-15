@@ -249,7 +249,7 @@ var BRS = (function(BRS, $, undefined) {
         }
 
         if (typeof formFunction === "function") {
-            var output = formFunction($modal);
+            var output = formFunction($form);
 
             if (!output) {
                 return;

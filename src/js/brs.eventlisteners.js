@@ -439,6 +439,26 @@
         $(".same_out_checkbox").on("change", BRS.evSameOutCheckboxChange);
         $("#multi_out_fee").on("change", BRS.evMultiOutFeeChange);
         $("#multi-out-submit").on("click", BRS.evMultiOutSubmitClick);
+        $(".transfer-asset-nav a").on("click", function(e) {
+            $(".multi-transfer").hide();
+            $(".transfer-asset").fadeIn();
+            if (!$(".transfer-asset-nav").hasClass("active")) {
+                $(".transfer-asset-nav").addClass("active");
+            }
+            if ($(".multi-transfer-nav").toggleClass("active")) {
+                $(".multi-transfer-nav").removeClass("active");
+            }
+        });
+        $(".multi-transfer-nav a").on("click", function(e) {
+            $(".transfer-asset").hide();
+            $(".multi-transfer").fadeIn();
+            if ($(".transfer-asset-nav").hasClass("active")) {
+                $(".transfer-asset-nav").removeClass("active");
+            }
+            if (!$(".multi-transfer-nav").hasClass("active")) {
+                $(".multi-transfer-nav").addClass("active");
+            }
+        });
         $(".add_message").on("change", function(e) {
             if ($(this).is(":checked")) {
                 $(this).closest("form").find(".optional_message").fadeIn();

@@ -549,3 +549,18 @@ background-color:#FFFAF0!important
     font-family: monospace,monospace;
     font-size:1em
 }
+/* modal */
+.flex-asset-quantity {
+    display: flex;
+    column-gap: 12px;
+    align-content: stretch;
+}
+.flex-asset-quantity > :nth-child(1){
+    width: 60%;
+}
+.flex-asset-quantity > :nth-child(2){
+    width: 40%;
+}
+.multi-transfer {
+    display: none;
+}
