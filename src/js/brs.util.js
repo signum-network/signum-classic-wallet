@@ -661,28 +661,6 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
-    BRS.isPrivateIP = function(ip) {
-        if (!/^\d+\.\d+\.\d+\.\d+$/.test(ip)) {
-            return false;
-        }
-        var parts = ip.split('.');
-        if (parts[0] === '10' || parts[0] === '127' || (parts[0] === '172' && (parseInt(parts[1], 10) >= 16 && parseInt(parts[1], 10) <= 31)) || (parts[0] === '192' && parts[1] === '168')) {
-            return true;
-        }
-        return false;
-    };
-
-    BRS.convertToHex16 = function(str) {
-        var hex, i;
-        var result = "";
-        for (i = 0; i < str.length; i++) {
-            hex = str.charCodeAt(i).toString(16);
-            result += ("000" + hex).slice(-4);
-        }
-
-        return result;
-    };
-
     BRS.convertFromHex16 = function(hex) {
         var j;
         var hexes = hex.match(/.{1,4}/g) || [];
@@ -700,14 +678,6 @@ var BRS = (function(BRS, $, undefined) {
         for (var i = 0; i < hex.length; i += 2)
             str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
         return str;
-    };
-
-    BRS.convertToHex8 = function(str) {
-        var hex = '';
-        for (var i = 0; i < str.length; i++) {
-            hex += '' + str.charCodeAt(i).toString(16);
-        }
-        return hex;
     };
 
     BRS.getFormData = function($form, unmodified) {
@@ -986,34 +956,6 @@ var BRS = (function(BRS, $, undefined) {
     BRS.createInfoTable = function(data, fixed) {
         var rows = "";
 
-        /*
-      var keys = [];
-
-      if (Object.keys) {
-      keys = Object.keys(data);
-      }
-          else {
-      for (var key in data) {
-      keys.push(key);
-      }
-      }
-
-      keys.sort(function(a, b) {
-      if (a < b) {
-      return -1;
-      }
-          else if (a > b) {
-      return 1
-      }
-          else {
-      return 0
-      }
-      });
-
-      for (var i = 0; i < keys.length; i++) {
-      var key = keys[i];
-    */
-
         for (var key in data) {
             var value = data[key];
 
@@ -1159,52 +1101,6 @@ var BRS = (function(BRS, $, undefined) {
         return ((transactions && transactions.length) || BRS.unconfirmedTransactionsChange);
     };
 
-    BRS.showMore = function($el) {
-        if (!$el) {
-            $el = $("#" + BRS.currentPage + "_contents");
-            if (!$el.length) {
-                $el = $("#" + BRS.currentPage + "_table");
-            }
-        }
-        var adjustheight = 40;
-        var moreText = "Show more...";
-        var lessText = "Show less...";
-
-        $el.find(".showmore > .moreblock").each(function() {
-            if ($(this).height() > adjustheight) {
-                $(this).css("height", adjustheight).css("overflow", "hidden");
-                $(this).parent(".showmore").append(' <a href="#" class="adjust"></a>');
-                $(this).parent(".showmore").find("a.adjust").text(moreText).click(function(e) {
-                    e.preventDefault();
-
-                    if ($(this).text() === moreText) {
-                        $(this).parents("div:first").find(".moreblock").css('height', 'auto').css('overflow', 'visible');
-                        $(this).parents("div:first").find("p.continued").css('display', 'none');
-                        $(this).text(lessText);
-                    } else {
-                        $(this).parents("div:first").find(".moreblock").css('height', adjustheight).css('overflow', 'hidden');
-                        $(this).parents("div:first").find("p.continued").css('display', 'block');
-                        $(this).text(moreText);
-                    }
-                });
-            }
-        });
-    };
-
-    BRS.showFullDescription = function($el) {
-        $el.addClass("open").removeClass("closed");
-        $el.find(".description_toggle").text("Less...");
-    };
-
-    BRS.showPartialDescription = function($el) {
-        if ($el.hasClass("open") || $el.height() > 40) {
-            $el.addClass("closed").removeClass("open");
-            $el.find(".description_toggle").text("More...");
-        } else {
-            $el.find(".description_toggle").text("");
-        }
-    };
-
     BRS.FnTree = function() {
         return this.each(function() {
             var btn = $(this).children("a").first();
@@ -1234,34 +1130,6 @@ var BRS = (function(BRS, $, undefined) {
                 }
             });
         });
-    };
-
-    BRS.setCookie = function(name, value, days) {
-        var expires;
-
-        if (days) {
-            var date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            expires = "; expires=" + date.toGMTString();
-        } else {
-            expires = "";
-        }
-        document.cookie = escape(name) + "=" + escape(value) + expires + "; path=/";
-    };
-
-    BRS.getCookie = function(name) {
-        var nameEQ = escape(name) + "=";
-        var ca = document.cookie.split(';');
-        for (var i = 0; i < ca.length; i++) {
-            var c = ca[i];
-            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) === 0) return unescape(c.substring(nameEQ.length, c.length));
-        }
-        return null;
-    };
-
-    BRS.deleteCookie = function(name) {
-        BRS.setCookie(name, "", -1);
     };
 
     BRS.translateServerError = function(response) {
