@@ -70,12 +70,7 @@
             }
         });
         $(".modal button.btn-primary:not([data-dismiss=modal]):not([data-ignore=true])").click(function() {
-            // ugly hack - this whole ui is hack, got a big urge to vomit
-            if ($(this)[0].id === "sign_message_modal_button") { // hack hackity hack!
-                BRS.forms.signModalButtonClicked();
-            } else {
-                BRS.submitForm($(this).closest(".modal"), $(this));
-            }
+            BRS.submitForm($(this).closest(".modal"), $(this));
         });
 
         // from brs.login.js
@@ -629,6 +624,7 @@
         });
 
         // from brs.modals.signmessage.js
+        $("#sign_message_modal_button").click(BRS.forms.signModalButtonClicked);
         $("#sign_message_modal").on("show.bs.modal", function(e) {
             $("#sign_message_output, #verify_message_output").html("").hide();
             $("#sign_message_modal_sign_message").show();
