@@ -1771,11 +1771,6 @@ var BRS = (function(BRS, $, undefined) {
                 })
             };
         }
-        if (!data.add_message) {
-            delete data.add_message;
-            delete data.message;
-            delete data.encrypt_message;
-        }
         return {
             "data": data
         };
@@ -1821,12 +1816,6 @@ var BRS = (function(BRS, $, undefined) {
         delete data.quantity;
         delete data.decimals;
         delete data.name_plus_asset;
-
-        if (!data.add_message) {
-            delete data.add_message;
-            delete data.message;
-            delete data.encrypt_message;
-        }
 
         return {
             "data": data

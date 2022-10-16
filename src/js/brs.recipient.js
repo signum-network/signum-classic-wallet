@@ -176,11 +176,7 @@ var BRS = (function(BRS, $, undefined) {
         delete data.amount_multi_out_same
         delete data.recipient_multi_out
         delete data.recipient_multi_out_same
-        if (!data.add_message) {
-            delete data.add_message;
-            delete data.message;
-            delete data.encrypt_message;
-        }
+
         return {
             requestType,
             "data": data
