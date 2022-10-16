@@ -418,11 +418,6 @@ var BRS = (function(BRS, $, undefined) {
             data.deadline = String(data.deadline * 60); //hours to minutes
         }
         
-        if (data.removeCommitment) {
-            requestType = "removeCommitment";
-            delete data.removeCommitment;
-        }
-
         if (data.doNotBroadcast) {
             data.broadcast = "false";
             delete data.doNotBroadcast;
@@ -566,6 +561,19 @@ var BRS = (function(BRS, $, undefined) {
                 }
             }
         });
+    };
+
+    BRS.forms.addCommitment = function ($form) {
+        const data = BRS.getFormData($form);
+        let requestType = 'addCommitment'
+        if (data.removeCommitment) {
+            requestType = 'removeCommitment';
+            delete data.removeCommitment;
+        }
+        return {
+            requestType,
+            data
+        }
     };
 
     BRS.unlockForm = function($modal, $btn, hide) {
