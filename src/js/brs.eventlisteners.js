@@ -73,7 +73,7 @@
             // ugly hack - this whole ui is hack, got a big urge to vomit
             if ($(this)[0].id === "sign_message_modal_button") { // hack hackity hack!
                 BRS.forms.signModalButtonClicked();
-            } else if (!$(this).hasClass("multi-out")) {
+            } else {
                 BRS.submitForm($(this).closest(".modal"), $(this));
             }
         });
@@ -118,19 +118,6 @@
         $("#send_money_amount, #send_money_fee").on("change", function(e) {
             BRS.sendMoneyCalculateTotal($(this));
         });
-        //todo later: http://twitter.github.io/typeahead.js/
-        $("span.recipient_selector button").on("click", function(e) {
-            if (!Object.keys(BRS.contacts).length) {
-                e.preventDefault();
-                e.stopPropagation();
-                return;
-            }
-            const $list = $(this).parent().find("ul");
-            $list.empty();
-            for (const accountId in BRS.contacts) {
-                $list.append("<li><a href='#' data-contact='" + String(BRS.contacts[accountId].name).escapeHTML() + "'>" + String(BRS.contacts[accountId].name).escapeHTML() + "</a></li>");
-            }
-        });
         $("span.asset_selector button").on("click", function(e) {
             const $list = $(this).parent().find("ul");
             $list.empty();
@@ -147,41 +134,8 @@
             }
         });
         $("span.asset_selector").on("click", "ul li a", BRS.evTransferAssetModalOnShowBsModal);
-        $(document).on("click", "span.recipient_selector button", function(e) {
-            if (!Object.keys(BRS.contacts).length) {
-                e.preventDefault();
-                e.stopPropagation();
-                return;
-            }
-            const $list = $(this).parent().find("ul");
-            $list.empty();
-            for (const accountId in BRS.contacts) {
-                $list.append("<li><a href='#' data-contact='" + String(BRS.contacts[accountId].name).escapeHTML() + "'>" + String(BRS.contacts[accountId].name).escapeHTML() + "</a></li>");
-            }
-        });
-        $("span.recipient_selector").on("click", "ul li a", function(e) {
-            e.preventDefault();
-            $(this).closest("form").find("input[name=converted_account_id]").val("");
-            $(this).closest("form").find("input[name=recipient],input[name=account_id]").not("[type=hidden]").trigger("unmask").val($(this).data("contact")).trigger("blur");
-        });
-        $(document).on("click", ".recipient_selector_multi_out button", function(e) {
-            if (!Object.keys(BRS.contacts).length) {
-                e.preventDefault();
-                e.stopPropagation();
-                return;
-            }
-            const $list = $(this).parent().find("ul");
-            $list.empty();
-            for (const accountId in BRS.contacts) {
-                $list.append("<li><a href='#' data-contact='" + String(accountId).escapeHTML() + "'>" + String(BRS.contacts[accountId].name).escapeHTML() + "</a></li>");
-            }
-        });
-        $(document).on("click", ".recipient_selector_multi_out ul li a", function(e) {
-            e.preventDefault();
-            // ugly hack - serious jquery cancer
-            $(this).parent().parent().parent().parent().find(".multi-out-recipient").val($(this).data("contact"));
-        });
-
+        $("span.recipient_selector").on("click", "button", BRS.evSpanRecipientSelectorClickButton);
+        $("span.recipient_selector").on("click", "ul li a", BRS.evSpanRecipientSelectorClickUlLiA);
         // from brs.assetexchange.js
         $("#asset_exchange_bookmark_this_asset").on("click", function() {
                 BRS.saveAssetBookmarks([BRS.currentAsset], function() {
@@ -401,20 +355,10 @@
             const target = $(e.target).attr("href");
             $(target).scrollTop(0);
         });
-        // hide multi-out
-        $(".hide").hide();
-        $(".multi-out").hide();
-        $(".multi-out-same").hide();
-        $(".multi-out-recipients").append($("#additional_multi_out_recipient").html());
-        $(".multi-out-recipients").append($("#additional_multi_out_recipient").html());
-        $(".multi-out-same-recipients").append($("#additional_multi_out_same_recipient").html());
-        $(".multi-out-same-recipients").append($("#additional_multi_out_same_recipient").html());
-        $(".multi-out .remove_recipient").each(function() {
-            $(this).remove();
-        });
+        BRS.resetModalMultiOut()
         $(".ordinary-nav a").on("click", function(e) {
-            $(".multi-out").hide();
-            $(".ordinary").fadeIn();
+            $("#send_multi_out").hide();
+            $("#send_ordinary").fadeIn();
             if (!$(".ordinary-nav").hasClass("active")) {
                 $(".ordinary-nav").addClass("active");
             }
@@ -423,8 +367,8 @@
             }
         });
         $(".multi-out-nav a").on("click", function(e) {
-            $(".ordinary").hide();
-            $(".multi-out").fadeIn();
+            $("#send_ordinary").hide();
+            $("#send_multi_out").fadeIn();
             if ($(".ordinary-nav").hasClass("active")) {
                 $(".ordinary-nav").removeClass("active");
             }
@@ -432,13 +376,9 @@
                 $(".multi-out-nav").addClass("active");
             }
         });
-        $(".add_recipients").on("click", BRS.evAddRecipientsClick);
-        $(document).on("click", ".remove_recipient .remove_recipient_button", BRS.evDocumentOnClickRemoveRecipient);
-        $(document).on("change remove", ".multi-out-amount", BRS.evDocumentOnChangeMultiOutAmount);
-        $("#multi-out-same-amount").on("change", BRS.evMultiOutSameAmountChange);
-        $(".same_out_checkbox").on("change", BRS.evSameOutCheckboxChange);
+        $("#multi_out_same_amount").on("change", BRS.evMultiOutSameAmountChange);
+        $("#send_money_same_out_checkbox").on("change", BRS.evSameOutCheckboxChange);
         $("#multi_out_fee").on("change", BRS.evMultiOutFeeChange);
-        $("#multi-out-submit").on("click", BRS.evMultiOutSubmitClick);
         $(".transfer-asset-nav a").on("click", function(e) {
             $(".multi-transfer").hide();
             $(".transfer-asset").fadeIn();
@@ -459,6 +399,7 @@
                 $(".multi-transfer-nav").addClass("active");
             }
         });
+        $(".add_recipients").on("click", BRS.evAddRecipientsClick);
         $(".add_message").on("change", function(e) {
             if ($(this).is(":checked")) {
                 $(this).closest("form").find(".optional_message").fadeIn();
@@ -762,7 +703,7 @@
             BRS.showFeeSuggestions("#commitment_fee", "#suggested_fee_response_commitment");
         });
         $('#send_money_modal').on('hide.bs.modal', function (e) {
-                $("#total_amount_multi_out").html('0.1 Signa');
+            $("#total_amount_multi_out").html('?');
         });
         $("#suggested_fee_ordinary").on("click", function(e) {
             e.preventDefault();

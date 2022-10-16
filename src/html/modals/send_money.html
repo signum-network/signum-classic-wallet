@@ -10,13 +10,13 @@
                 <tr><td>Amount Committed:</td> <td id="account_committed_balance"></td><td>&nbsp;<span data-value-suffix=""></span></td></tr>
                 </table>
             </div>
-            <div class="modal-body">
-                <ul style="margin-bottom: 10px" class="nav nav-pills">
-                    <li class="ordinary-nav active"><a href="#">Ordinary</a></li>
-                    <li class="multi-out-nav"><a href="#">Multi-Out</a></li>
-                </ul>
-                <div class="ordinary">
-                    <form role="form" autocomplete="off">
+            <ul style="margin: 15px 15px 0 15px"  class="nav nav-pills">
+                <li class="ordinary-nav active"><a href="#" data-i18n="ordinary">ordinary</a></li>
+                <li class="multi-out-nav"><a href="#" data-i18n="multiple">multiple</a></li>
+            </ul>
+            <div id="send_ordinary">
+                <div class="modal-body">
+                    <form role="form" autocomplete="off" id="form_ordinary">
                         <div class="callout callout-danger error_message" style="display:none"></div>
                         <div class="form-group">
                             <label for="send_money_recipient" data-i18n="recipient">RECIPIENT</label>
@@ -106,16 +106,23 @@
                         <input type="hidden" name="merchant_info" value="" data-default="" />
                     </form>
                 </div>
-                <div class="multi-out">
-                    <form role="form" autocomplete="off">
+                <div class="modal-footer" style="margin-top:0;">
+                    <div class="advanced_info"><strong data-i18n="total">Total</strong>: <span class="total_amount_ordinary" id="total_amount_ordinary"></span> - <a href="#" data-i18n="advanced">advanced</a></div>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" data-i18n="cancel">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-loading-text="Submitting..." data-i18n="send_burst;[data-loading-text]submitting" data-form="form_ordinary">Send SIGNA</button>
+                </div>
+            </div>
+            <div id="send_multi_out">
+                <div class="modal-body">
+                  <form role="form" autocomplete="off" id="form_multi_out">
                     <div class="callout callout-danger error_message" style="display:none"></div>
                     <div class="form-group" style="margin-bottom:5px">
-                        <input type="checkbox" class="same_out_checkbox" name="same_out_checkbox" id="send_money_same_out" value="1" /> <label for="send_money_same_out" style="font-weight:normal;" data-i18n="same_out">Same Amount</label>
+                        <input type="checkbox" name="same_out_checkbox" id="send_money_same_out_checkbox" value="1" /> <label for="send_money_same_out_checkbox" style="font-weight:normal;" data-i18n="same_out">Same Amount</label>
                     </div>
-                    <div class="multi-out-recipients multi-out-ordinary">
+                    <div id="multi_out_recipients">
                         <!-- added dynamically -->
                     </div>
-                    <div class="multi-out-same-recipients multi-out-same">
+                    <div id="multi_out_same_recipients">
                         <!-- added dynamically -->
                     </div>
                     <div class="row">
@@ -123,12 +130,12 @@
                             <button type="button" class="btn btn-default add_recipients" style="width: 100%; margin-bottom: 10px">Add Recipient</button>
                         </div>
                     </div>
-                    <div class="row multi-out-same">
+                    <div class="row" id="row_multi_out_same_amount">
                         <div class="col-xs-12 col-sm-12 col-md-12">
                             <div class="form-group">
                                 <label for="send_money_amount" data-i18n="amount">AMOUNT</label>
                                 <div class="input-group">
-                                    <input type="text" name="amountNXT" step="any" min="0.00000001" class="form-control" id="multi-out-same-amount" placeholder="Amount" data-i18n="[placeholder]amount" >
+                                    <input type="text" name="amount_multi_out_same" step="any" min="0" class="form-control" id="multi_out_same_amount" placeholder="Amount" data-i18n="[placeholder]amount" >
                                     <span class="input-group-addon" data-value-suffix=""></span>
                                 </div>
                             </div>
@@ -152,35 +159,43 @@
                         </div>
                     </div>
                     <div class="row">
+                        <div class="col-xs-5 col-sm-5 col-md-5 advanced">
+                            <div class="form-group">
+                                <label for="send_money_deadline_2" data-i18n="deadline_hours">DEADLINE (HOURS)</label>
+                                <input type="number" name="deadline" id="send_money_deadline_2" class="form-control" placeholder="Deadline" data-i18n="deadline" min="1" data-default="24" value="24" tabindex="5">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group advanced" style="margin-bottom:5px">
+                        <input type="checkbox" name="doNotBroadcast" value="1" id="send_money_do_not_broadcast_2" /> <label for="send_money_do_not_broadcast_2" style="font-weight:normal;" tabindex="10" data-i18n="do_not_broadcast">Do Not Broadcast</label>
+                    </div>
+                    <div class="row">
                         <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group secret_phrase">
-                            <label for="multi-out-passphrase" data-i18n="passphrase">PASSPHRASE</label>
-                            <input type="password" name="secretPhrase" id="multi-out-passphrase" class="form-control" placeholder="" autocomplete="">
+                            <label for="multi_out_passphrase" data-i18n="passphrase">PASSPHRASE</label>
+                            <input type="password" name="secretPhrase" id="multi_out_passphrase" class="form-control" placeholder="" autocomplete="">
                         </div>
                         </div>
                     </div>
-                    </form>
-                  </div>
+                    <input type="hidden" name="request_type" value="sendMoneyMulti" />
+                  </form>
+                </div>
+                <div class="modal-footer" style="margin-top:0;">
+                    <div class="advanced_info"><strong data-i18n="total">Total</strong>: <span id="total_amount_multi_out">?</span> - <a href="#" data-i18n="advanced">advanced</a></div>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" data-i18n="cancel">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-loading-text="Submitting..." data-i18n="send_burst;[data-loading-text]submitting" data-form="form_multi_out">Send SIGNA</button>
+                </div>
             </div>
-            <div class="modal-footer ordinary" style="margin-top:0;">
-                <div class="advanced_info"><strong data-i18n="total">Total</strong>: <span class="total_amount_ordinary" id="total_amount_ordinary"></span> - <a href="#" data-i18n="advanced">advanced</a></div>
-                <button type="button" class="btn btn-default" data-dismiss="modal" data-i18n="cancel">Cancel</button>
-                <button type="button" class="btn btn-primary" data-loading-text="Submitting..." data-i18n="send_burst;[data-loading-text]submitting">Send SIGNA</button>
-            </div>
-            <div class="modal-footer multi-out" style="margin-top:0;">
-                <div class="advanced_info"><strong data-i18n="total">Total</strong>: <span class="total_amount_multi_out" id="total_amount_multi_out">0.1</span> </div>
-                <button type="button" class="btn btn-default" data-dismiss="modal" data-i18n="cancel">Cancel</button>
-                <button type="button" class="btn btn-primary multi-out" id="multi-out-submit" data-loading-text="Submitting..." data-i18n="send_burst;[data-loading-text]submitting">Send SIGNA</button>
-            </div>
-            <!-- Multi Out additional recipient -->
-            <div class="hide" id="additional_multi_out_recipient">
+            <div style="display: none;">
+              <!-- Multi Out additional recipient -->
+              <div id="additional_multi_out_recipient">
                 <div class="row">
                     <div class="col-xs-6 col-sm-6 col-md-6">
                         <div class="form-group">
                             <div class="input-group">
-                                <input type="text" class="form-control multi-out-recipient" placeholder="Recipient Address or Numeric ID" data-i18n="[placeholder]recipient_account" autofocus />
-                                <span class="input-group-btn btn-group recipient_selector_multi_out">
-                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span></button>
+                                <input type="text" class="form-control" placeholder="Recipient Address or Numeric ID" data-i18n="[placeholder]recipient_account" name="recipient_multi_out" />
+                                <span class="input-group-btn btn-group recipient_selector">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></button>
                                 <ul class="dropdown-menu scrollable-menu" role="menu" style="right:0;left:auto;"></ul>
                                 </span>
                             </div>
@@ -189,7 +204,7 @@
                     <div class="col-xs-5 col-sm-5 col-md-5">
                         <div class="form-group">
                             <div class="input-group">
-                                <input type="text" name="amountNXT" step="any" min="0.00000001" class="form-control multi-out-amount" placeholder="Amount" data-i18n="[placeholder]amount"  >
+                                <input type="text" name="amount_multi_out" step="any" min="0" class="form-control" placeholder="Amount" data-i18n="[placeholder]amount" >
                                 <span class="input-group-addon" data-value-suffix=""></span>
                             </div>
                         </div>
@@ -198,16 +213,16 @@
                         <button type="button" class="btn btn-default remove_recipient_button"><span class="glyphicon glyphicon-remove"></span></button>
                     </div>
                 </div>
-            </div>
-            <!-- Multi Out same additional recipient -->
-            <div class="hide" id="additional_multi_out_same_recipient">
+              </div>
+              <!-- Multi Out same additional recipient -->
+              <div id="additional_multi_out_same_recipient">
                 <div class="row">
                     <div class="col-xs-11 col-sm-11 col-md-11">
                         <div class="form-group">
                             <div class="input-group">
-                                <input type="text" class="form-control multi-out-recipient" placeholder="Recipient Address or Numeric ID" data-i18n="[placeholder]recipient_account" autofocus />
-                                <span class="input-group-btn btn-group recipient_selector_multi_out">
-                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span></button>
+                                <input type="text" class="form-control" placeholder="Recipient Address or Numeric ID" data-i18n="[placeholder]recipient_account" name="recipient_multi_out_same" />
+                                <span class="input-group-btn btn-group recipient_selector">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></button>
                                 <ul class="dropdown-menu scrollable-menu" role="menu" style="right:0;left:auto;"></ul>
                                 </span>
                             </div>
@@ -217,6 +232,7 @@
                         <button type="button" class="btn btn-default remove_recipient_button"><span class="glyphicon glyphicon-remove"></span></button>
                     </div>
                 </div>
+              </div>
             </div>
         </div>
     </div>

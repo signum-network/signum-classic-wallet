@@ -36,268 +36,108 @@ var BRS = (function(BRS, $, undefined) {
         }
     });
 
-    // just to be safe set total display
-    var current_fee = parseFloat($("#multi_out_fee").val(), 10);
-    var fee = BRS.checkMinimumFee(current_fee);
-    $("#multi_out_fee").val(fee);
-    var total_multi_out = fee;
-    var amount_total = 0;
+    BRS.evSpanRecipientSelectorClickButton = function(e) {
+        if (!Object.keys(BRS.contacts).length) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+        const $list = $(this).parent().find("ul");
+        $list.empty();
+        for (const accountId in BRS.contacts) {
+            $list.append("<li><a href='#' data-contact='" + String(BRS.contacts[accountId].name).escapeHTML() + "'>" + String(BRS.contacts[accountId].name).escapeHTML() + "</a></li>");
+        }
+    }
 
-    // multi-out inputs
-    var multi_out_recipients = 2;
-    var multi_out_same_recipients = 2;
+    BRS.evSpanRecipientSelectorClickUlLiA = function(e) {
+        e.preventDefault();
+        $(this).closest("form").find("input[name=converted_account_id]").val("");
+        $(this).closest(".input-group").find("input").not("[type=hidden]").val($(this).data("contact")).trigger("blur");
+    };
 
     BRS.evAddRecipientsClick = function(e) {
         e.preventDefault();
-        if ($(".same_out_checkbox").is(":checked")) {
-            if (multi_out_same_recipients < 128) {
-                multi_out_same_recipients++;
-                $(".multi-out-same-recipients").append($("#additional_multi_out_same_recipient").html()); //add input box
-
-                total_multi_out = 0;
-                amount_total = 0;
-                var current_amount = parseFloat($("#multi-out-same-amount").val(), 10);
-                var current_fee = parseFloat($("#multi_out_fee").val(), 10);
-
-                var amount = isNaN(current_amount) ? 0.00000001 : (current_amount < 0.00000001 ? 0.00000001 : current_amount);
-                var fee = BRS.checkMinimumFee(current_fee);
-
-                $("#multi-out-same-amount").val(amount.toFixed(8));
-                $("#multi_out_fee").val(fee.toFixed(8));
-
-                $(".multi-out-same-recipients .multi-out-recipient").each(function() {
-                    amount_total += amount;
-                });
-
-                total_multi_out = amount_total + fee;
-
-                $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " " + BRS.valueSuffix);
-            }
+        if ($("#send_money_same_out_checkbox").is(":checked")) {
+            $("#multi_out_same_recipients").append($("#additional_multi_out_same_recipient").html()); //add input box
         } else {
-            if (multi_out_recipients < 64) {
-                multi_out_recipients++;
-                $(".multi-out-recipients").append($("#additional_multi_out_recipient").html()); //add input box
-            }
+            $("#multi_out_recipients").append($("#additional_multi_out_recipient").html()); //add input box
         }
-    };
+        $("input[name=recipient_multi_out_same]").off('blur').on('blur', BRS.evMultiOutSameAmountChange);
+        $('input[name=recipient_multi_out]').off('blur').on('blur', BRS.evMultiOutAmountChange);
+        $('input[name=amount_multi_out]').off('blur').on('blur', BRS.evMultiOutAmountChange);
+        $(".remove_recipient .remove_recipient_button").off('click').on("click", BRS.evDocumentOnClickRemoveRecipient);
+
+        $("span.recipient_selector").on("click", "button", BRS.evSpanRecipientSelectorClickButton);
+        $("span.recipient_selector").on("click", "ul li a", BRS.evSpanRecipientSelectorClickUlLiA);    };
 
     BRS.evDocumentOnClickRemoveRecipient = function(e) {
         e.preventDefault();
         $(this).parent().parent('div').remove();
 
-        if ($(".same_out_checkbox").is(":checked")) {
-            multi_out_same_recipients--;
-
-            total_multi_out = 0;
-            amount_total = 0;
-            var current_amount = parseFloat($("#multi-out-same-amount").val(), 10);
-            var current_fee = parseFloat($("#multi_out_fee").val(), 10);
-
-            var amount = isNaN(current_amount) ? 0.00000001 : (current_amount < 0.00000001 ? 0.00000001 : current_amount);
-            var fee = BRS.checkMinimumFee(current_fee);
-
-            $("#multi-out-same-amount").val(amount.toFixed(8));
-            $("#multi_out_fee").val(fee.toFixed(8));
-
-            $(".multi-out-same-recipients .multi-out-recipient").each(function() {
-                amount_total += amount;
-            });
-
-            total_multi_out = amount_total + fee;
-
-            $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " " + BRS.valueSuffix);
+        if ($("#send_money_same_out_checkbox").is(":checked")) {
+            BRS.evMultiOutSameAmountChange()
         } else {
-            multi_out_recipients--;
-            // get amount for each recipient
-            total_multi_out = 0;
-            amount_total = 0;
-            $(".multi-out .multi-out-amount").each(function() {
-                var current_amount = parseFloat($(this).val(), 10);
-                var amount = isNaN(current_amount) ? 0.00000001 : (current_amount < 0.00000001 ? 0.00000001 : current_amount);
-                $(this).val(amount.toFixed(8));
-                amount_total += amount;
-            });
-
-            var current_fee = parseFloat($("#multi_out_fee").val(), 10);
-            var fee = BRS.checkMinimumFee(current_fee);
-            $("#multi_out_fee").val(fee.toFixed(8));
-            total_multi_out = amount_total + fee;
-
-            $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " " + BRS.valueSuffix);
+            BRS.evMultiOutAmountChange()
         }
     };
 
-    BRS.evDocumentOnChangeMultiOutAmount = function(e) {
+    BRS.evMultiOutAmountChange = function(e) {
         // get amount for each recipient
-        total_multi_out = 0;
-        amount_total = 0;
-        $(".multi-out .multi-out-amount").each(function() {
-            var current_amount = parseFloat($(this).val(), 10);
-            var amount = isNaN(current_amount) ? 0.00000001 : (current_amount < 0.00000001 ? 0.00000001 : current_amount);
-            $(this).val(amount.toFixed(8));
-            amount_total += amount;
+        let amount_total = 0;
+        $("#multi_out_recipients .row").each(function(index, row) {
+            const recipient = $(row).find('input[name=recipient_multi_out]').val()
+            const value = $(row).find('input[name=amount_multi_out]').val()
+            const current_amount = parseFloat(value, 10);
+            const amount = isNaN(current_amount) ? 0 : (current_amount < 0.00000001 ? 0 : current_amount);
+            if (recipient !== '') {
+                amount_total += amount;
+            }
         });
+        const current_fee = parseFloat($("#multi_out_fee").val(), 10);
+        const fee = BRS.checkMinimumFee(current_fee);
+        // $("#multi_out_fee").val(fee.toFixed(8));
+        amount_total += fee;
 
-        var current_fee = parseFloat($("#multi_out_fee").val(), 10);
-        var fee = BRS.checkMinimumFee(current_fee);
-        $("#multi_out_fee").val(fee.toFixed(8));
-        total_multi_out = amount_total + fee;
+        $("#total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(amount_total)) + " " + BRS.valueSuffix);
+};
 
-        $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " " + BRS.valueSuffix);
-    };
+    BRS.evMultiOutSameAmountChange = function() {
+        let amount_total = 0;
+        const current_amount = parseFloat($('#multi_out_same_amount').val(), 10);
+        const current_fee = parseFloat($("#multi_out_fee").val(), 10);
+        const amount = isNaN(current_amount) ? 0 : (current_amount < 0.00000001 ? 0 : current_amount);
+        const fee = BRS.checkMinimumFee(current_fee);
 
-    BRS.evMultiOutSameAmountChange = function(e) {
-        total_multi_out = 0;
-        amount_total = 0;
-        var current_amount = parseFloat($(this).val(), 10);
-        var current_fee = parseFloat($("#multi_out_fee").val(), 10);
-
-        var amount = isNaN(current_amount) ? 0.00000001 : (current_amount < 0.00000001 ? 0.00000001 : current_amount);
-        var fee = BRS.checkMinimumFee(current_fee);
-
-        $("#multi-out-same-amount").val(amount.toFixed(8));
-        $("#multi_out_fee").val(fee.toFixed(8));
-
-        $(".multi-out-same-recipients .multi-out-recipient").each(function() {
-            amount_total += amount;
+        $("#multi_out_same_recipients input[name=recipient_multi_out_same]").each(function() {
+            if ($(this).val() !== '') {
+                amount_total += amount;
+            }
         });
+        amount_total += fee;
 
-        total_multi_out = amount_total + fee;
-
-        $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " " + BRS.valueSuffix);
+        $("#total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(amount_total)) + " " + BRS.valueSuffix);
     };
 
     BRS.evSameOutCheckboxChange = function(e) {
-        //amount_total = 0 ///fixing incorrect Total when switch from multi same to multi and fee is changed.
-        $(".total_amount_multi_out").html("0.1 Signa");
+        $("#total_amount_multi_out").html("?");
         if ($(this).is(":checked")) {
-            $(".multi-out-same").fadeIn();
-            $(".multi-out-ordinary").hide();
-            total_multi_out = 0;
-            amount_total = 0;
-            var current_amount = parseFloat($("#multi-out-same-amount").val(), 10);
-            if(!isNaN(current_amount))
-            {
-            $(".multi-out-same-recipients .multi-out-recipient").each(function() {
-                 amount_total += current_amount;
-            });
-            var current_fee = parseFloat($("#multi_out_fee").val(), 10);
-            var fee = BRS.checkMinimumFee(current_fee);
-            $("#multi_out_fee").val(fee.toFixed(8));
-            total_multi_out = amount_total + fee;
-            $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " " + BRS.valueSuffix);
-            }
-
+            $("#multi_out_same_recipients").fadeIn();
+            $("#row_multi_out_same_amount").fadeIn();
+            $("#multi_out_recipients").hide();
+            BRS.evMultiOutSameAmountChange()
         } else {
-            $(".multi-out-same").hide();
-            $(".multi-out-ordinary").fadeIn();
-            total_multi_out = 0;
-            amount_total = 0;
-            $(".multi-out .multi-out-amount").each(function() {
-                var current_amount = parseFloat($(this).val(), 10);
-                if(!isNaN(current_amount))
-                amount_total += current_amount;
-            });
-
-            var current_fee = parseFloat($("#multi_out_fee").val(), 10);
-            var fee = BRS.checkMinimumFee(current_fee);
-            $("#multi_out_fee").val(fee.toFixed(8));
-            total_multi_out = amount_total + fee;
-
-            $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(total_multi_out)) + " " + BRS.valueSuffix);
+            $("#multi_out_same_recipients").hide();
+            $("#row_multi_out_same_amount").hide();
+            $("#multi_out_recipients").fadeIn();
+            BRS.evMultiOutAmountChange()
         }
     };
 
     BRS.evMultiOutFeeChange = function(e) {
-        var current_fee = parseFloat($(this).val(), 10);
-        var fee = BRS.checkMinimumFee(current_fee);
-
-        $("#multi_out_fee").val(fee.toFixed(8));
-
-        $(".total_amount_multi_out").html(BRS.formatAmount(BRS.convertToNQT(amount_total + fee)) + " " + BRS.valueSuffix);
-    };
-
-    BRS.evMultiOutSubmitClick = function(e) {
-        var recipients = [];
-        var passphrase = $("#multi-out-passphrase").val();
-        // remember password set?
-        if (BRS.rememberPassword) {
-            passphrase = BRS.getServerPassword();
-        }
-        if (passphrase == "") {
-            $(".multi-out").find(".error_message").html("Passphrase is empty!").show();
-            return;
-        }
-
-        var fee = parseFloat($("#multi_out_fee").val(), 10);
-        if (isNaN(fee)) {
-            $(".multi-out").find(".error_message").html("Fee is not specified!").show();
-            return;
-        }
-
-        if ($(".same_out_checkbox").is(":checked")) {
-            var amount = $("#multi-out-same-amount").val();
-            if (isNaN(amount) || amount <= 0) {
-                $(".multi-out").find(".error_message").html("Wrong amount!").show();
-                return;
-            }
-            $(".multi-out-same-recipients .multi-out-recipient").each(function() {
-                recipients.push($(this).val());
-            });
-            // verify recipients
-            var ids = [];
-            for (var i = 0; i < recipients.length; i++) {
-                var address = new NxtAddress();
-                address.set(recipients[i]);
-                if (!address.ok()) {
-                    $(".multi-out").find(".error_message").html("Wrong addresses. Please verify!").show();
-                    return;
-                }
-                var id = address.account_id();
-                ids.push(id);
-            }
-            // duplicate ids?
-            if ((new Set(ids)).size !== ids.length) {
-                $(".multi-out").find(".error_message").html("Duplicate recipients not allowed!").show();
-                return;
-            }
-            BRS.sendMultiOutSame(ids, amount, fee, passphrase);
+        if ($("#send_money_same_out_checkbox").is(":checked")) {
+            BRS.evMultiOutSameAmountChange()
         } else {
-            var amounts = [];
-            $(".multi-out-recipients .multi-out-amount").each(function() {
-                var amount = $(this).val();
-                if (isNaN(amount) || amount <= 0) {
-                    $(".multi-out").find(".error_message").html("Wrong amount!").show();
-                    return;
-                }
-                amounts.push(amount);
-            });
-            $(".multi-out-recipients .multi-out-recipient").each(function() {
-                recipients.push($(this).val());
-            });
-
-            if (recipients.length != amounts.length) {
-                $(".multi-out").find(".error_message").html("Amount count does not match recipient count").show();
-                return;
-            }
-            // verify recipients
-            var ids = [];
-            for (var i = 0; i < recipients.length; i++) {
-                var address = new NxtAddress();
-                address.set(recipients[i]);
-                if (!address.ok()) {
-                    $(".multi-out").find(".error_message").html("Wrong addresses. Please verify!").show();
-                    return;
-                }
-                var id = address.account_id();
-                ids.push(id);
-            }
-            // duplicate ids?
-            if ((new Set(ids)).size !== ids.length) {
-                $(".multi-out").find(".error_message").html("Duplicate recipients not allowed!").show();
-                return;
-            }
-            BRS.sendMultiOut(ids, amounts, fee, passphrase);
+            BRS.evMultiOutAmountChange()
         }
     };
 
@@ -333,38 +173,40 @@ var BRS = (function(BRS, $, undefined) {
         $(this).find(".form-group").css("margin-bottom", "");
     };
 
-    //Reset form to initial state when modal is closed
-    BRS.evModalOnHiddenBsModal = function(e) {
-        // multi-out reset
-        multi_out_recipients = 2;
-        multi_out_same_recipients = 2;
-        // remove recipients
-        $(".multi-out-recipients").empty();
-        $(".multi-out-same-recipients").empty();
-        // add default recipients
-        $(".multi-out").hide();
-        $(".multi-out-same").hide();
-        $(".multi-out-ordinary").fadeIn();
-        $(".multi-out-recipients").append($("#additional_multi_out_recipient").html());
-        $(".multi-out-recipients").append($("#additional_multi_out_recipient").html());
-        $(".multi-out-same-recipients").append($("#additional_multi_out_same_recipient").html());
-        $(".multi-out-same-recipients").append($("#additional_multi_out_same_recipient").html());
-        $(".multi-out .remove_recipient").each(function() {
+    BRS.resetModalMultiOut = function () {
+        $("#multi_out_recipients").empty();
+        $("#multi_out_same_recipients").empty();
+        $("#multi_out_same_recipients").hide();
+        $("#row_multi_out_same_amount").hide();
+        $("#multi_out_recipients").fadeIn();
+        $("#multi_out_recipients").append($("#additional_multi_out_recipient").html());
+        $("#multi_out_recipients").append($("#additional_multi_out_recipient").html());
+        $("#multi_out_same_recipients").append($("#additional_multi_out_same_recipient").html());
+        $("#multi_out_same_recipients").append($("#additional_multi_out_same_recipient").html());
+        $("#multi_out_same_recipients input[name=recipient_multi_out_same]").off('blur').on('blur', BRS.evMultiOutSameAmountChange);
+        $('#multi_out_recipients input[name=recipient_multi_out]').off('blur').on('blur', BRS.evMultiOutAmountChange);
+        $('#multi_out_recipients input[name=amount_multi_out]').off('blur').on('blur', BRS.evMultiOutAmountChange);
+        $("span.recipient_selector").on("click", "button", BRS.evSpanRecipientSelectorClickButton);
+        $("span.recipient_selector").on("click", "ul li a", BRS.evSpanRecipientSelectorClickUlLiA);        
+        $("#send_multi_out .remove_recipient").each(function() {
             $(this).remove();
         });
-        // uncheck same out
-        $(".same_out_checkbox").prop('checked', false);
-        // reset fee and amount
-        $("#multi_out_fee").val((1).toFixed(8));
-        $("#multi-out-same-amount").val('');
-        // show ordinary
-        $(".ordinary").fadeIn();
+        $("#send_money_same_out_checkbox").prop('checked', false);
+        $("#multi_out_fee").val(0.02);
+        $("#multi_out_same_amount").val('');
+        $("#send_ordinary").fadeIn();
+        $("#send_multi_out").hide();
         if (!$(".ordinary-nav").hasClass("active")) {
             $(".ordinary-nav").addClass("active");
         }
         if ($(".multi-out-nav").toggleClass("active")) {
             $(".multi-out-nav").removeClass("active");
         }
+    }
+
+    //Reset form to initial state when modal is closed
+    BRS.evModalOnHiddenBsModal = function(e) {
+        BRS.resetModalMultiOut();
 
         // Multi-transfers
         $(".multi-transfer").hide();

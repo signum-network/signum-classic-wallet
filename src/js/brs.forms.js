@@ -579,52 +579,5 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
-    BRS.sendMultiOut = function(recipients, amounts, fee, passphrase) {
-        var multiOutString = "";
-        for (var i = 0; i < recipients.length; i++) {
-            multiOutString += recipients[i] + ":" + BRS.convertToNQT(amounts[i]) + ";";
-        }
-        multiOutString = multiOutString.substring(0, multiOutString.length - 1);
-
-        var data = {
-            secretPhrase: passphrase,
-            recipients: multiOutString,
-            feeNQT: BRS.convertToNQT(fee),
-            deadline: "1440",
-        };
-
-        BRS.sendRequest("sendMoneyMulti", data, function(response) {
-            if (response.errorCode) {
-                $(".multi-out").find(".error_message").html(response.errorDescription.escapeHTML()).show();
-            } else {
-                $(".modal").modal("hide");
-            }
-        });
-    };
-
-    BRS.sendMultiOutSame = function(recipients, amount, fee,  passphrase) {
-        var multiOutString = "";
-        for (var i = 0; i < recipients.length; i++) {
-            multiOutString += recipients[i] + ";";
-        }
-        multiOutString = multiOutString.substring(0, multiOutString.length - 1);
-
-        var data = {
-            secretPhrase: passphrase,
-            recipients: multiOutString,
-            amountNQT: BRS.convertToNQT(amount),
-            feeNQT: BRS.convertToNQT(fee),
-            deadline: "1440",
-        };
-
-        BRS.sendRequest("sendMoneyMultiSame", data, function(response) {
-            if (response.errorCode) {
-                $(".multi-out").find(".error_message").html(response.errorDescription.escapeHTML()).show();
-            } else {
-                $(".modal").modal("hide");
-            }
-        });
-    };
-
     return BRS;
 }(BRS || {}, jQuery));
