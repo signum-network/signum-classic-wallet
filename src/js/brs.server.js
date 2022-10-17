@@ -51,6 +51,61 @@ var BRS = (function(BRS, $, undefined) {
         });
     };
 
+    function convertNxtToNqt (data) {
+        //convert NXT to NQT...
+        let field;
+        try {
+            const nxtFields = ["feeNXT", "amountNXT", "priceNXT", "refundNXT", "discountNXT", "minActivationAmountNXT"];
+            for (let i = 0; i < nxtFields.length; i++) {
+                const nxtField = nxtFields[i];
+                field = nxtField.replace("NXT", "");
+                if (nxtField in data) {
+                    data[field + "NQT"] = BRS.convertToNQT(data[nxtField]);
+                    delete data[nxtField];
+                }
+            }
+            return { data }
+        } catch (err) {
+            return {
+                "errorDescription": err + " (Field: " + field + ")"
+            }
+        }
+    }
+
+    function addUnconfirmedProperty(response, requestType) {
+        if (!response || response.errorCode) {
+            return response
+        }
+        switch (requestType) {
+        case "getTransaction":
+            if (response.block === undefined) {
+                response.unconfirmed = true;
+                break
+            }
+            response.unconfirmed = false;
+            break;
+        case "getUnconfirmedTransactions":
+            if (response.unconfirmedTransactions) {
+                response.unconfirmedTransactions.forEach(transaction => transaction.unconfirmed = true)
+            }
+            break;
+        case "getAccountTransactions":
+            if (response.transactions) {
+                response.transactions.forEach(trans => {
+                    if (trans.block === undefined) {
+                        trans.unconfirmed = true;
+                    } else {
+                        trans.unconfirmed = false;
+                    }
+                })
+            }
+            break
+        default:
+            response.unconfirmed = false
+        }
+        return response
+    }
+
     BRS.sendRequest = function(requestType, data, callback, async) {
         if (requestType === undefined) {
             return;
@@ -72,29 +127,17 @@ var BRS = (function(BRS, $, undefined) {
             }
         });
 
-        //convert NXT to NQT...
-        try {
-            var nxtFields = ["feeNXT", "amountNXT", "priceNXT", "refundNXT", "discountNXT", "minActivationAmountNXT"];
-
-            for (var i = 0; i < nxtFields.length; i++) {
-                var nxtField = nxtFields[i];
-                var field = nxtField.replace("NXT", "");
-
-                if (nxtField in data) {
-                    data[field + "NQT"] = BRS.convertToNQT(data[nxtField]);
-                    delete data[nxtField];
-                }
-            }
-        } catch (err) {
+        const retObj = convertNxtToNqt (data)
+        if (retObj.errorDescription !== undefined) {
             if (callback) {
                 callback({
                     "errorCode": 1,
-                    "errorDescription": err + " (Field: " + field + ")"
+                    "errorDescription": retObj.errorDescription
                 });
             }
-
             return;
         }
+        data = retObj.data
 
         if (!data.recipientPublicKey) {
             delete data.recipientPublicKey;
@@ -136,20 +179,17 @@ var BRS = (function(BRS, $, undefined) {
                     });
                 }
                 return;
-            } else {
-                //ok, accountId matches..continue with the real request.
-                BRS.processAjaxRequest(requestType, data, callback, async);
             }
-        } else {
-            BRS.processAjaxRequest(requestType, data, callback, async);
         }
+
+        BRS.processAjaxRequest(requestType, data, callback, async);
     };
 
     BRS.processAjaxRequest = function(requestType, data, callback, async) {
         if (!BRS.multiQueue) {
             BRS.multiQueue = $.ajaxMultiQueue(8);
         }
-        var extra;
+        let extra;
         if (data._extra) {
             extra = data._extra;
             delete data._extra;
@@ -157,43 +197,29 @@ var BRS = (function(BRS, $, undefined) {
             extra = null;
         }
 
-        var currentPage = null;
-        var currentSubPage = null;
+        let currentPage = null;
+        let currentSubPage = null;
 
         //means it is a page request, not a global request.. Page requests can be aborted.
         if (requestType.slice(-1) == "+") {
             requestType = requestType.slice(0, -1);
             currentPage = BRS.currentPage;
-        } else {
-            //not really necessary... we can just use the above code..
-            var plusCharacter = requestType.indexOf("+");
-
-            if (plusCharacter > 0) {
-                var subType = requestType.substr(plusCharacter);
-                requestType = requestType.substr(0, plusCharacter);
-                currentPage = BRS.currentPage;
-            }
         }
 
         if (currentPage && BRS.currentSubPage) {
             currentSubPage = BRS.currentSubPage;
         }
 
-        var type = (("secretPhrase" in data) || (data.broadcast == "false") ) ? "POST" : "GET";
-        var url = BRS.server + "/burst?requestType=" + requestType;
+        let type = (("secretPhrase" in data) || (data.broadcast == "false") ) ? "POST" : "GET";
+        const url = BRS.server + "/burst?requestType=" + requestType;
 
         if (type == "GET") {
             // rico666: gives us lots (thousands) of connection refused messages in the UI
             // has been there for ages, no clear function visible
-            //   if (typeof data == "string") {
-            //	data += "&random=" + Math.random();
-            //    }
-            //    else {
             data._ = $.now();
-            //    }
         }
 
-        var secretPhrase = "";
+        let secretPhrase = "";
 
         //unknown account..
         if (type == "POST" && (BRS.accountInfo.errorCode && BRS.accountInfo.errorCode == 5)) {
@@ -205,10 +231,7 @@ var BRS = (function(BRS, $, undefined) {
             } else {
                 $.notify($.t("error_new_account"), {
                     type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
+                    offset: { x: 5, y: 60 }                
                 });
             }
             return;
@@ -216,20 +239,18 @@ var BRS = (function(BRS, $, undefined) {
 
         if (data.referencedTransactionFullHash) {
             if (!/^[a-z0-9]{64}$/.test(data.referencedTransactionFullHash)) {
+                const errorMessage = $.t("error_invalid_referenced_transaction_hash")
                 if (callback) {
                     callback({
                         "errorCode": -1,
-                        "errorDescription": $.t("error_invalid_referenced_transaction_hash")
+                        "errorDescription": errorMessage
                     }, data);
-                } else {
-                    $.notify($.t("error_invalid_referenced_transaction_hash"), {
-                        type: 'danger',
-                        offset: {
-                            x: 5,
-                            y: 60
-                            }
-                    });
+                    return
                 }
+                $.notify(errorMessage, {
+                    type: 'danger',
+                    offset: { x: 5, y: 60 }
+                });
                 return;
             }
         }
@@ -240,7 +261,6 @@ var BRS = (function(BRS, $, undefined) {
             } else {
                 secretPhrase = data.secretPhrase;
             }
-
             delete data.secretPhrase;
 
             if (BRS.accountInfo && BRS.accountInfo.publicKey) {
@@ -253,224 +273,147 @@ var BRS = (function(BRS, $, undefined) {
 
         $.support.cors = true;
 
+        let ajaxCall = $.ajax;
         if (type == "GET") {
-            var ajaxCall = BRS.multiQueue.queue;
-        } else {
-            var ajaxCall = $.ajax;
-        }
-
-        // the recipient param is used to do some message encryption ... so I can not remove it as I thought first
-        requestTypeWithNonWalletCompatibleRecipientParam = ["dgsPurchase", "dgsRefund", "dgsDelivery", "dgsFeedback", "buyAlias"];
-        if ( requestTypeWithNonWalletCompatibleRecipientParam.indexOf(requestType) + 1 ) {
-            delete data.recipient;
-        }
-
-        //workaround for 1 specific case.. ugly
-        if (data.querystring) {
-            data = data.querystring;
-            type = "POST";
+            ajaxCall = BRS.multiQueue.queue;
         }
 
         if (requestType == "broadcastTransaction") {
             type = "POST";
         }
+
         async = (async === undefined ? true : async);
         if (async === false && type == "GET") {
             url += "&" + $.param(data);
-            var client = new XMLHttpRequest();
+            const client = new XMLHttpRequest();
             client.open("GET", url, false);
             client.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
             client.data = data;
             client.send();
-            var response = JSON.parse(client.responseText);
+            let response = JSON.parse(client.responseText);
+            response = addUnconfirmedProperty(response, requestType)
             callback(response, data);
-        } else {
-            ajaxCall({
-                url: url,
-                crossDomain: true,
-                dataType: "json",
-                type: type,
-                timeout: 30000,
-                async: true,
-                currentPage: currentPage,
-                currentSubPage: currentSubPage,
-                shouldRetry: (type == "GET" ? 2 : undefined),
-                data: data
-            }).done(function(response, status, xhr) {
-                if (BRS.console) {
-                    BRS.addToConsole(this.url, this.type, this.data, response);
-                }
+            return
+        }
+        ajaxCall({
+            url: url,
+            crossDomain: true,
+            dataType: "json",
+            type: type,
+            timeout: 30000,
+            async: true,
+            currentPage: currentPage,
+            currentSubPage: currentSubPage,
+            shouldRetry: (type == "GET" ? 2 : undefined),
+            data: data
+        }).done(function(response, status, xhr) {
+            if (BRS.console) {
+                BRS.addToConsole(this.url, this.type, this.data, response);
+            }
 
-                response.unconfirmed = false;
-                switch (requestType) {
-                case "getTransaction":
-                    if (!response.errorCode) {
-                        if (response.block === undefined) {
-                            response.unconfirmed = true;
-                        } else {
-                            response.unconfirmed = false;
-                        }
-                    }
-                    break;
-                case "getUnconfirmedTransactions":
-                    if (response.unconfirmedTransactions) {
+            response = addUnconfirmedProperty(response, requestType)
 
-                        response.unconfirmedTransactions.forEach(transaction => transaction.unconfirmed = true)
-                    }
-                    break;
-                case "getAccountTransactions":
-                    if (response.transactions) {
-                        response.transactions.forEach(trans => {
-                            if (trans.block === undefined) {
-                                trans.unconfirmed = true;
-                            } else {
-                                trans.unconfirmed = false;
-                            }
-                        })
-                    }
-                }
-
-                if (typeof data == "object" && "recipient" in data) {
-                  var address = new NxtAddress();
-                    if (/^BURST\-/i.test(data.recipient)) {
-                        data.recipientRS = data.recipient;
-
-                        if (address.set(data.recipient)) {
-                            data.recipient = address.account_id();
-                        }
+            if (secretPhrase && response.unsignedTransactionBytes && !response.errorCode && !response.error) {
+                const publicKey = BRS.generatePublicKey(secretPhrase);
+                const signature = BRS.signBytes(response.unsignedTransactionBytes, converters.stringToHexString(secretPhrase));
+                if (!BRS.verifyBytes(signature, response.unsignedTransactionBytes, publicKey)) {
+                    const errorMessage = $.t("error_signature_verification_client")
+                    if (callback) {
+                        callback({
+                            "errorCode": 1,
+                            "errorDescription": errorMessage
+                        }, data);
                     } else {
-
-                        if (address.set(data.recipient)) {
-                            data.recipientRS = address.toString();
-                        }
-                    }
-                }
-
-                if (secretPhrase && response.unsignedTransactionBytes && !response.errorCode && !response.error) {
-                    var publicKey = BRS.generatePublicKey(secretPhrase);
-                    var signature = BRS.signBytes(response.unsignedTransactionBytes, converters.stringToHexString(secretPhrase));
-
-                    if (!BRS.verifyBytes(signature, response.unsignedTransactionBytes, publicKey)) {
-                        if (callback) {
-                            callback({
-                                "errorCode": 1,
-                                "errorDescription": $.t("error_signature_verification_client")
-                            }, data);
-                        } else {
-                            $.notify($.t("error_signature_verification_client"), {
-                                type: 'danger',
-                                offset: {
-                                    x: 5,
-                                    y: 60
-                                    }
-                            });
-                        }
-                        return;
-                    } else {
-                        const payload = BRS.verifyAndSignTransactionBytes(response.unsignedTransactionBytes, signature, requestType, data);
-
-                        if (payload.length === 0) {
-                            if (callback) {
-                                callback({
-                                    "errorCode": 1,
-                                    "errorDescription": $.t("error_signature_verification_server")
-                                }, data);
-                            } else {
-                                $.notify($.t("error_signature_verification_server"), {
-                                    type: 'danger',
-                                    offset: {
-                                        x: 5,
-                                        y: 60
-                                        }
-                                });
-                            }
-                            return;
-                        } else {
-                            if (data.broadcast == "false") {
-                                response.transactionBytes = payload;
-                                BRS.showRawTransactionModal(response);
-                            } else {
-                                if (callback) {
-                                    if (extra) {
-                                        data._extra = extra;
-                                    }
-
-                                    BRS.broadcastTransactionBytes(payload, callback, response, data);
-                                } else {
-                                    BRS.broadcastTransactionBytes(payload, null, response, data);
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    if (response.errorCode || response.errorDescription || response.errorMessage || response.error) {
-                        response.errorDescription = BRS.translateServerError(response);
-                        delete response.fullHash;
-                        if (!response.errorCode) {
-                            response.errorCode = -1;
-                        }
-                    }
-
-                    /*
-		  if (response.errorCode && !response.errorDescription) {
-		  response.errorDescription = (response.errorMessage ? response.errorMessage : $.t("error_unknown"));
-		  }
-                  else if (response.error && !response.errorDescription) {
-		  response.errorDescription = (typeof response.error == "string" ? response.error : $.t("error_unknown"));
-		  if (!response.errorCode) {
-		  response.errorCode = 1;
-		  }
-		  }
-		*/
-
-                    if (response.broadcasted === false) {
-                        BRS.showRawTransactionModal(response);
-                    } else {
-                        if (callback) {
-                            if (extra) {
-                                data._extra = extra;
-                            }
-                            callback(response, data);
-                        }
-                        if (data.referencedTransactionFullHash && !response.errorCode) {
-                            $.notify($.t("info_referenced_transaction_hash"), {
-                                type: 'info',
-                                offset: {
-                                       x: 5,
-                                       y: 60
-                                        }
-                            });
-                        }
-                    }
-                }
-            }).fail(function(xhr, textStatus, error) {
-                if (BRS.console) {
-                    BRS.addToConsole(this.url, this.type, this.data, error, true);
-                }
-
-                if ((error == "error" || textStatus == "error") && (xhr.status == 404 || xhr.status === 0)) {
-                    if (type == "POST") {
-                        $.notify($.t("error_server_connect"), {
+                        $.notify(errorMessage, {
                             type: 'danger',
-                            offset: 10
+                            offset: { x: 5, y: 60 }
                         });
                     }
-                }
-
-                if (error == "abort") {
                     return;
-                } else if (callback) {
-                    if (error == "timeout") {
-                        error = $.t("error_request_timeout");
-                    }
-                    callback({
-                        "errorCode": -1,
-                        "errorDescription": error
-                    }, {});
                 }
-            });
-        }
+                const payload = BRS.verifyAndSignTransactionBytes(response.unsignedTransactionBytes, signature, requestType, data);
+                if (payload.length === 0) {
+                    const errorMessage = $.t("error_signature_verification_server")
+                    if (callback) {
+                        callback({
+                            "errorCode": 1,
+                            "errorDescription": errorMessage
+                        }, data);
+                    } else {
+                        $.notify(errorMessage, {
+                            type: 'danger',
+                            offset: { x: 5, y: 60 }
+                        });
+                    }
+                    return;
+                }
+                if (data.broadcast == "false") {
+                    response.transactionBytes = payload;
+                    BRS.showRawTransactionModal(response);
+                    return;
+                }
+                if (callback) {
+                    if (extra) {
+                        data._extra = extra;
+                    }
+                    BRS.broadcastTransactionBytes(payload, callback, response, data);
+                } else {
+                    BRS.broadcastTransactionBytes(payload, null, response, data);
+                }
+                return
+            }
+            // Request sucessfull but there was an error in response.
+            if (response.errorCode || response.errorDescription || response.errorMessage || response.error) {
+                response.errorDescription = BRS.translateServerError(response);
+                delete response.fullHash;
+                if (!response.errorCode) {
+                    response.errorCode = -1;
+                }
+            }
+            if (response.broadcasted === false) {
+                BRS.showRawTransactionModal(response);
+            } else {
+                if (callback) {
+                    if (extra) {
+                        data._extra = extra;
+                    }
+                    callback(response, data);
+                }
+                if (data.referencedTransactionFullHash && !response.errorCode) {
+                    $.notify($.t("info_referenced_transaction_hash"), {
+                        type: 'info',
+                        offset: { x: 5, y: 60 }
+                    });
+                }
+            }
+        }).fail(function(xhr, textStatus, error) {
+            if (BRS.console) {
+                BRS.addToConsole(this.url, this.type, this.data, error, true);
+            }
+
+            if ((error == "error" || textStatus == "error") && (xhr.status == 404 || xhr.status === 0)) {
+                if (type == "POST") {
+                    $.notify($.t("error_server_connect"), {
+                        type: 'danger',
+                        offset: 10
+                    });
+                }
+            }
+
+            if (error == "abort") {
+                return;
+            } else if (callback) {
+                if (error == "timeout") {
+                    error = $.t("error_request_timeout");
+                }
+                callback({
+                    "errorCode": -1,
+                    "errorDescription": error
+                }, {});
+            }
+        });
     };
+
     BRS.verifyAndSignTransactionBytes = function(transactionBytes, signature, requestType, data) {
         // this will be the reconstructed base transaction
         const transaction = {};
