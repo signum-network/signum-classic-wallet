@@ -1192,8 +1192,8 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
-    BRS.forms.issueAsset = function($modal) {
-        var data = BRS.getFormData($modal.find("form:first"));
+    BRS.forms.issueAsset = function($form) {
+        const data = BRS.getFormData($form);
 
         data.description = $.trim(data.description);
 
@@ -1222,7 +1222,7 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
-    BRS.forms.assetExchangeChangeGroupName = function($modal) {
+    BRS.forms.assetExchangeChangeGroupName = function() {
         var oldGroupName = $("#asset_exchange_change_group_name_old").val();
         var newGroupName = $("#asset_exchange_change_group_name_new").val();
 
@@ -1332,7 +1332,7 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
-    BRS.forms.assetExchangeGroup = function($modal) {
+    BRS.forms.assetExchangeGroup = function() {
         const assetId = $("#asset_exchange_group_asset").val();
         let groupName = $("#asset_exchange_group_group").val();
 
@@ -1711,8 +1711,8 @@ var BRS = (function(BRS, $, undefined) {
         };
     };
 
-    BRS.forms.transferAsset = function($modal) {
-        var data = BRS.getFormData($modal.find("form:first"));
+    BRS.forms.transferAsset = function($form) {
+        const data = BRS.getFormData($form);
 
         if (!data.quantity) {
             return {
@@ -2008,16 +2008,13 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
-    BRS.forms.cancelOrder = function($modal) {
-        var data = BRS.getFormData($modal.find("form:first"));
-
-        var requestType = data.cancel_order_type;
-
+    BRS.forms.cancelOrder = function($form) {
+        const data = BRS.getFormData($form);
+        const requestType = data.cancel_order_type;
         delete data.cancel_order_type;
-
         return {
-            "data": data,
-            "requestType": requestType
+            data,
+            requestType
         };
     };
 

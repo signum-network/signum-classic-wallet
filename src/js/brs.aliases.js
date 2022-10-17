@@ -392,11 +392,11 @@ BRS = (function (BRS, $, undefined) {
         }
     };
 
-    BRS.forms.sellAlias = function ($modal) {
-        var data = BRS.getFormData($modal.find("form:first"));
+    BRS.forms.sellAlias = function ($form) {
+        const data = BRS.getFormData($form);
 
-        var successMessage = "";
-        var errorMessage = "";
+        let successMessage = "";
+        let errorMessage = "";
 
         if (data.modal === "cancel_alias_sale") {
             data.priceNXT = "0";
@@ -636,15 +636,15 @@ BRS = (function (BRS, $, undefined) {
         }
     };
 
-    BRS.forms.setAlias = function ($modal) {
-        var data = BRS.getFormData($modal.find("form:first"));
+    BRS.forms.setAlias = function ($form) {
+        const data = BRS.getFormData($form);
 
         data.aliasURI = $.trim(data.aliasURI).toLowerCase();
 
         if (data.type === "account") {
             if (!(/acct:(.*)@burst/.test(data.aliasURI)) && !(/nacc:(.*)/.test(data.aliasURI))) {
-                if (/^(BURST\-)/i.test(data.aliasURI) || /^(S\-)/i.test(data.aliasURI)) {
-                    var address = new NxtAddress();
+                if (BRS.rsRegEx.test(data.aliasURI.toUpperCase())) {
+                    const address = new NxtAddress(BRS.prefix);
 
                     if (!address.set(data.aliasURI)) {
                         return {
@@ -655,7 +655,7 @@ BRS = (function (BRS, $, undefined) {
                         data.aliasURI = "acct:" + data.aliasURI + "@burst";
                     }
                 }
-                else if (/^\d+$/.test(data.aliasURI)) {
+                else if (BRS.idRegEx.test(data.aliasURI)) {
                     data.aliasURI = "acct:" + data.aliasURI + "@burst";
                 }
                 else {

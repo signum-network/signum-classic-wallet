@@ -483,66 +483,58 @@ var BRS = (function(BRS, $, undefined) {
 	}
     };
 
-    BRS.forms.decryptMessages = function($modal) {
-	var data = BRS.getFormData($modal.find("form:first"));
+    BRS.forms.decryptMessages = function($form) {
+        const data = BRS.getFormData($form);
+        let success = false;
+        try {
+            const messagesToDecrypt = [];
+            for (const otherUser in _messages) {
+                for (const key in _messages[otherUser]) {
+                    const message = _messages[otherUser][key];
+                    if (message.attachment && message.attachment.encryptedMessage) {
+                        messagesToDecrypt.push(message);
+                    }
+                }
+            }
 
-	var success = false;
+            const unconfirmedMessages = BRS.getUnconfirmedTransactionsFromCache(1, 0);
+            if (unconfirmedMessages) {
+                for (const unconfirmedMessage of unconfirmedMessages) {
+                    if (unconfirmedMessage.attachment && unconfirmedMessage.attachment.encryptedMessage) {
+                        messagesToDecrypt.push(unconfirmedMessage);
+                    }
+                }
+            }
 
-	try {
-	    var messagesToDecrypt = [];
+            success = BRS.decryptAllMessages(messagesToDecrypt, data.secretPhrase);
+        } catch (err) {
+            if (err.errorCode && err.errorCode <= 2) {
+                return {
+                    "error": err.message.escapeHTML()
+                };
+            } else {
+                return {
+                    "error": $.t("error_messages_decrypt")
+                };
+            }
+        }
 
-	    for (var otherUser in _messages) {
-		for (var key in _messages[otherUser]) {
-		    var message = _messages[otherUser][key];
+        if (data.rememberPassword) {
+            BRS.setDecryptionPassword(data.secretPhrase);
+        }
 
-		    if (message.attachment && message.attachment.encryptedMessage) {
-			messagesToDecrypt.push(message);
-		    }
-		}
-	    }
+        $("#messages_sidebar a.active").trigger("click");
 
-	    var unconfirmedMessages = BRS.getUnconfirmedTransactionsFromCache(1, 0);
-
-	    if (unconfirmedMessages) {
-		for (var i = 0; i < unconfirmedMessages.length; i++) {
-		    var unconfirmedMessage = unconfirmedMessages[i];
-
-		    if (unconfirmedMessage.attachment && unconfirmedMessage.attachment.encryptedMessage) {
-			messagesToDecrypt.push(unconfirmedMessage);
-		    }
-		}
-	    }
-
-	    success = BRS.decryptAllMessages(messagesToDecrypt, data.secretPhrase);
-	} catch (err) {
-	    if (err.errorCode && err.errorCode <= 2) {
-		return {
-		    "error": err.message.escapeHTML()
-		};
-	    }
-            else {
-		return {
-		    "error": $.t("error_messages_decrypt")
-		};
-	    }
-	}
-
-	if (data.rememberPassword) {
-	    BRS.setDecryptionPassword(data.secretPhrase);
-	}
-
-	$("#messages_sidebar a.active").trigger("click");
-
-	if (success) {
-	    $.notify($.t("success_messages_decrypt"), { type: 'success' });
-	}
+        if (success) {
+            $.notify($.t("success_messages_decrypt"), { type: 'success' });
+        }
         else {
-	    $.notify($.t("error_messages_decrypt"), { type: 'danger' });
-	}
+            $.notify($.t("error_messages_decrypt"), { type: 'danger' });
+        }
 
-	return {
-	    "stop": true
-	};
+        return {
+            "stop": true
+        };
     };
 
     return BRS;

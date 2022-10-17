@@ -363,26 +363,25 @@ var BRS = (function(BRS, $, undefined) {
 	});
     };
 
-    BRS.forms.deleteContact = function($modal) {
-	var id = parseInt($("#delete_contact_id").val(), 10);
+    BRS.forms.deleteContact = function() {
+        const id = parseInt($("#delete_contact_id").val(), 10);
+        const accountId = $("#delete_contact_account_id").val()
 
-	BRS.database.delete("contacts", [{
-	    "id": id
-	}], function() {
-	    delete BRS.contacts[$("#delete_contact_account_id").val()];
+        BRS.database.delete("contacts", [{
+            "id": id
+        }], function() {
+            delete BRS.contacts[accountId];
+            setTimeout(function() {
+                $.notify($.t("success_contact_delete"), { type: 'success' });
+                if (BRS.currentPage == "contacts") {
+                    BRS.loadPage("contacts");
+                }
+            }, 50);
+        });
 
-	    setTimeout(function() {
-		$.notify($.t("success_contact_delete"), { type: 'success' });
-
-		if (BRS.currentPage == "contacts") {
-		    BRS.loadPage("contacts");
-		}
-	    }, 50);
-	});
-
-	return {
-	    "stop": true
-	};
+        return {
+            "stop": true
+        };
     };
 
     BRS.exportContacts = function() {
