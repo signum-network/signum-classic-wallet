@@ -1117,7 +1117,6 @@ $(document).ready(function() {
         { location: 'body', path: 'html/modals/send_money.html' },
         { location: 'body', path: 'html/modals/commitment.html' },
         { location: 'body', path: 'html/modals/subscription.html' },
-        { location: 'body', path: 'html/modals/token.html' },
         { location: 'body', path: 'html/modals/transaction_info.html' },
         { location: 'body', path: 'html/modals/transaction_operations.html' },
         { location: 'body', path: 'html/modals/user_info.html' },

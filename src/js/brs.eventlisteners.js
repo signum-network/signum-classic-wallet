@@ -658,33 +658,6 @@
             BRS.showSubscriptionCancelModal(subscriptionId);
         });
 
-        // from brs.modals.token.js
-        $("#token_modal").on("show.bs.modal", function(e) {
-            $("#generate_token_output, #decode_token_output").html("").hide();
-            $("#token_modal_generate_token").show();
-            $("#token_modal_button").text($.t("generate")).data("form", "generate_token_form");
-        });
-        $("#token_modal ul.nav li").click(function(e) {
-            e.preventDefault();
-            const tab = $(this).data("tab");
-            $(this).siblings().removeClass("active");
-            $(this).addClass("active");
-            $(".token_modal_content").hide();
-            const content = $("#token_modal_" + tab);
-            if (tab == "generate_token") {
-                $("#token_modal_button").text($.t("generate")).data("form", "generate_token_form");
-            } else {
-                $("#token_modal_button").text($.t("validate")).data("form", "validate_token_form");
-            }
-            $("#token_modal .error_message").hide();
-            content.show();
-        });
-        $("#token_modal").on("hidden.bs.modal", function(e) {
-            $(this).find(".token_modal_content").hide();
-            $(this).find("ul.nav li.active").removeClass("active");
-            $("#generate_token_nav").addClass("active");
-        });
-
         // from brs.modals.transaction.js
         $("#transactions_table, #dashboard_transactions_table, #transfer_history_table, #asset_exchange_trade_history_table").on("click", "a[data-transaction]", function(e) {
             e.preventDefault();

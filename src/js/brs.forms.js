@@ -27,18 +27,12 @@ var BRS = (function(BRS, $, undefined) {
     }
 
     function getErrorMessage(requestType) {
-        var ignore = ["generate_token", "validate_token"];
+        const key = "error_" + requestType;
 
-        if (ignore.indexOf(requestType) !== -1) {
-            return "";
+        if ($.i18n.exists(key)) {
+            return $.t(key);
         } else {
-            var key = "error_" + requestType;
-
-            if ($.i18n.exists(key)) {
-                return $.t(key);
-            } else {
-                return "";
-            }
+            return "";
         }
     }
 
