@@ -131,13 +131,7 @@ var BRS = (function(BRS, $, undefined) {
 			    $.notify($.t("you_received_message", {
 				"account": BRS.getAccountFormatted(trans, "sender"),
 				"name": BRS.getAccountTitle(trans, "sender")
-			    }), {
-				type: 'success',
-                offset: {
-                    x: 5,
-                    y: 60
-                    }
-			    });
+			    }), { type: 'success' });
 			}
 		    }
 		}
@@ -365,26 +359,14 @@ var BRS = (function(BRS, $, undefined) {
 
 	if (!BRS.rememberPassword) {
 	    if ($("#inline_message_password").val() == "") {
-		$.notify($.t("error_passphrase_required"), {
-		    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-		});
+		$.notify($.t("error_passphrase_required"), { type: 'danger' });
 		return;
 	    }
 
 	    var accountId = BRS.getAccountId(data.secretPhrase);
 
 	    if (accountId != BRS.account) {
-		$.notify($.t("error_passphrase_incorrect"), {
-		    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-		});
+		$.notify($.t("error_passphrase_incorrect"), { type: 'danger' });
 		return;
 	    }
 	}
@@ -405,13 +387,7 @@ var BRS = (function(BRS, $, undefined) {
 	    try {
 		data = BRS.addMessageData(data, "sendMessage");
 	    } catch (err) {
-		$.notify(String(err.message).escapeHTMl(), {
-		    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-		});
+		$.notify(String(err.message).escapeHTMl(), { type: 'danger' });
 		return;
 	    }
 	}
@@ -423,22 +399,10 @@ var BRS = (function(BRS, $, undefined) {
 
 	BRS.sendRequest(requestType, data, function(response, input) {
 	    if (response.errorCode) {
-		$.notify(BRS.translateServerError(response).escapeHTML(), {
-		    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-		});
+		$.notify(BRS.translateServerError(response).escapeHTML(), { type: 'danger' });
 	    }
             else if (response.fullHash) {
-		$.notify($.t("success_message_sent"), {
-		    type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-		});
+		$.notify($.t("success_message_sent"), { type: 'success' });
 
 		$("#inline_message_text").val("");
 
@@ -459,13 +423,7 @@ var BRS = (function(BRS, $, undefined) {
 	    }
             else {
 		//TODO
-		$.notify($.t("error_send_message"), {
-		    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-		});
+		$.notify($.t("error_send_message"), { type: 'danger' });
 	    }
 	    $btn.button("reset");
 	});
@@ -475,22 +433,10 @@ var BRS = (function(BRS, $, undefined) {
 	data.message = data._extra.message;
 
 	if (!(data._extra && data._extra.convertedAccount)) {
-	    $.notify($.t("success_message_sent") + " <a href='#' data-account='" + BRS.getAccountFormatted(data, "recipient") + "' data-toggle='modal' data-target='#add_contact_modal' style='text-decoration:underline'>" + $.t("add_recipient_to_contacts_q") + "</a>", {
-		type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-	    });
+	    $.notify($.t("success_message_sent") + " <a href='#' data-account='" + BRS.getAccountFormatted(data, "recipient") + "' data-toggle='modal' data-target='#add_contact_modal' style='text-decoration:underline'>" + $.t("add_recipient_to_contacts_q") + "</a>", { type: 'success' });
 	}
         else {
-	    $.notify($.t("success_message_sent"), {
-		type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-	    });
+	    $.notify($.t("success_message_sent"), { type: 'success' });
 	}
 
 	if (data.message && data.encryptedMessageData) {
@@ -588,22 +534,10 @@ var BRS = (function(BRS, $, undefined) {
 	$("#messages_sidebar a.active").trigger("click");
 
 	if (success) {
-	    $.notify($.t("success_messages_decrypt"), {
-		type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-	    });
+	    $.notify($.t("success_messages_decrypt"), { type: 'success' });
 	}
         else {
-	    $.notify($.t("error_messages_decrypt"), {
-		type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-	    });
+	    $.notify($.t("error_messages_decrypt"), { type: 'danger' });
 	}
 
 	return {

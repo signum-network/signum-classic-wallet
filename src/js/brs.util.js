@@ -841,13 +841,7 @@ var BRS = (function(BRS, $, undefined) {
                     "text": BRS.getClipboardText($(this).data("type"))
                 }, "*");
 
-                $.notify($.t("success_clipboard_copy"), {
-                    type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                $.notify($.t("success_clipboard_copy"), { type: 'success' });
             });
         } else {
             var clipboard = new Clipboard('.copy_link', {
@@ -862,25 +856,13 @@ var BRS = (function(BRS, $, undefined) {
             }
 
             clipboard.on('success', function(e) {
-                $.notify($.t("success_clipboard_copy"), {
-                    type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                $.notify($.t("success_clipboard_copy"), { type: 'success' });
             });
 
             clipboard.on('error', function(e) {
                 $("#asset_id_dropdown .dropdown-menu").remove();
                 $("#asset_id").data("toggle", "");
-                $.notify($.t("error_clipboard_copy"), {
-                    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                $.notify($.t("error_clipboard_copy"), { type: 'danger' });
             });
         }
     };

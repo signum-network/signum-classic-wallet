@@ -159,13 +159,7 @@ var BRS = (function(BRS, $, undefined) {
                     if (BRS.settings.console_log && !BRS.inApp) {
                         $("#show_console").show();
                     }
-                    $.notify($.t("success_blockchain_up_to_date"), {
-                        type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                    });
+                    $.notify($.t("success_blockchain_up_to_date"), { type: 'success' });
                     BRS.checkIfOnAFork();
                 }
                 else {

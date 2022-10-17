@@ -482,13 +482,7 @@ var BRS = (function(BRS, $, undefined) {
                 }
 
                 if (successMessage) {
-                    $.notify(successMessage.escapeHTML(), {
-                        type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                    });
+                    $.notify(successMessage.escapeHTML(), { type: 'success' });
                 }
 
                 formCompleteFunction = BRS.forms[originalRequestType + "Complete"];
@@ -551,13 +545,7 @@ var BRS = (function(BRS, $, undefined) {
                 if (!sentToFunction) {
                     BRS.unlockForm($modal, $btn, true);
 
-                    $.notify(errorMessage.escapeHTML(), {
-                        type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                    });
+                    $.notify(errorMessage.escapeHTML(), { type: 'danger' });
                 }
             }
         });

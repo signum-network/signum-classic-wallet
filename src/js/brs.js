@@ -101,6 +101,7 @@ var BRS = (function(BRS, $, undefined) {
         } catch (err) {
             BRS.hasLocalStorage = false;
         }
+        // Default location for notify message (set once)
         $.notifyDefaults({
             placement:{ from:"bottom", align:"right" },
             offset: 10
@@ -703,13 +704,7 @@ var BRS = (function(BRS, $, undefined) {
             }
             else {
                 if (BRS.accountRS && BRS.accountInfo.accountRS !== BRS.accountRS) {
-                    $.notify("Generated Reed Solomon address different from the one in the blockchain!", {
-                        type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                    });
+                    $.notify("Generated Reed Solomon address different from the one in the blockchain!", { type: 'danger' });
                     BRS.accountRS = BRS.accountInfo.accountRS;
                 }
 
@@ -869,13 +864,7 @@ var BRS = (function(BRS, $, undefined) {
                                 "asset": String(asset.asset).escapeHTML(),
                                 "name": String(asset.name).escapeHTML(),
                                 "count": quantity
-                            }), {
-                                type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                            });
+                            }), { type: 'success' });
                         }
                     }
                     else {
@@ -888,26 +877,14 @@ var BRS = (function(BRS, $, undefined) {
                                 "asset": String(asset.asset).escapeHTML(),
                                 "name": String(asset.name).escapeHTML(),
                                 "count": quantity
-                            }), {
-                                type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                            });
+                            }), { type: 'success' });
                         }
                     }
                 });
             }
         }
         else {
-            $.notify($.t("multiple_assets_differences"), {
-                type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-            });
+            $.notify($.t("multiple_assets_differences"), { type: 'success' });
         }
     };
 
@@ -987,13 +964,7 @@ var BRS = (function(BRS, $, undefined) {
             }
 
             if (onAFork) {
-                $.notify($.t("fork_warning"), {
-                    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                $.notify($.t("fork_warning"), { type: 'danger' });
             }
         }
     };

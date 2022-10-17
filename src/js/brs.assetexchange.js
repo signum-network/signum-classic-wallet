@@ -30,9 +30,7 @@ var BRS = (function(BRS, $, undefined) {
 
     function notifyErrorSaveAsset() {
         $.notify($.t("error_assets_save_db"), {
-            type: 'danger',
-            offset: { x: 5, y: 60 }
-        });
+            type: 'danger' });
     }
 
     BRS.saveCachedAssets = function () {
@@ -267,13 +265,7 @@ var BRS = (function(BRS, $, undefined) {
             BRS.closeModal();
             $.notify($.t("error_asset_already_bookmarked", {
                 "count": submittedAssets.length
-            }), {
-                type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-            });
+            }), { type: 'danger' });
             BRS.goToAsset(submittedAssets[0].asset)
         } else {
             BRS.closeModal();
@@ -286,13 +278,7 @@ var BRS = (function(BRS, $, undefined) {
                 message += " " + $.t("error_assets_save_db");
             }
 
-            $.notify(message, {
-                type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-            });
+            $.notify(message, { type: 'success' });
 
             BRS.goToAsset(newAssets[0].asset)
         }
@@ -666,10 +652,7 @@ var BRS = (function(BRS, $, undefined) {
                     $("#asset_exchange_sidebar a.active").removeClass("active");
                     $("#no_asset_selected").show();
                     $("#asset_details, #no_assets_available, #no_asset_search_results").hide();
-                    $.notify($.t("invalid_asset"), {
-                        type: 'danger',
-                        offset: { x: 5, y: 60 }
-                    });
+                    $.notify($.t("invalid_asset"), { type: 'danger' });
                 }
             });
         }
@@ -998,13 +981,7 @@ var BRS = (function(BRS, $, undefined) {
         } else {
             //do not allow period
             if (charCode == 110 || charCode == 190 || charCode == 188) {
-                $.notify($.t("error_fractions"), {
-                    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                $.notify($.t("error_fractions"), { type: 'danger' });
                 e.preventDefault();
                 return false;
             }
@@ -1031,13 +1008,7 @@ var BRS = (function(BRS, $, undefined) {
                     });
                 }
 
-                $.notify(errorMessage, {
-                    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                $.notify(errorMessage, { type: 'danger' });
 
                 e.preventDefault();
                 return false;
@@ -1051,13 +1022,7 @@ var BRS = (function(BRS, $, undefined) {
         } else {
             //comma
             if (charCode == 188) {
-                $.notify($.t("error_comma_not_allowed"), {
-                    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                $.notify($.t("error_comma_not_allowed"), { type: 'danger' });
             }
             e.preventDefault();
             return false;
@@ -1105,24 +1070,12 @@ var BRS = (function(BRS, $, undefined) {
             feeNQT = new BigInteger(BRS.convertToNQT(String($("#" + orderType + "_asset_fee").val())));
             totalNXT = BRS.formatAmount(BRS.calculateOrderTotalNQT(quantityQNT, priceNQT, BRS.currentAsset.decimals), false, true);
         } catch (err) {
-            $.notify("Invalid input.", {
-                type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-            });
+            $.notify("Invalid input.", { type: 'danger' });
             return e.preventDefault();
         }
 
         if (priceNQT.toString() == "0" || quantityQNT.toString() == "0") {
-            $.notify($.t("error_amount_price_required"), {
-                type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-            });
+            $.notify($.t("error_amount_price_required"), { type: 'danger' });
             return e.preventDefault();
         }
 
@@ -1286,13 +1239,7 @@ var BRS = (function(BRS, $, undefined) {
         }], function() {
             setTimeout(function() {
                 BRS.loadPage("asset_exchange");
-                $.notify($.t("success_group_name_update"), {
-                    type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                $.notify($.t("success_group_name_update"), { type: 'success' });
             }, 50);
         });
 
@@ -1364,10 +1311,7 @@ var BRS = (function(BRS, $, undefined) {
             }], function() {
                 setTimeout(function() {
                     BRS.loadPage("asset_exchange");
-                    $.notify($.t("success_asset_group_removal"), {
-                        type: 'success',
-                        offset: { x: 5, y: 60 }
-                    });
+                    $.notify($.t("success_asset_group_removal"), { type: 'success' });
                 }, 50);
             });
         } else if (option == "remove_from_bookmarks") {
@@ -1382,10 +1326,7 @@ var BRS = (function(BRS, $, undefined) {
             }], function(error, affected) {
                 setTimeout(function() {
                     BRS.loadPage("asset_exchange");
-                    $.notify($.t("success_asset_bookmark_removal"), {
-                        type: 'success',
-                        offset: { x: 5, y: 60 }
-                    });
+                    $.notify($.t("success_asset_bookmark_removal"), { type: 'success' });
                 }, 50);
             });
         }
@@ -1414,15 +1355,9 @@ var BRS = (function(BRS, $, undefined) {
             setTimeout(function() {
                 BRS.loadPage("asset_exchange");
                 if (!groupName) {
-                    $.notify($.t("success_asset_group_removal"), {
-                        type: 'success',
-                        offset: { x: 5, y: 60 }
-                    });
+                    $.notify($.t("success_asset_group_removal"), { type: 'success' });
                 } else {
-                    $.notify($.t("success_asset_group_add"), {
-                        type: 'success',
-                        offset: { x: 5, y: 60 }
-                    });
+                    $.notify($.t("success_asset_group_add"), { type: 'success' });
                 }
             }, 50);
         });
@@ -1857,10 +1792,7 @@ var BRS = (function(BRS, $, undefined) {
                 });
                 return
             }
-            $.notify($.t("error_asset_not_found"), {
-                type: 'danger',
-                offset: { x: 5, y: 60 }
-            });
+            $.notify($.t("error_asset_not_found"), { type: 'danger' });
             BRS.loadAssetExchangeSidebar();
             $("#loading_asset_data").hide();
         });
@@ -2091,21 +2023,9 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.forms.cancelOrderComplete = function(response, data) {
         if (data.requestType == "cancelAskOrder") {
-            $.notify($.t("success_cancel_sell_order"), {
-                type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-            });
+            $.notify($.t("success_cancel_sell_order"), { type: 'success' });
         } else {
-            $.notify($.t("success_cancel_buy_order"), {
-                type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-            });
+            $.notify($.t("success_cancel_buy_order"), { type: 'success' });
         }
 
         if (response.alreadyProcessed) {

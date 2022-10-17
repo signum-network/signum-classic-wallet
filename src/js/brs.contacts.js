@@ -150,10 +150,7 @@ var BRS = (function(BRS, $, undefined) {
             $btn.button("reset");
             $modal.modal("unlock");
             $modal.modal("hide");
-            $.notify($.t("success_contact_add") + " " + $.t("contacts_no_db_warning"), {
-                type: 'warning',
-                offset: { x: 5, y: 60 }
-            });
+            $.notify($.t("success_contact_add") + " " + $.t("contacts_no_db_warning"), { type: 'warning' });
             return;
         } 
         BRS.database.insert("contacts", record, function(error) {
@@ -168,10 +165,7 @@ var BRS = (function(BRS, $, undefined) {
                 $btn.button("reset");
                 $modal.modal("unlock");
                 $modal.modal("hide");
-                $.notify($.t("success_contact_add"), {
-                    type: 'success',
-                    offset: { x: 5, y: 60 }
-                });
+                $.notify($.t("success_contact_add"), { type: 'success' });
                 if (BRS.currentPage == "contacts") {
                     BRS.loadPage("contacts");
                 } else if (BRS.currentPage == "messages" && BRS.selectedContext) {
@@ -335,13 +329,7 @@ var BRS = (function(BRS, $, undefined) {
 			$btn.button("reset");
 			$modal.modal("unlock");
 			$modal.modal("hide");
-			$.notify($.t("success_contact_update"), {
-			    type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-			});
+			$.notify($.t("success_contact_update"), { type: 'success' });
 
 			if (BRS.currentPage == "contacts") {
 			    BRS.loadPage("contacts");
@@ -384,13 +372,7 @@ var BRS = (function(BRS, $, undefined) {
 	    delete BRS.contacts[$("#delete_contact_account_id").val()];
 
 	    setTimeout(function() {
-		$.notify($.t("success_contact_delete"), {
-		    type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-		});
+		$.notify($.t("success_contact_delete"), { type: 'success' });
 
 		if (BRS.currentPage == "contacts") {
 		    BRS.loadPage("contacts");
@@ -432,25 +414,13 @@ var BRS = (function(BRS, $, undefined) {
 	    }], function(error, contacts) {
 		if (contacts && contacts.length) {
 		    if (contacts[0].name == imported_contact.name) {
-			//$modal.find(".error_message").html($.t("error_contact_name_exists")).show();
-			$.notify($.t("error_contact_name_exists"), {
-                    offset: {
-                        x: 5,
-                        y: 60
-			}}).show();
+			$.notify($.t("error_contact_name_exists"), { type: 'danger' });
 			console.log('Error, contact already exists with same name:'+imported_contact.name);
 		    }
                     else {
-			//$modal.find(".error_message").html($.t("error_contact_account_id_exists")).show();
-			$.notify($.t("error_contact_account_id_exists"), {
-                    offset: {
-                        x: 5,
-                        y: 60
-			}}).show();
+			$.notify($.t("error_contact_account_id_exists"), { type: 'danger' });
 			console.log('Error, contact already exists with same account ID:'+imported_contact.account);
 		    }
-		    /*$btn.button("reset");
-		      $modal.modal("unlock");*/
 		}
                 else {
 		    BRS.database.insert("contacts", {
@@ -469,16 +439,7 @@ var BRS = (function(BRS, $, undefined) {
 			};
 
 			setTimeout(function() {
-			    /*$btn.button("reset");
-			      $modal.modal("unlock");
-			      $modal.modal("hide");*/
-			    $.notify($.t("success_contact_add"), {
-				type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-			    });
+			    $.notify($.t("success_contact_add"), { type: 'success' });
 
 			    if (BRS.currentPage == "contacts") {
 				BRS.loadPage("contacts");

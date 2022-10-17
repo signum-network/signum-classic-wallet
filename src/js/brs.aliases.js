@@ -524,33 +524,18 @@ BRS = (function (BRS, $, undefined) {
             if (response.errorCode) {
                 e.preventDefault();
                 $.notify($.t("error_alias_not_found"), {
-                    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                    type: 'danger' });
             }
             else {
                 if (!("priceNQT" in response)) {
                     e.preventDefault();
                     $.notify($.t("error_alias_not_for_sale"), {
-                        type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                    });
+                        type: 'danger' });
                 }
                 else if (typeof response.buyer !== "undefined" && response.buyer !== BRS.account) {
                     e.preventDefault();
                     $.notify($.t("error_alias_sale_different_account"), {
-                        type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                    });
+                        type: 'danger' });
                 }
                 else {
                     $modal.find("input[name=recipient]").val(String(response.accountRS).escapeHTML());
@@ -601,12 +586,7 @@ BRS = (function (BRS, $, undefined) {
                 if (response.errorCode) {
                     e.preventDefault();
                     $.notify($.t("error_alias_not_found"), {
-                        type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                    });
+                        type: 'danger' });
                     BRS.fetchingModalData = false;
                 }
                 else {
@@ -847,12 +827,7 @@ BRS = (function (BRS, $, undefined) {
                 }
 
                 $.notify($.t("success_alias_update"), {
-                    type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                    type: 'success' });
             }
             else {
                 var $rows = $table.find("tr");
@@ -884,12 +859,7 @@ BRS = (function (BRS, $, undefined) {
                 }
 
                 $.notify($.t("success_alias_register"), {
-                    type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                    type: 'success' });
             }
         }
     };
@@ -913,12 +883,7 @@ BRS = (function (BRS, $, undefined) {
                     + " <a href='#' data-toggle='modal' data-target='#register_alias_modal' data-prefill-alias='"
                     + String(alias).escapeHTML() + "'>"
                     + $.t("register_q") + "</a>", {
-                    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                    type: 'danger' });
                 BRS.fetchingModalData = false;
                 return
             }

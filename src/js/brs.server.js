@@ -229,10 +229,7 @@ var BRS = (function(BRS, $, undefined) {
                     "errorDescription": $.t("error_new_account")
                 }, data);
             } else {
-                $.notify($.t("error_new_account"), {
-                    type: 'danger',
-                    offset: { x: 5, y: 60 }                
-                });
+                $.notify($.t("error_new_account"), { type: 'danger' });
             }
             return;
         }
@@ -247,10 +244,7 @@ var BRS = (function(BRS, $, undefined) {
                     }, data);
                     return
                 }
-                $.notify(errorMessage, {
-                    type: 'danger',
-                    offset: { x: 5, y: 60 }
-                });
+                $.notify(errorMessage, { type: 'danger' });
                 return;
             }
         }
@@ -324,10 +318,7 @@ var BRS = (function(BRS, $, undefined) {
                             "errorDescription": errorMessage
                         }, data);
                     } else {
-                        $.notify(errorMessage, {
-                            type: 'danger',
-                            offset: { x: 5, y: 60 }
-                        });
+                        $.notify(errorMessage, { type: 'danger' });
                     }
                     return;
                 }
@@ -340,10 +331,7 @@ var BRS = (function(BRS, $, undefined) {
                             "errorDescription": errorMessage
                         }, data);
                     } else {
-                        $.notify(errorMessage, {
-                            type: 'danger',
-                            offset: { x: 5, y: 60 }
-                        });
+                        $.notify(errorMessage, { type: 'danger' });
                     }
                     return;
                 }
@@ -380,10 +368,7 @@ var BRS = (function(BRS, $, undefined) {
                     callback(response, data);
                 }
                 if (data.referencedTransactionFullHash && !response.errorCode) {
-                    $.notify($.t("info_referenced_transaction_hash"), {
-                        type: 'info',
-                        offset: { x: 5, y: 60 }
-                    });
+                    $.notify($.t("info_referenced_transaction_hash"), { type: 'info' });
                 }
             }
         }).fail(function(xhr, textStatus, error) {
@@ -393,10 +378,7 @@ var BRS = (function(BRS, $, undefined) {
 
             if ((error == "error" || textStatus == "error") && (xhr.status == 404 || xhr.status === 0)) {
                 if (type == "POST") {
-                    $.notify($.t("error_server_connect"), {
-                        type: 'danger',
-                        offset: 10
-                    });
+                    $.notify($.t("error_server_connect"), { type: 'danger' });
                 }
             }
 
@@ -954,13 +936,7 @@ var BRS = (function(BRS, $, undefined) {
                     originalResponse.fullHash = response.fullHash;
                     callback(originalResponse, originalData);
                     if (originalData.referencedTransactionFullHash) {
-                        $.notify($.t("info_referenced_transaction_hash"), {
-                            type: 'info',
-                            offset: {
-                                   x: 5,
-                                   y: 60
-                                    }
-                        });
+                        $.notify($.t("info_referenced_transaction_hash"), { type: 'info' });
                     }
                 }
             }
