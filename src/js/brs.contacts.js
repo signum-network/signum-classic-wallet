@@ -68,33 +68,46 @@ var BRS = (function(BRS, $, undefined) {
 	});
     };
 
-    BRS.forms.addContact = function($modal) {
-        const data = BRS.getFormData($modal.find("form:first"));
-        data.account_id = String(data.account_id);
+    function validateContactData(data) {
         if (!data.name) {
-            return {
-                "error": $.t("error_contact_name_required")
-            };
+            return $.t("error_contact_name_required")
         }
         if (!data.account_id) {
-            return {
-                "error": $.t("error_account_id_required")
-            };
+            return $.t("error_account_id_required")
         }
         if (BRS.idRegEx.test(data.name) || BRS.rsRegEx.test(data.name)) {
-            return {
-                "error": $.t("error_contact_name_alpha")
-            };
+            return $.t("error_contact_name_alpha")
         }
         if (data.email && !/@/.test(data.email)) {
-            return {
-                "error": $.t("error_email_address")
-            };
+            return $.t("error_email_address")
+        }
+        return ""
+    }
+
+    function notifyContactOperationSuccess (message) {
+        $.notify(message, { type: 'success' });
+        if (BRS.currentPage == "contacts") {
+            BRS.loadPage("contacts");
+            return
+        }
+        if (BRS.currentPage == "messages" && BRS.selectedContext) {
+            const heading = BRS.selectedContext.find("h4.list-group-item-heading");
+            if (heading.length) {
+                heading.html(data.name.escapeHTML());
+            }
+        }
+    }
+
+    BRS.forms.addContact = function($form) {
+        const data = BRS.getFormData($form, true);
+        data.account_id = String(data.account_id);
+        const error = validateContactData(data);
+        if (error.length) {
+            return { error }
         }
         if (data.account_id.charAt(0) == '@') {
-            const convertedAccountId = $modal.find("input[name=converted_account_id]").val();
-            if (convertedAccountId) {
-                data.account_id = convertedAccountId;
+            if (data.converted_account_id) {
+                data.account_id = data.converted_account_id;
             } else {
                 return {
                     "error": $.t("error_account_id")
@@ -110,72 +123,40 @@ var BRS = (function(BRS, $, undefined) {
                 "error": $.t("error_account_id")
             };
         }
-        BRS.sendRequest("getAccount", {
-            "account": data.account_id
-        }, function(response) {
-            if (!response.errorCode) {
-                if (response.account != data.account || response.accountRS != data.account_rs) {
-                    return {
-                        "error": $.t("error_account_id")
-                    };
-                }
-            }
-        }, false);
-        const $btn = $modal.find("button.btn-primary:not([data-dismiss=modal], .ignore)");
         for (const Contact in BRS.contacts) {
             if (BRS.contacts[Contact].account === data.account_id) {
-                $modal.find(".error_message").html($.t("error_contact_account_id_exists")).show();
-                $btn.button("reset");
-                $modal.modal("unlock");
-                return;
+                return { 'error': $.t("error_contact_account_id_exists") }
             }
             if (BRS.contacts[Contact].name == data.name) {
-                $modal.find(".error_message").html($.t("error_contact_name_exists")).show();
-                $btn.button("reset");
-                $modal.modal("unlock");
-                return;
+                return { 'error': $.t("error_contact_name_exists") }
             }
         }
 
-        // It is OK to insert into database!
+        BRS.addContactToDatabase(data)
+
+        return { "stop": true}
+    }
+
+    BRS.addContactToDatabase = function (data) {
+        // Just insertion, no validation
         const record = {
             name: data.name,
             email: data.email,
-            account: data.account_id,
+            account: data.account,
             accountRS: data.account_rs,
             description: data.description
         }
+        BRS.contacts[data.account_rs] = record;
         if (!BRS.databaseSupport) {
-            BRS.contacts[data.account_id] = record;
-            $btn.button("reset");
-            $modal.modal("unlock");
-            $modal.modal("hide");
             $.notify($.t("success_contact_add") + " " + $.t("contacts_no_db_warning"), { type: 'warning' });
             return;
         } 
         BRS.database.insert("contacts", record, function(error) {
             if (error) {
-                $modal.find(".error_message").html($.t("error_save_db")).show();
-                $btn.button("reset");
-                $modal.modal("unlock");
+                $.notify($.t("error_save_db"));
                 return;
             }
-            BRS.contacts[data.account_id] = record;
-            setTimeout(function() {
-                $btn.button("reset");
-                $modal.modal("unlock");
-                $modal.modal("hide");
-                $.notify($.t("success_contact_add"), { type: 'success' });
-                if (BRS.currentPage == "contacts") {
-                    BRS.loadPage("contacts");
-                } else if (BRS.currentPage == "messages" && BRS.selectedContext) {
-                    const heading = BRS.selectedContext.find("h4.list-group-item-heading");
-                    if (heading.length) {
-                        heading.html(data.name.escapeHTML());
-                    }
-                    BRS.selectedContext.data("context", "messages_sidebar_update_context");
-                }
-            }, 50);
+            setTimeout(notifyContactOperationSuccess, 50, $.t("success_contact_add"));
         });
     };
 
@@ -218,138 +199,83 @@ var BRS = (function(BRS, $, undefined) {
 	}
     };
 
-    BRS.forms.updateContact = function($modal) {
-	var data = BRS.getFormData($modal.find("form:first"));
-
+    BRS.forms.updateContact = function($form) {
+	const data = BRS.getFormData($form, true);
 	data.account_id = String(data.account_id);
-
-	if (!data.name) {
-	    return {
-		"error": $.t("error_contact_name_required")
-	    };
-	}
-        else if (!data.account_id) {
-	    return {
-		"error": $.t("error_account_id_required")
-	    };
-	}
-
-	if (data.account_id.charAt(0) == '@') {
-	    var convertedAccountId = $modal.find("input[name=converted_account_id]").val();
-	    if (convertedAccountId) {
-		data.account_id = convertedAccountId;
-	    }
-            else {
-		return {
-		    "error": $.t("error_account_id")
-		};
-	    }
-	}
-
-	var contactId = parseInt($("#update_contact_id").val(), 10);
-
-	if (!contactId) {
+        const error = validateContactData(data);
+        if (error.length) {
+            return { error }
+        }
+        if (data.account_id.charAt(0) == '@') {
+            if (data.converted_account_id) {
+                data.account_id = data.converted_account_id;
+            } else {
+                return {
+                    "error": $.t("error_account_id")
+                };
+            }
+        }
+        if (!data.contact_id) {
 	    return {
 		"error": $.t("error_contact")
 	    };
 	}
+        const address = new NxtAddress(BRS.prefix);
+        if (address.set(data.account_id)) {
+            data.account = address.account_id();
+            data.account_rs = address.toString();
+        } else {
+            return {
+                "error": $.t("error_account_id")
+            };
+        }
 
-	if (/^(BURST|S)\-/i.test(data.account_id)) {
-	    data.account_rs = data.account_id;
+        BRS.updateContactToDatabase(data)
 
-	    var address = new NxtAddress();
+        return { "stop": true }
 
-	    if (address.set(data.account_rs)) {
-		data.account_id = address.account_id();
-	    }
-            else {
-		return {
-		    "error": $.t("error_account_id")
-		};
-	    }
-	}
-        else {
-	    var address = new NxtAddress();
+    }
 
-	    if (address.set(data.account_id)) {
-		data.account_rs = address.toString();
-	    }
-            else {
-		return {
-		    "error": $.t("error_account_id")
-		};
-	    }
-	}
 
-	BRS.sendRequest("getAccount", {
-	    "account": data.account_id
-	}, function(response) {
-	    if (!response.errorCode) {
-		if (response.account != data.account_id || response.accountRS != data.account_rs) {
-		    return {
-			"error": $.t("error_account_id")
-		    };
-		}
-	    }
-	}, false);
+    BRS.updateContactToDatabase = function (data) {
+        BRS.contacts[data.account_rs] = {
+            name: data.name,
+            email: data.email,
+            account: data.account,
+            accountRS: data.account_rs,
+            description: data.description
+        }
 
-	var $btn = $modal.find("button.btn-primary:not([data-dismiss=modal])");
-
-	BRS.database.select("contacts", [{
-	    "account": data.account_id
-	}], function(error, contacts) {
-	    if (contacts && contacts.length && contacts[0].id != contactId) {
-		$modal.find(".error_message").html($.t("error_contact_exists")).show();
-		$btn.button("reset");
-		$modal.modal("unlock");
-	    }
-            else {
-		BRS.database.update("contacts", {
-		    name: data.name,
-		    email: data.email,
-		    account: data.account_id,
-		    accountRS: data.account_rs,
-		    description: data.description
-		}, [{
-		    "id": contactId
-		}], function(error) {
-		    if (contacts.length && data.account_id != contacts[0].accountId) {
-			delete BRS.contacts[contacts[0].accountId];
-		    }
-
-		    BRS.contacts[data.account_id] = {
-			name: data.name,
-			email: data.email,
-			account: data.account_id,
-			accountRS: data.account_rs,
-			description: data.description
-		    };
-
-		    setTimeout(function() {
-			$btn.button("reset");
-			$modal.modal("unlock");
-			$modal.modal("hide");
-			$.notify($.t("success_contact_update"), { type: 'success' });
-
-			if (BRS.currentPage == "contacts") {
-			    BRS.loadPage("contacts");
-			}
-                        else if (BRS.currentPage == "messages" && BRS.selectedContext) {
-			    var heading = BRS.selectedContext.find("h4.list-group-item-heading");
-			    if (heading.length) {
-				heading.html(data.name.escapeHTML());
-			    }
-			}
-		    }, 50);
-		});
-	    }
+        BRS.database.select("contacts", [{
+            "account": data.account
+        }], function(error, contacts) {
+            if ( error ||
+                (contacts && contacts.length && contacts[0].id != data.contact_id)) {
+                $.notify($.t("error_save_db"));
+                return;
+            }
+            BRS.database.update("contacts",  {
+                name: data.name,
+                email: data.email,
+                account: data.account,
+                accountRS: data.account_rs,
+                description: data.description
+            }, [{
+                "id": Number(data.contact_id)
+            }], function(error) {
+                if (error || (contacts.length && data.account != contacts[0].account)) {
+                    $.notify($.t("error_save_db"));
+                    return
+                }
+                setTimeout(notifyContactOperationSuccess, 50, $.t("success_contact_update"));
+            });
 	});
     };
 
     BRS.evDeleteContactModalOnShowBsModal = function(e) {
-	var $invoker = $(e.relatedTarget);
+        const $invoker = $(e.relatedTarget);
 
-	var contactId = $invoker.data("contact");
+        const contactId = $invoker.data("contact");
 
 	$("#delete_contact_id").val(contactId);
 
@@ -359,29 +285,24 @@ var BRS = (function(BRS, $, undefined) {
 	    contact = contact[0];
 
 	    $("#delete_contact_name").html(contact.name.escapeHTML());
-	    $("#delete_contact_account_id").val(BRS.getAccountFormatted(contact, "account"));
+            $("#delete_contact_account_rs").html(contact.accountRS)
+            $("#delete_contact_account_id").html(contact.account)
+            $("#delete_contact_account_rs").val(contact.accountRS);
 	});
     };
 
     BRS.forms.deleteContact = function() {
         const id = parseInt($("#delete_contact_id").val(), 10);
-        const accountId = $("#delete_contact_account_id").val()
+        const accountRs = $("#delete_contact_account_rs").val()
 
         BRS.database.delete("contacts", [{
             "id": id
         }], function() {
-            delete BRS.contacts[accountId];
-            setTimeout(function() {
-                $.notify($.t("success_contact_delete"), { type: 'success' });
-                if (BRS.currentPage == "contacts") {
-                    BRS.loadPage("contacts");
-                }
-            }, 50);
+            delete BRS.contacts[accountRs];
+            setTimeout(notifyContactOperationSuccess, 50, $.t("success_contact_delete"));
         });
 
-        return {
-            "stop": true
-        };
+        return { "stop": true };
     };
 
     BRS.exportContacts = function() {

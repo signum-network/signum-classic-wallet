@@ -331,16 +331,16 @@ var BRS = (function(BRS, $, undefined) {
 	}
     };
 
-    BRS.forms.sendMessage = function($modal) {
-	var data = BRS.getFormData($modal.find("form:first"));
+    BRS.forms.sendMessage = function($form) {
+        const data = BRS.getFormData($form, true);
 
-	var converted = $modal.find("input[name=converted_account_id]").val();
-
-	if (converted) {
-	    data.recipient = converted;
+        if (data.converted_account_id) {
+            data.recipient = data.converted_account_id;
 	}
 
-	var message = $.trim(data.message);
+        delete data.request_type;
+        delete data.converted_account_id;
+        delete data.merchant_info;
 
 	return {
 	    "data": data

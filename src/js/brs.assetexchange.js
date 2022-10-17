@@ -200,8 +200,9 @@ var BRS = (function(BRS, $, undefined) {
         BRS.assets.push(asset);
     };
 
-    BRS.forms.addAssetBookmark = function($modal) {
-        var data = BRS.getFormData($modal.find("form:first"));
+    BRS.forms.addAssetBookmark = function($form) {
+
+        const data = BRS.getFormData($form);
 
         data.id = $.trim(data.id);
 
@@ -211,75 +212,37 @@ var BRS = (function(BRS, $, undefined) {
             };
         }
 
-        if (!/^\d+$/.test(data.id) && !/^BURST\-/i.test(data.id)) {
+        if (!BRS.idRegEx.test(data.id)) {
             return {
-                "error": $.t("error_asset_or_account_id_invalid")
+                "error": $.t("no_asset_found")
             };
         }
-
-        if (/^BURST\-/i.test(data.id)) {
-            BRS.sendRequest("getAssetsByIssuer", {
-                "account": data.id
-            }, function(response) {
-                if (response.errorCode) {
-                    BRS.showModalError(BRS.translateServerError(response), $modal);
-                } else {
-                    if (response.assets && response.assets[0] && response.assets[0].length) {
-                        BRS.saveAssetBookmarks(response.assets[0], BRS.forms.addAssetBookmarkComplete);
-                    } else {
-                        BRS.showModalError($.t("account_no_assets"), $modal);
-                    }
-                }
-            });
-        } else {
-            BRS.sendRequest("getAsset", {
-                "asset": data.id
-            }, function(response) {
-                if (response.errorCode) {
-                    BRS.sendRequest("getAssetsByIssuer", {
-                        "account": data.id
-                    }, function(response) {
-                        if (response.errorCode) {
-                            BRS.showModalError(BRS.translateServerError(response), $modal);
-                        } else {
-                            if (response.assets && response.assets[0] && response.assets[0].length) {
-                                BRS.saveAssetBookmarks(response.assets[0], BRS.forms.addAssetBookmarkComplete);
-                            } else {
-                                BRS.showModalError($.t("no_asset_found"), $modal);
-                            }
-                        }
-                    });
-                } else {
-                    BRS.saveAssetBookmarks(new Array(response), BRS.forms.addAssetBookmarkComplete);
-                }
-            });
+        const foundAsset = BRS.getAssetDetails(data.id)
+        if (foundAsset === undefined) {
+            return {
+                "error": $.t("no_asset_found")
+            };
         }
+        BRS.saveAssetBookmarks([foundAsset], BRS.forms.addAssetBookmarkComplete);
+
+        return { 'stop': true }
     };
-
-
 
     BRS.forms.addAssetBookmarkComplete = function(newAssets, submittedAssets) {
         BRS.assetSearch = false;
-
         if (newAssets.length === 0) {
-            BRS.closeModal();
             $.notify($.t("error_asset_already_bookmarked", {
                 "count": submittedAssets.length
             }), { type: 'danger' });
             BRS.goToAsset(submittedAssets[0].asset)
         } else {
-            BRS.closeModal();
-
             let message = $.t("success_asset_bookmarked", {
                 "count": newAssets.length
             });
-
             if (!BRS.databaseSupport) {
                 message += " " + $.t("error_assets_save_db");
             }
-
             $.notify(message, { type: 'success' });
-
             BRS.goToAsset(newAssets[0].asset)
         }
     };
