@@ -494,6 +494,28 @@ var BRS = (function(BRS, $, undefined) {
             return SUCCESS
         }
 
+        function getAttachmentSpecV2(rqType) {
+            switch (rqType) {
+            case "issueAsset": 
+                return {
+                    "type":    2,
+                    "subtype": 0,
+                    "attachmentInfo":   [
+                        { type: "ByteString*1", value: [data.name] },
+                        { type: "ShortString*1", value: [data.description] },
+                        { type: "Long*1", value: [data.quantityQNT] },
+                        { type: "Byte*1", value: [data.decimals] },
+                        { type: "Byte*1", value: [data.mintable ? 1 : 0] }
+                    ]
+                }
+            default:
+                return {
+                    "type":    -1,
+                    "subtype": -1,
+                }
+            }
+        }
+
         function getAttachmentSpec(rqType) {
             switch (rqType) {
             case "sendMoney":
@@ -702,7 +724,17 @@ var BRS = (function(BRS, $, undefined) {
             }
             const attachmentVersion = byteArray[pos]
             pos++;
-            if (attachmentVersion !== 1) {
+            switch (attachmentVersion) {
+            case 1:
+                break;
+            case 2:
+                attachmentSpec = getAttachmentSpecV2(requestType)
+                if (transaction.type === attachmentSpec.type &&
+                    transaction.subtype === attachmentSpec.subtype) {
+                    break;
+                }
+                return ERROR
+            default:
                 return ERROR
             }
             for (const item of attachmentSpec.attachmentInfo) {

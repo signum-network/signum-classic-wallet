@@ -164,7 +164,7 @@
         });
         $("#asset_exchange_bid_orders_table tbody, #asset_exchange_ask_orders_table tbody").on("click", "td", BRS.evAssetExchangeOrdersTableClick);
         $("#sell_automatic_price, #buy_automatic_price").on("click", BRS.evSellBuyAutomaticPriceClick);
-        $("#buy_asset_quantity, #buy_asset_price, #sell_asset_quantity, #sell_asset_price, #buy_asset_fee, #sell_asset_fee").keydown(BRS.evAssetExchangeQuantityPriceKeydown);
+        $("#buy_asset_quantity, #buy_asset_price, #sell_asset_quantity, #sell_asset_price").keydown(BRS.evAssetExchangeQuantityPriceKeydown);
         $("#sell_asset_quantity, #sell_asset_price, #buy_asset_quantity, #buy_asset_price").keyup(BRS.evCalculatePricePreviewKeyup);
         $("#asset_order_modal").on("show.bs.modal", BRS.evAssetOrderModalOnShowBsModal);
         $("#asset_exchange_sidebar_group_context").on("click", "a", function(e) {

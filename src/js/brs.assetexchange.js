@@ -1016,7 +1016,6 @@ var BRS = (function(BRS, $, undefined) {
         var assetId = $invoker.data("asset");
         var quantityQNT;
         var priceNQT;
-        var feeNQT;
         var totalNXT;
         var quantity;
         $("#asset_order_modal_button").html(orderType + " Asset").data("resetText", orderType + " Asset");
@@ -1028,7 +1027,6 @@ var BRS = (function(BRS, $, undefined) {
             quantity = String($("#" + orderType + "_asset_quantity").val());
             quantityQNT = new BigInteger(BRS.convertToQNT(quantity, BRS.currentAsset.decimals));
             priceNQT = new BigInteger(BRS.calculatePricePerWholeQNT(BRS.convertToNQT(String($("#" + orderType + "_asset_price").val())), BRS.currentAsset.decimals));
-            feeNQT = new BigInteger(BRS.convertToNQT(String($("#" + orderType + "_asset_fee").val())));
             totalNXT = BRS.formatAmount(BRS.calculateOrderTotalNQT(quantityQNT, priceNQT, BRS.currentAsset.decimals), false, true);
         } catch (err) {
             $.notify("Invalid input.", { type: 'danger' });
@@ -1038,10 +1036,6 @@ var BRS = (function(BRS, $, undefined) {
         if (priceNQT.toString() == "0" || quantityQNT.toString() == "0") {
             $.notify($.t("error_amount_price_required"), { type: 'danger' });
             return e.preventDefault();
-        }
-
-        if (feeNQT.toString() == "0") {
-            feeNQT = new BigInteger("100000000");
         }
 
         var priceNQTPerWholeQNT = priceNQT.multiply(new BigInteger("" + Math.pow(10, BRS.currentAsset.decimals)));
@@ -1075,7 +1069,6 @@ var BRS = (function(BRS, $, undefined) {
 
         $("#asset_order_description").html(description);
         $("#asset_order_total").html(totalNXT + " " + BRS.valueSuffix);
-        $("#asset_order_fee_paid").html(BRS.formatAmount(feeNQT) + " " + BRS.valueSuffix);
 
         if (quantity != "1") {
             $("#asset_order_total_tooltip").show();
@@ -1093,7 +1086,6 @@ var BRS = (function(BRS, $, undefined) {
         $("#asset_order_asset").val(assetId);
         $("#asset_order_quantity").val(quantityQNT.toString());
         $("#asset_order_price").val(priceNQT.toString());
-        $("#asset_order_fee").val(feeNQT.toString());
     };
 
     BRS.forms.orderAsset = function(data) {
@@ -1101,7 +1093,7 @@ var BRS = (function(BRS, $, undefined) {
         delete data.asset_order_type
         return {
             requestType,
-            "successMessage": (orderType == "placeBidOrder" ? $.t("success_buy_order_asset") : $.t("success_sell_order_asset")),
+            "successMessage": (requestType == "placeBidOrder" ? $.t("success_buy_order_asset") : $.t("success_sell_order_asset")),
             "errorMessage": $.t("error_order_asset")
         };
     };
@@ -1155,30 +1147,34 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.forms.issueAsset = function(data) {
         data.description = $.trim(data.description);
-
         if (!data.description) {
             return {
                 "error": $.t("error_description_required")
             };
-        } else if (!/^\d+$/.test(data.quantity)) {
+        }
+        if (!/^[a-zA-Z0-9]{3,10}$/.test(data.name)) {
+            return {
+                "error": $.t("error_incorrect_name", { name: 'name' })
+            };
+        }
+        if (!/^\d+$/.test(data.quantity)) {
             return {
                 "error": $.t("error_whole_quantity")
             };
-        } else {
-            data.quantityQNT = String(data.quantity);
-
-            if (data.decimals > 0) {
-                for (var i = 0; i < data.decimals; i++) {
-                    data.quantityQNT += "0";
-                }
-            }
-
-            delete data.quantity;
-
-            return {
-                "data": data
-            };
         }
+        if (data.mintable) {
+            data.mintable = true;
+        }
+        data.quantityQNT = String(data.quantity);
+        if (data.decimals > 0) {
+            for (let i = 0; i < data.decimals; i++) {
+                data.quantityQNT += "0";
+            }
+        }
+        delete data.quantity;
+        return {
+            "data": data
+        };
     };
 
     BRS.forms.assetExchangeChangeGroupName = function() {

@@ -1,4 +1,5 @@
 {
+    "ordinary": "Ordinary",
     "error_max_recipients": "Maximum recipients for this type of transaction is __max__.",
     "error_multi_out_minimum_recipients": "Multi-out transfer must have at least two recipients.",
     "error_multi_out_duplicate_recipient": "Multi-out transfer cannot have duplicated recipients.",
@@ -572,7 +573,7 @@
     "message_is_encrypted": "This message is encrypted.",
     "message_is_not_encrypted": "This message is not encrypted.",
     "minimum_nr_choices": "Minimum Nr Of Choices",
-    "mintable_asset": "Mintable asset. Not supported by Classic. Use BTDEX wallet for more options",
+    "mintable_asset": "Mintable asset. You will be able to increase token circulating quantity by minting new tokens.",
     "min_nr_of_options": "Minimum Nr of Options",
     "more_info": "More Info",
     "multiple": "Multiple",
