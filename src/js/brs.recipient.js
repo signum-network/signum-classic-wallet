@@ -3,20 +3,19 @@
  */
 var BRS = (function(BRS, $, undefined) {
     BRS.automaticallyCheckRecipient = function() {
-        var $recipientFields = $("#add_contact_account_id, #update_contact_account_id, #buy_alias_recipient, #escrow_create_recipient, #inline_message_recipient, #lease_balance_recipient, #reward_recipient, #sell_alias_recipient, #send_message_recipient, #send_money_recipient, #subscription_cancel_recipient, #subscription_create_recipient, #transfer_alias_recipient, #transfer_asset_recipient");
+        var $recipientFields = $("#add_contact_account_id, #update_contact_account_id, #buy_alias_recipient, #escrow_create_recipient, #inline_message_recipient, #reward_recipient, #sell_alias_recipient, #send_message_recipient, #send_money_recipient, #subscription_cancel_recipient, #subscription_create_recipient, #transfer_alias_recipient, #transfer_asset_recipient, #transfer_asset_multi_recipient");
 
         $recipientFields.on("blur", function() {
             $(this).trigger("checkRecipient");
         });
 
         $recipientFields.on("checkRecipient", function() {
-            var value = $(this).val();
-            var modal = $(this).closest(".modal");
-
-            if (value && value != "BURST-____-____-____-_____" && value != "S-____-____-____-_____") {
-                BRS.checkRecipient(value, modal);
+            const value = $(this).val();
+            const form = $(this).closest("form");
+            if (value) {
+                BRS.checkRecipient(value, form);
             } else {
-                modal.find(".account_info").hide();
+                form.find(".account_info").hide();
             }
         });
 

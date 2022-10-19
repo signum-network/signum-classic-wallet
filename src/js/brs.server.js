@@ -214,8 +214,8 @@ var BRS = (function(BRS, $, undefined) {
         const url = BRS.server + "/burst?requestType=" + requestType;
 
         if (type == "GET") {
-            // rico666: gives us lots (thousands) of connection refused messages in the UI
-            // has been there for ages, no clear function visible
+            // It’s challenging to manage caching in XMLHttpRequest.
+            // Appending a random query string value to bypass the browser cache. 
             data._ = $.now();
         }
 
@@ -278,9 +278,8 @@ var BRS = (function(BRS, $, undefined) {
 
         async = (async === undefined ? true : async);
         if (async === false && type == "GET") {
-            url += "&" + $.param(data);
             const client = new XMLHttpRequest();
-            client.open("GET", url, false);
+            client.open("GET", url + "&" + $.param(data), false);
             client.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
             client.data = data;
             client.send();

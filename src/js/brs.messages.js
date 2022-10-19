@@ -331,22 +331,6 @@ var BRS = (function(BRS, $, undefined) {
 	}
     };
 
-    BRS.forms.sendMessage = function($form) {
-        const data = BRS.getFormData($form, true);
-
-        if (data.converted_account_id) {
-            data.recipient = data.converted_account_id;
-	}
-
-        delete data.request_type;
-        delete data.converted_account_id;
-        delete data.merchant_info;
-
-	return {
-	    "data": data
-	};
-    };
-
     BRS.evInlineMessageFormSubmit = function(e) {
 	e.preventDefault();
 

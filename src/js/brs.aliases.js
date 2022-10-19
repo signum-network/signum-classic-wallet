@@ -583,11 +583,11 @@ BRS = (function (BRS, $, undefined) {
             BRS.sendRequest("getAlias", {
                 "aliasName": alias
             }, function (response) {
+                BRS.fetchingModalData = false;
                 if (response.errorCode) {
                     e.preventDefault();
                     $.notify($.t("error_alias_not_found"), {
                         type: 'danger' });
-                    BRS.fetchingModalData = false;
                 }
                 else {
                     var aliasURI;

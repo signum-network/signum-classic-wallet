@@ -243,9 +243,11 @@ var BRS = (function(BRS, $, undefined) {
         }
 
         if (typeof formFunction === "function") {
-            var output = formFunction($form);
+            const output = formFunction($form);
 
             if (!output) {
+                // DO NOT USE
+                console.warn("Smelling detected at requestType " + requestType )
                 return;
             } else if (output.error) {
                 $form.find(".error_message").html(output.error.escapeHTML()).show();
@@ -282,9 +284,8 @@ var BRS = (function(BRS, $, undefined) {
             data.recipient = $.trim(data.recipient);
             if (BRS.idRegEx.test(data.recipient) === false && 
                 BRS.rsRegEx.test(data.recipient) === false) {
-                let convertedAccountId = $modal.find("input[name=converted_account_id]").val();
-                if (convertedAccountId && (BRS.idRegEx.test(convertedAccountId) || BRS.rsRegEx.test(convertedAccountId))) {
-                    data.recipient = convertedAccountId;
+                if (data.converted_account_id && (BRS.idRegEx.test(data.converted_account_id) || BRS.rsRegEx.test(data.converted_account_id))) {
+                    data.recipient = data.converted_account_id;
                     data._extra = {
                         "convertedAccount": true
                     };
@@ -300,10 +301,8 @@ var BRS = (function(BRS, $, undefined) {
         }
 
         if (requestType === "sendMoney" || requestType === "transferAsset") {
-            var merchantInfo = $modal.find("input[name=merchant_info]").val();
-
-            var result = merchantInfo.match(/#merchant:(.*)#/i);
-            var regexp;
+            let merchantInfo = data.merchant_info;
+            const result = merchantInfo.match(/#merchant:(.*)#/i);
             if (result && result[1]) {
                 merchantInfo = $.trim(result[1]);
 
@@ -464,6 +463,10 @@ var BRS = (function(BRS, $, undefined) {
                 }
             }
         }
+
+        delete data.request_type;
+        delete data.converted_account_id;
+        delete data.merchant_info;
 
         BRS.sendRequest(requestType, data, function(response) {
             //todo check again.. response.error

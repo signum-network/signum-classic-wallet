@@ -680,11 +680,10 @@ var BRS = (function(BRS, $, undefined) {
         return str;
     };
 
-    BRS.getFormData = function($form, unmodified) {
-        var serialized = $form.serializeArray();
-        var data = {};
-
-        for (var s in serialized) {
+    BRS.getFormData = function($form) {
+        const serialized = $form.serializeArray();
+        const data = {};
+        for (const s in serialized) {
             if (data[serialized[s].name] === undefined) {
                 data[serialized[s].name] = serialized[s].value;
             } else if (typeof data[serialized[s].name] !== 'object') {
@@ -693,13 +692,6 @@ var BRS = (function(BRS, $, undefined) {
                 data[serialized[s].name].push(serialized[s].value)
             }
         }
-
-        if (!unmodified) {
-            delete data.request_type;
-            delete data.converted_account_id;
-            delete data.merchant_info;
-        }
-
         return data;
     };
 

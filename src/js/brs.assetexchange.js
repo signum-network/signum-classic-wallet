@@ -671,7 +671,7 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.updateMiniTradeHistory = function () {
         //todo BRS.currentSubPageID ??...
-        BRS.sendRequest("getTrades+" + BRS.currentAsset.asset, {
+        BRS.sendRequest("getTrades+", {
             "asset": BRS.currentAsset.asset,
             "account": ($("#ae_show_my_trades_only").is(":checked")) ? $("#account_id").text() : "",
             "firstIndex": 0,
@@ -704,7 +704,7 @@ var BRS = (function(BRS, $, undefined) {
     BRS.loadAssetOrders = function(type, assetId, refresh) {
         type = type.toLowerCase();
 
-        BRS.sendRequest("get" + type.capitalize() + "Orders+" + assetId, {
+        BRS.sendRequest("get" + type.capitalize() + "Orders+", {
             "asset": assetId,
             "firstIndex": 0,
             "lastIndex": 49

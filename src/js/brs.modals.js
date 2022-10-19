@@ -44,8 +44,19 @@ var BRS = (function(BRS, $, undefined) {
         }
         const $list = $(this).parent().find("ul");
         $list.empty();
+        const names = []
         for (const accountId in BRS.contacts) {
-            $list.append("<li><a href='#' data-contact='" + String(BRS.contacts[accountId].name).escapeHTML() + "'>" + String(BRS.contacts[accountId].name).escapeHTML() + "</a></li>");
+            names.push(BRS.contacts[accountId].name)
+        }
+        names.sort((a, b) => {
+            const nameA = a.toUpperCase();
+            const nameB = b.toUpperCase();
+            if (nameA < nameB) return -1;
+            if (nameA > nameB) return 1;
+            return 0;
+        })
+        for (const name of names) {
+            $list.append("<li><a href='#' data-contact='" + name.escapeHTML() + "'>" + name.escapeHTML() + "</a></li>");
         }
     }
 
