@@ -154,33 +154,15 @@ var BRS = (function(BRS, $, undefined) {
 
     //hide modal when another one is activated.
     BRS.evModalOnShowBsModal = function(e) {
-        var $inputFields = $(this).find("input[name=recipient], input[name=account_id]").not("[type=hidden]");
-
-        $.each($inputFields, function() {
-            if ($(this).hasClass("noMask")) {
-                $(this).mask("BURST-****-****-****-*****", {
-                    "noMask": true
-                }).removeClass("noMask");
-                $(this).mask("S-****-****-****-*****", {
-                    "noMask": true
-                }).removeClass("noMask");
-            } else {
-                // Removed due to implemetation of Signum (Quick fix)
-                //$(this).mask("BURST-****-****-****-*****");
-            }
-        });
-
-        var $visible_modal = $(".modal.in");
-
+        const $visible_modal = $(".modal.in");
         if ($visible_modal.length) {
             if ($visible_modal.hasClass("locked")) {
-                var $btn = $visible_modal.find("button.btn-primary:not([data-dismiss=modal])");
+                const $btn = $visible_modal.find("button.btn-primary:not([data-dismiss=modal])");
                 BRS.unlockForm($visible_modal, $btn, true);
             } else {
                 $visible_modal.modal("hide");
             }
         }
-
         $(this).find(".form-group").css("margin-bottom", "");
     };
 
@@ -235,8 +217,6 @@ var BRS = (function(BRS, $, undefined) {
             $(this).html('?');
         })
         // End multi-transfers
-
-        $(this).find("input[name=recipient], input[name=account_id]").not("[type=hidden]").trigger("unmask");
 
         $(this).find(":input:not(button)").each(function(index) {
             var defaultValue = $(this).data("default");

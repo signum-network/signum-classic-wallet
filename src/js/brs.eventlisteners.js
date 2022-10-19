@@ -85,9 +85,6 @@
             }
             if (account) {
                 const $inputField = $(this).find("input[name=recipient], input[name=account_id]").not("[type=hidden]");
-                if (!/BURST\-/i.test(account)) {
-                    $inputField.addClass("noMask");
-                }
                 $inputField.val(account).trigger("checkRecipient");
             }
             BRS.sendMoneyCalculateTotal($(this));
@@ -100,9 +97,6 @@
             }
             if (account) {
                 const $inputField = $(this).find("input[name=recipient], input[name=account_id]").not("[type=hidden]");
-                if (!/BURST\-/i.test(account)) {
-                    $inputField.addClass("noMask");
-                }
                 $inputField.val(account).trigger("checkRecipient");
             }
             BRS.commitmentCalculateTotal($(this));

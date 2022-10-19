@@ -453,10 +453,6 @@ margin-bottom:10px;
 margin-top:10px
 }
 
-input.masked {
-text-transform:uppercase
-}
-
 input:invalid {
 border:1px solid red
 }

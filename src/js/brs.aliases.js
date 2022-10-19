@@ -677,7 +677,6 @@ BRS = (function (BRS, $, undefined) {
         $("#register_alias_type").val(type);
 
         if (type == "uri") {
-            $("#register_alias_uri.masked").trigger("unmask", true);
             $("#register_alias_uri_label").html($.t("uri"));
             $("#register_alias_uri").prop("placeholder", $.t("uri"));
             var keyword = "https?:\/\/";
@@ -701,7 +700,7 @@ BRS = (function (BRS, $, undefined) {
         else if (type === "account") {
             $("#register_alias_uri_label").html($.t("account_id"));
             $("#register_alias_uri").prop("placeholder", $.t("account_id"));
-            $("#register_alias_uri").val("").mask("S-****-****-****-*****");
+            $("#register_alias_uri").val("");
 
             if (uri) {
                 var match = uri.match(/acct:(.*)@burst/i);
@@ -737,7 +736,6 @@ BRS = (function (BRS, $, undefined) {
             $("#register_alias_help").html($.t("alias_account_help")).show();
         }
         else {
-            $("#register_alias_uri.masked").trigger("unmask", true);
             $("#register_alias_uri_label").html($.t("data"));
             $("#register_alias_uri").prop("placeholder", $.t("data"));
             if (uri) {
