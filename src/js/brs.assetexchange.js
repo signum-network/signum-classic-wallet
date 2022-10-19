@@ -200,9 +200,7 @@ var BRS = (function(BRS, $, undefined) {
         BRS.assets.push(asset);
     };
 
-    BRS.forms.addAssetBookmark = function($form) {
-
-        const data = BRS.getFormData($form);
+    BRS.forms.addAssetBookmark = function(data) {
 
         data.id = $.trim(data.id);
 
@@ -1098,11 +1096,11 @@ var BRS = (function(BRS, $, undefined) {
         $("#asset_order_fee").val(feeNQT.toString());
     };
 
-    BRS.forms.orderAsset = function($modal) {
-        var orderType = $("#asset_order_type").val();
-
+    BRS.forms.orderAsset = function(data) {
+        const requestType = data.asset_order_type
+        delete data.asset_order_type
         return {
-            "requestType": orderType,
+            requestType,
             "successMessage": (orderType == "placeBidOrder" ? $.t("success_buy_order_asset") : $.t("success_sell_order_asset")),
             "errorMessage": $.t("error_order_asset")
         };
@@ -1155,9 +1153,7 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
-    BRS.forms.issueAsset = function($form) {
-        const data = BRS.getFormData($form);
-
+    BRS.forms.issueAsset = function(data) {
         data.description = $.trim(data.description);
 
         if (!data.description) {
@@ -1623,8 +1619,7 @@ var BRS = (function(BRS, $, undefined) {
         $formGroup.find("span[name=transfer_asset_available]").html(availableAssetsMessage);
     };
 
-    BRS.forms.transferAssetMulti = function($form) {
-        const data = BRS.getFormData($form);
+    BRS.forms.transferAssetMulti = function(data) {
         data['assetIdsAndQuantities'] = ''
         let items = 0;
         let showWarning = false;
@@ -1674,9 +1669,7 @@ var BRS = (function(BRS, $, undefined) {
         };
     };
 
-    BRS.forms.transferAsset = function($form) {
-        const data = BRS.getFormData($form);
-
+    BRS.forms.transferAsset = function(data) {
         if (!data.quantity) {
             return {
                 "error": $.t("error_not_specified", {
@@ -1971,8 +1964,7 @@ var BRS = (function(BRS, $, undefined) {
         }
     };
 
-    BRS.forms.cancelOrder = function($form) {
-        const data = BRS.getFormData($form);
+    BRS.forms.cancelOrder = function(data) {
         const requestType = data.cancel_order_type;
         delete data.cancel_order_type;
         return {

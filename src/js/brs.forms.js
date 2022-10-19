@@ -242,8 +242,10 @@ var BRS = (function(BRS, $, undefined) {
             return;
         }
 
+        data = BRS.getFormData($form);
+
         if (typeof formFunction === "function") {
-            const output = formFunction($form);
+            const output = formFunction(data);
 
             if (!output) {
                 // DO NOT USE
@@ -274,10 +276,6 @@ var BRS = (function(BRS, $, undefined) {
                     return;
                 }
             }
-        }
-
-        if (!data) {
-            data = BRS.getFormData($form);
         }
 
         if (data.recipient) {
@@ -548,8 +546,7 @@ var BRS = (function(BRS, $, undefined) {
         });
     };
 
-    BRS.forms.addCommitment = function ($form) {
-        const data = BRS.getFormData($form);
+    BRS.forms.addCommitment = function (data) {
         let requestType = 'addCommitment'
         if (data.removeCommitment) {
             requestType = 'removeCommitment';

@@ -392,9 +392,7 @@ BRS = (function (BRS, $, undefined) {
         }
     };
 
-    BRS.forms.sellAlias = function ($form) {
-        const data = BRS.getFormData($form);
-
+    BRS.forms.sellAlias = function (data) {
         let successMessage = "";
         let errorMessage = "";
 
@@ -636,9 +634,7 @@ BRS = (function (BRS, $, undefined) {
         }
     };
 
-    BRS.forms.setAlias = function ($form) {
-        const data = BRS.getFormData($form);
-
+    BRS.forms.setAlias = function (data) {
         data.aliasURI = $.trim(data.aliasURI).toLowerCase();
 
         if (data.type === "account") {

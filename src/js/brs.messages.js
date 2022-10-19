@@ -467,8 +467,7 @@ var BRS = (function(BRS, $, undefined) {
 	}
     };
 
-    BRS.forms.decryptMessages = function($form) {
-        const data = BRS.getFormData($form);
+    BRS.forms.decryptMessages = function(data) {
         let success = false;
         try {
             const messagesToDecrypt = [];

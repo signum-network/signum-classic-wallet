@@ -73,8 +73,7 @@ var BRS = (function(BRS, $, undefined) {
         return accountId
     }
 
-    BRS.forms.sendMoneyMulti = function($form) {
-        const data = BRS.getFormData($form);
+    BRS.forms.sendMoneyMulti = function(data) {
         data['recipients'] = ''
         let items = 0;
         let biTotalAmount = 0n;

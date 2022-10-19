@@ -98,8 +98,7 @@ var BRS = (function(BRS, $, undefined) {
         }
     }
 
-    BRS.forms.addContact = function($form) {
-        const data = BRS.getFormData($form);
+    BRS.forms.addContact = function(data) {
         data.account_id = String(data.account_id);
         const error = validateContactData(data);
         if (error.length) {
@@ -199,8 +198,7 @@ var BRS = (function(BRS, $, undefined) {
 	}
     };
 
-    BRS.forms.updateContact = function($form) {
-	const data = BRS.getFormData($form);
+    BRS.forms.updateContact = function(data) {
 	data.account_id = String(data.account_id);
         const error = validateContactData(data);
         if (error.length) {
