@@ -1,4 +1,9 @@
 {
+    "latest_blocks": "Latest blocks",
+    "invalid_blockheight": "Invalid block height",
+    "block_info": "Block info",
+    "inspect_block": "Inspect block…",
+    "latest_block": "Latest block",
     "ordinary": "Ordinary",
     "error_max_recipients": "Maximum recipients for this type of transaction is __max__.",
     "error_multi_out_minimum_recipients": "Multi-out transfer must have at least two recipients.",

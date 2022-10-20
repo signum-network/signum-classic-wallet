@@ -557,6 +557,11 @@ background-color:#FFFAF0!important
 .flex-asset-quantity > :nth-child(2){
     width: 40%;
 }
+.flex-mini-row {
+    display: flex;
+    column-gap: 12px;
+    padding-bottom: 15px;
+}
 .multi-transfer {
     display: none;
 }

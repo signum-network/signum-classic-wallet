@@ -285,6 +285,48 @@ var BRS = (function(BRS, $, undefined) {
         });
     }
 
+    BRS.pages.block_info = function() {
+        BRS.blocksInfoLoad('');
+    }
+
+    BRS.blocksInfoLoad = function (blockheight) {
+        if (blockheight === '') {
+            blockheight = BRS.blocks[0].height.toString()
+        }
+        BRS.sendRequest("getBlock+", {
+            "height": blockheight,
+            "includeTransactions": true
+        }, function(response) {
+            if (response.errorCode) {
+                $.notify($.t('invalid_blockheight'), { type: 'danger' })
+                BRS.dataLoaded('');
+                return
+            }
+            $('#block_info_input_block').val(blockheight)
+            const rows = response.transactions.reduce((prev, currTr) => prev + getTransactionInBlocksRowHTML(currTr), '')
+            BRS.dataLoaded(rows);
+        })
+    };
+
+    function getTransactionInBlocksRowHTML(transaction) {
+        const details = BRS.getTransactionDetails(transaction);
+
+        let rowStr = ''
+        rowStr += "<tr>";
+        rowStr += "<td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "'>" + String(transaction.transaction).escapeHTML() + "</a></td>"
+        rowStr += "<td>" + (details.hasMessage ? "<i class='far fa-envelope-open'></i>&nbsp;" : "") + "</td>"
+        rowStr += "<td>" + BRS.formatTimestamp(transaction.timestamp) + "</td>"
+        rowStr += "<td>" + details.nameOfTransaction + "</td>"
+        rowStr += "<td>" + details.senderHTML + "</td>"
+        rowStr += "<td>" + details.recipientHTML + "</td>"
+        rowStr += "<td>" + details.circleText + "</td>"
+        rowStr += `<td ${details.colorClass}>${details.amountToFromViewerHTML}</td>`
+        rowStr += "<td>" + BRS.formatAmount(transaction.feeNQT) + "</td>"
+        rowStr += "</tr>";
+
+        return rowStr;
+    };
+
     BRS.pages.blocks = function() {
         if (BRS.blocks.length >= 100 || BRS.downloadingBlockchain) {
             // Just show what we have

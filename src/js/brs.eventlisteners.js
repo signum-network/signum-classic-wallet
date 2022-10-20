@@ -429,7 +429,7 @@
         });
 
         // from brs.modals.account.js
-        $("#blocks_table, #blocks_forged_table, #contacts_table, #transactions_table, #dashboard_transactions_table, #asset_account, #asset_exchange_ask_orders_table, #transfer_history_table, #asset_exchange_bid_orders_table, #alias_info_table, .dgs_page_contents, .modal-content, #register_alias_modal").on("click", "a[data-user]", function(e) {
+        $("#blocks_table, #blocks_forged_table, #contacts_table, #transactions_table, #dashboard_transactions_table, #asset_account, #asset_exchange_ask_orders_table, #transfer_history_table, #asset_exchange_bid_orders_table, #alias_info_table, .dgs_page_contents, .modal-content, #register_alias_modal, #block_info_table").on("click", "a[data-user]", function(e) {
             e.preventDefault();
             const account = $(this).data("user");
             BRS.showAccountModal(account);
@@ -653,7 +653,7 @@
         });
 
         // from brs.modals.transaction.js
-        $("#transactions_table, #dashboard_transactions_table, #transfer_history_table, #asset_exchange_trade_history_table").on("click", "a[data-transaction]", function(e) {
+        $("#transactions_table, #dashboard_transactions_table, #transfer_history_table, #asset_exchange_trade_history_table, #block_info_table").on("click", "a[data-transaction]", function(e) {
             e.preventDefault();
             const transactionId = $(this).data("transaction");
             BRS.showTransactionModal(transactionId);
@@ -683,6 +683,36 @@
 
         // from brs.utils.js
         $.fn.tree = BRS.FnTree;
+
+        // from brs.blocks.js
+        $("#block_info_latest_block").on("click", function(e) {
+            e.preventDefault();
+            BRS.blocksInfoLoad(BRS.blocks[0].height.toString());
+        });
+        $("#block_info_search").on("click", function(e) {
+            const userInput = $("#block_info_input_block").val()
+            const currentBlock = Number(userInput)
+            if (isNaN(currentBlock) || currentBlock < 0) {
+                $.notify($.t('invalid_blockheight'), { type: 'danger' })
+            }
+            BRS.blocksInfoLoad($("#block_info_input_block").val());
+        });
+        $("#block_info_previous_block").on("click", function(e) {
+            const userInput = $("#block_info_input_block").val()
+            const currentBlock = Number(userInput)
+            if (isNaN(currentBlock) || currentBlock <= 0) {
+                $.notify($.t('invalid_blockheight'), { type: 'danger' })
+            }
+            BRS.blocksInfoLoad(currentBlock - 1);
+        });
+        $("#block_info_next_block").on("click", function(e) {
+            const userInput = $("#block_info_input_block").val()
+            const currentBlock = Number(userInput)
+            if (isNaN(currentBlock) || currentBlock < 0) {
+                $.notify($.t('invalid_blockheight'), { type: 'danger' })
+            }
+            BRS.blocksInfoLoad(currentBlock + 1);
+        });
     }
 
     return BRS;

@@ -1,5 +1,9 @@
 "Property","en","pt-br","pt","pl","nl","lt","ja","it","id","hr","hi","gl","fr","fi","es-es","el","de-de","cs","ca","bg","sk","sh","ru","sr","sr-cs","ro","uk","tr","zh-tw","zh-cn"
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"latest_blocks","Latest blocks",,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"invalid_blockheight","Invalid block height",,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"block_info","Block info",,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"inspect_block","Inspect block…",,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"latest_block","Latest block",,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 "ordinary","Ordinary",,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 "error_max_recipients","Maximum recipients for this type of transaction is __max__.",,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 "error_multi_out_minimum_recipients","Multi-out transfer must have at least two recipients.",,,,,,,,,,,,,,,,,,,,,,,,,,,,,
