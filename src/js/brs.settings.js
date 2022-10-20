@@ -82,7 +82,9 @@ var BRS = (function(BRS, $, undefined) {
             if (BRS.settings.submit_on_enter) {
                 $(".modal form:not('#decrypt_note_form_container')").on("submit.onEnter", function(e) {
                     e.preventDefault();
-                    BRS.submitForm($(this).closest(".modal"));
+                    const $modal = $(this).closest(".modal")
+                    $btn = $modal.find("button.btn-primary:not([data-dismiss=modal])");
+                    BRS.submitForm($btn);
                 });
             } else {
                 $(".modal form").off("submit.onEnter");

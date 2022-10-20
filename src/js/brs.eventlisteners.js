@@ -70,7 +70,7 @@
             }
         });
         $(".modal button.btn-primary:not([data-dismiss=modal]):not([data-ignore=true])").click(function() {
-            BRS.submitForm($(this).closest(".modal"), $(this));
+            BRS.submitForm($(this));
         });
 
         // from brs.login.js
