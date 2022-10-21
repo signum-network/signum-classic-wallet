@@ -429,7 +429,7 @@
         });
 
         // from brs.modals.account.js
-        $("#blocks_table, #blocks_forged_table, #contacts_table, #transactions_table, #dashboard_transactions_table, #asset_account, #asset_exchange_ask_orders_table, #transfer_history_table, #asset_exchange_bid_orders_table, #alias_info_table, .dgs_page_contents, .modal-content, #register_alias_modal, #block_info_table").on("click", "a[data-user]", function(e) {
+        $("#blocks_table, #blocks_forged_table, #contacts_table, #transactions_table, #dashboard_transactions_table, #asset_account, #asset_exchange_ask_orders_table, #transfer_history_table, #asset_exchange_bid_orders_table, #alias_info_table, .dgs_page_contents, .modal-content, #register_alias_modal, #block_info_table, #search_results_ul_container").on("click", "a[data-user]", function(e) {
             e.preventDefault();
             const account = $(this).data("user");
             BRS.showAccountModal(account);

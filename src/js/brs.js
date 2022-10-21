@@ -1001,7 +1001,18 @@ var BRS = (function(BRS, $, undefined) {
           });
     };
 
-    
+    function showAccountSearchResults(accountsList) {
+        if (BRS.currentPage !== "search_results") {
+            BRS.goToPage("search_results")
+        }
+        let items = ''
+        for (const account of accountsList) {
+            const accountRS = BRS.convertNumericToRSAccountFormat(account)
+            items += `<li><a href="#" data-user="${accountRS}" class="user-info">${accountRS}</a></li>`
+        }
+        $("#search_results_ul_container").html(items)
+    }
+
     BRS.evIdSearchSubmit = function(e) {
         e.preventDefault();
         const searchText = $.trim($("#id_search input[name=q]").val());
@@ -1036,7 +1047,7 @@ var BRS = (function(BRS, $, undefined) {
             $.notify($.t("error_search_invalid"), { type: 'danger' });
             return
         }
-        switch (splitted[0]) {
+        switch (splitted[0].trim()) {
         case 'a':
         case 'address':
             BRS.sendRequest("getAccount", {
@@ -1084,6 +1095,30 @@ var BRS = (function(BRS, $, undefined) {
                     return
                 }
                 BRS.evAliasShowSearchResult(response);
+            });
+            return;
+        case 'name':
+            BRS.sendRequest("getAccountsWithName", {
+                "name": splitted[1].trim()
+            }, function(response) {
+                if (response.errorCode || !response.accounts ||  response.accounts.length === 0) {
+                    $.notify($.t("error_search_no_results"), { type: 'danger' })
+                    return
+                }
+                if (response.accounts.length === 1) {
+                    BRS.sendRequest("getAccount", {
+                        "account": response.accounts[0]
+                    }, function(response2, input) {
+                        if (response2.errorCode) {
+                            $.notify($.t("error_search_no_results"), { type: 'danger' })
+                            return
+                        }
+                        BRS.showAccountModal(response2);
+                    });
+                    return;
+                }
+                // show multi result page
+                showAccountSearchResults(response.accounts)
             });
             return;
         default:
