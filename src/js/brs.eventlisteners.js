@@ -653,7 +653,7 @@
         });
 
         // from brs.modals.transaction.js
-        $("#transactions_table, #dashboard_transactions_table, #transfer_history_table, #asset_exchange_trade_history_table, #block_info_table").on("click", "a[data-transaction]", function(e) {
+        $("#transactions_table, #dashboard_transactions_table, #transfer_history_table, #asset_exchange_trade_history_table, #block_info_table, #block_info_transactions_table").on("click", "a[data-transaction]", function(e) {
             e.preventDefault();
             const transactionId = $(this).data("transaction");
             BRS.showTransactionModal(transactionId);
