@@ -185,6 +185,8 @@ var BRS = (function(BRS, $, undefined) {
 
         $(".sidebar .treeview").tree();
 
+        setInterval(setHeaderClock, 1000);
+
         /*
           $("#asset_exchange_search input[name=q]").addClear({
           right: 0,
@@ -295,6 +297,14 @@ var BRS = (function(BRS, $, undefined) {
         }
     }
 
+    function setHeaderClock () {
+        const lastBlockDate = new Date(Date.UTC(2014, 7, 11, 2, 0, 0, 0) + BRS.state.lastBlockTimestamp * 1000);
+        const diffSeconds = Math.floor((Date.now() - lastBlockDate.getTime()) / 1000);
+        const minutes = (diffSeconds / 60) < 10 ? "0" + Math.floor(diffSeconds / 60).toString() : Math.floor(diffSeconds / 60).toString()
+        const seconds = (diffSeconds % 60) < 10 ? "0" + (diffSeconds % 60).toString() : (diffSeconds % 60).toString()
+        $("#header_block_time").html(minutes + ":" + seconds);
+    }
+
     BRS.getState = function(callback) {
         BRS.checkSelectedNode();
 
@@ -318,6 +328,8 @@ var BRS = (function(BRS, $, undefined) {
 
             $("#brs_version").html(BRS.state.version + " on " + BRS.server).removeClass("loading_dots");
             $("#brs_version_dashboard").html(BRS.state.version).removeClass("loading_dots");
+            $("#header_current_block").html("#" + BRS.state.numberOfBlocks);
+            setHeaderClock()
             switch (true) {
             case firstTime:
                 BRS.getBlock(BRS.state.lastBlock, BRS.handleInitialBlocks);

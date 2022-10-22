@@ -286,7 +286,7 @@ a:focus {
   background-color: transparent;
   background-image: none;
   padding: 15px 15px;
-  font-family: fontAwesome;
+  text-decoration: none;
 }
 
 .main-header .sidebar-toggle:hover {
