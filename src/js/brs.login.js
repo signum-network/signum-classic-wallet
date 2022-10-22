@@ -144,10 +144,6 @@ var BRS = (function(BRS, $, undefined) {
 
         BRS.unlock();
 
-        if (BRS.isOutdated) {
-            $.notify($.t("brs_update_available"), { type: 'danger' });
-        }
-
         if (!BRS.downloadingBlockchain) {
             BRS.checkIfOnAFork();
         }
