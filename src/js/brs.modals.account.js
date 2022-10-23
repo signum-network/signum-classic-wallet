@@ -90,7 +90,7 @@ var BRS = (function(BRS, $, undefined) {
                     const details = BRS.getTransactionDetails(transaction, BRS.userInfoModal.user);
 
                     rows += "<tr>";
-                    rows += "<td>" + BRS.formatTimestamp(transaction.timestamp) + "</td>"
+                    rows += "<td><a href='#' data-transaction='" + String(transaction.transaction).escapeHTML() + "' data-timestamp='" + String(transaction.timestamp).escapeHTML() + "'>" + BRS.formatTimestamp(transaction.timestamp) + "</a></td>"
                     rows += "<td>" + details.nameOfTransaction + "</td>"
                     rows += "<td>" + details.circleText + "</td>"
                     rows += `<td ${details.colorClass}>${details.amountToFromViewerHTML}</td>`;
@@ -152,28 +152,62 @@ var BRS = (function(BRS, $, undefined) {
 	});
     };
 
-    BRS.userInfoModal.marketplace = function() {
-	BRS.sendRequest("getDGSGoods", {
-	    "seller": BRS.userInfoModal.user,
-	    "firstIndex": 0,
-	    "lastIndex": 99
-	}, function(response) {
-	    var rows = "";
-
-	    if (response.goods && response.goods.length) {
-		for (var i = 0; i < response.goods.length; i++) {
-		    var good = response.goods[i];
-		    if (good.name.length > 150) {
-			good.name = good.name.substring(0, 150) + "...";
-		    }
-		    rows += "<tr><td><a href='#' data-goto-goods='" + String(good.goods).escapeHTML() + "' data-seller='" + String(BRS.userInfoModal.user).escapeHTML() + "'>" + String(good.name).escapeHTML() + "</a></td><td>" + BRS.formatAmount(good.priceNQT) + " " + BRS.valueSuffix + "</td><td>" + BRS.format(good.quantity) + "</td></tr>";
-		}
-	    }
-
-	    $("#user_info_modal_marketplace_table tbody").empty().append(rows);
-	    BRS.dataLoadFinished($("#user_info_modal_marketplace_table"));
-	});
-    };
+    BRS.userInfoModal.smartcontract = function() {
+        BRS.sendRequest("getAT", {
+            "at": BRS.convertRSAccountToNumeric(BRS.userInfoModal.user)
+        }, function(response) {
+            let rows = "";
+            if (response.errorCode) {
+                $("#user_info_modal_smartcontract_table tbody").empty();
+                BRS.dataLoadFinished($("#user_info_modal_smartcontract_table"));
+                return
+            }
+            const props = [
+                "name",
+                "description",
+                "creatorRS",
+                "minActivation",
+                "machineCodeHashId",
+                "status",
+                "atVersion",
+                "creationBlock",
+                "machineData",
+                "machineCode"
+            ]
+            for (const row of props) {
+                const key = row.replace(/\s+/g, "").replace(/([A-Z])/g, function($1) {
+                    return "_" + $1.toLowerCase();
+                });
+                rows += "<tr>"
+                rows += `<td>${$.t(key)}</td>`
+                let codeHTML = ''
+                switch (row) {
+                case 'minActivation':
+                    codeHTML = BRS.formatAmount(response[row]) + " " + BRS.valueSuffix
+                    break;
+                case 'creatorRS':
+                    codeHTML = BRS.getAccountTitle(response[row])
+                    break;
+                case 'machineCode':
+                    codeHTML = response[row].replace(/0+$/, '');
+                    break;
+                case "status":
+                    for (const val of ["running", "stopped", "finished", "frozen", "dead"]) {
+                        if (response[val] === true) {
+                            codeHTML += (codeHTML === '' ? '' : ' + ') + $.t(val)
+                        }
+                    }
+                    break
+                default:
+                    codeHTML = String(response[row]).escapeHTML()
+                }
+                rows += `<td style='word-break: break-word;'>${codeHTML}</td>`
+                rows += '</tr>'
+            }
+            $("#user_info_modal_smartcontract_table tbody").html(rows);
+            BRS.dataLoadFinished($("#user_info_modal_smartcontract_table"));
+        })
+    }
 
     BRS.userInfoModal.assets = function() {
 	BRS.sendRequest("getAccount", {

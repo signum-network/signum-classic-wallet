@@ -101,6 +101,7 @@ var BRS = (function(BRS, $, undefined) {
         } catch (err) {
             BRS.hasLocalStorage = false;
         }
+        // Default location for notify message (set once)
         $.notifyDefaults({
             placement:{ from:"bottom", align:"right" },
             offset: 10
@@ -183,6 +184,8 @@ var BRS = (function(BRS, $, undefined) {
         $("[data-toggle='tooltip']").tooltip();
 
         $(".sidebar .treeview").tree();
+
+        setInterval(setHeaderClock, 1000);
 
         /*
           $("#asset_exchange_search input[name=q]").addClear({
@@ -294,6 +297,14 @@ var BRS = (function(BRS, $, undefined) {
         }
     }
 
+    function setHeaderClock () {
+        const lastBlockDate = new Date(Date.UTC(2014, 7, 11, 2, 0, 0, 0) + BRS.state.lastBlockTimestamp * 1000);
+        const diffSeconds = Math.floor((Date.now() - lastBlockDate.getTime()) / 1000);
+        const minutes = (diffSeconds / 60) < 10 ? "0" + Math.floor(diffSeconds / 60).toString() : Math.floor(diffSeconds / 60).toString()
+        const seconds = (diffSeconds % 60) < 10 ? "0" + (diffSeconds % 60).toString() : (diffSeconds % 60).toString()
+        $("#header_block_time").html(minutes + ":" + seconds);
+    }
+
     BRS.getState = function(callback) {
         BRS.checkSelectedNode();
 
@@ -317,6 +328,8 @@ var BRS = (function(BRS, $, undefined) {
 
             $("#brs_version").html(BRS.state.version + " on " + BRS.server).removeClass("loading_dots");
             $("#brs_version_dashboard").html(BRS.state.version).removeClass("loading_dots");
+            $("#header_current_block").html("#" + BRS.state.numberOfBlocks);
+            setHeaderClock()
             switch (true) {
             case firstTime:
                 BRS.getBlock(BRS.state.lastBlock, BRS.handleInitialBlocks);
@@ -703,13 +716,7 @@ var BRS = (function(BRS, $, undefined) {
             }
             else {
                 if (BRS.accountRS && BRS.accountInfo.accountRS !== BRS.accountRS) {
-                    $.notify("Generated Reed Solomon address different from the one in the blockchain!", {
-                        type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                    });
+                    $.notify("Generated Reed Solomon address different from the one in the blockchain!", { type: 'danger' });
                     BRS.accountRS = BRS.accountInfo.accountRS;
                 }
 
@@ -869,13 +876,7 @@ var BRS = (function(BRS, $, undefined) {
                                 "asset": String(asset.asset).escapeHTML(),
                                 "name": String(asset.name).escapeHTML(),
                                 "count": quantity
-                            }), {
-                                type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                            });
+                            }), { type: 'success' });
                         }
                     }
                     else {
@@ -888,26 +889,14 @@ var BRS = (function(BRS, $, undefined) {
                                 "asset": String(asset.asset).escapeHTML(),
                                 "name": String(asset.name).escapeHTML(),
                                 "count": quantity
-                            }), {
-                                type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                            });
+                            }), { type: 'success' });
                         }
                     }
                 });
             }
         }
         else {
-            $.notify($.t("multiple_assets_differences"), {
-                type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-            });
+            $.notify($.t("multiple_assets_differences"), { type: 'success' });
         }
     };
 
@@ -987,13 +976,7 @@ var BRS = (function(BRS, $, undefined) {
             }
 
             if (onAFork) {
-                $.notify($.t("fork_warning"), {
-                    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                $.notify($.t("fork_warning"), { type: 'danger' });
             }
         }
     };
@@ -1030,7 +1013,18 @@ var BRS = (function(BRS, $, undefined) {
           });
     };
 
-    
+    function showAccountSearchResults(accountsList) {
+        if (BRS.currentPage !== "search_results") {
+            BRS.goToPage("search_results")
+        }
+        let items = ''
+        for (const account of accountsList) {
+            const accountRS = BRS.convertNumericToRSAccountFormat(account)
+            items += `<li><a href="#" data-user="${accountRS}" class="user-info">${accountRS}</a></li>`
+        }
+        $("#search_results_ul_container").html(items)
+    }
+
     BRS.evIdSearchSubmit = function(e) {
         e.preventDefault();
         const searchText = $.trim($("#id_search input[name=q]").val());
@@ -1065,7 +1059,7 @@ var BRS = (function(BRS, $, undefined) {
             $.notify($.t("error_search_invalid"), { type: 'danger' });
             return
         }
-        switch (splitted[0]) {
+        switch (splitted[0].trim()) {
         case 'a':
         case 'address':
             BRS.sendRequest("getAccount", {
@@ -1115,6 +1109,30 @@ var BRS = (function(BRS, $, undefined) {
                 BRS.evAliasShowSearchResult(response);
             });
             return;
+        case 'name':
+            BRS.sendRequest("getAccountsWithName", {
+                "name": splitted[1].trim()
+            }, function(response) {
+                if (response.errorCode || !response.accounts ||  response.accounts.length === 0) {
+                    $.notify($.t("error_search_no_results"), { type: 'danger' })
+                    return
+                }
+                if (response.accounts.length === 1) {
+                    BRS.sendRequest("getAccount", {
+                        "account": response.accounts[0]
+                    }, function(response2, input) {
+                        if (response2.errorCode) {
+                            $.notify($.t("error_search_no_results"), { type: 'danger' })
+                            return
+                        }
+                        BRS.showAccountModal(response2);
+                    });
+                    return;
+                }
+                // show multi result page
+                showAccountSearchResults(response.accounts)
+            });
+            return;
         default:
             $.notify($.t("error_search_invalid"), { type: 'danger' });
         }
@@ -1146,7 +1164,6 @@ $(document).ready(function() {
         { location: 'body', path: 'html/modals/send_money.html' },
         { location: 'body', path: 'html/modals/commitment.html' },
         { location: 'body', path: 'html/modals/subscription.html' },
-        { location: 'body', path: 'html/modals/token.html' },
         { location: 'body', path: 'html/modals/transaction_info.html' },
         { location: 'body', path: 'html/modals/transaction_operations.html' },
         { location: 'body', path: 'html/modals/user_info.html' },

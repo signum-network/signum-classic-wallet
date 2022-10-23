@@ -70,12 +70,7 @@
             }
         });
         $(".modal button.btn-primary:not([data-dismiss=modal]):not([data-ignore=true])").click(function() {
-            // ugly hack - this whole ui is hack, got a big urge to vomit
-            if ($(this)[0].id === "sign_message_modal_button") { // hack hackity hack!
-                BRS.forms.signModalButtonClicked();
-            } else if (!$(this).hasClass("multi-out")) {
-                BRS.submitForm($(this).closest(".modal"), $(this));
-            }
+            BRS.submitForm($(this));
         });
 
         // from brs.login.js
@@ -90,9 +85,6 @@
             }
             if (account) {
                 const $inputField = $(this).find("input[name=recipient], input[name=account_id]").not("[type=hidden]");
-                if (!/BURST\-/i.test(account)) {
-                    $inputField.addClass("noMask");
-                }
                 $inputField.val(account).trigger("checkRecipient");
             }
             BRS.sendMoneyCalculateTotal($(this));
@@ -105,9 +97,6 @@
             }
             if (account) {
                 const $inputField = $(this).find("input[name=recipient], input[name=account_id]").not("[type=hidden]");
-                if (!/BURST\-/i.test(account)) {
-                    $inputField.addClass("noMask");
-                }
                 $inputField.val(account).trigger("checkRecipient");
             }
             BRS.commitmentCalculateTotal($(this));
@@ -117,19 +106,6 @@
         });
         $("#send_money_amount, #send_money_fee").on("change", function(e) {
             BRS.sendMoneyCalculateTotal($(this));
-        });
-        //todo later: http://twitter.github.io/typeahead.js/
-        $("span.recipient_selector button").on("click", function(e) {
-            if (!Object.keys(BRS.contacts).length) {
-                e.preventDefault();
-                e.stopPropagation();
-                return;
-            }
-            const $list = $(this).parent().find("ul");
-            $list.empty();
-            for (const accountId in BRS.contacts) {
-                $list.append("<li><a href='#' data-contact='" + String(BRS.contacts[accountId].name).escapeHTML() + "'>" + String(BRS.contacts[accountId].name).escapeHTML() + "</a></li>");
-            }
         });
         $("span.asset_selector button").on("click", function(e) {
             const $list = $(this).parent().find("ul");
@@ -147,41 +123,8 @@
             }
         });
         $("span.asset_selector").on("click", "ul li a", BRS.evTransferAssetModalOnShowBsModal);
-        $(document).on("click", "span.recipient_selector button", function(e) {
-            if (!Object.keys(BRS.contacts).length) {
-                e.preventDefault();
-                e.stopPropagation();
-                return;
-            }
-            const $list = $(this).parent().find("ul");
-            $list.empty();
-            for (const accountId in BRS.contacts) {
-                $list.append("<li><a href='#' data-contact='" + String(BRS.contacts[accountId].name).escapeHTML() + "'>" + String(BRS.contacts[accountId].name).escapeHTML() + "</a></li>");
-            }
-        });
-        $("span.recipient_selector").on("click", "ul li a", function(e) {
-            e.preventDefault();
-            $(this).closest("form").find("input[name=converted_account_id]").val("");
-            $(this).closest("form").find("input[name=recipient],input[name=account_id]").not("[type=hidden]").trigger("unmask").val($(this).data("contact")).trigger("blur");
-        });
-        $(document).on("click", ".recipient_selector_multi_out button", function(e) {
-            if (!Object.keys(BRS.contacts).length) {
-                e.preventDefault();
-                e.stopPropagation();
-                return;
-            }
-            const $list = $(this).parent().find("ul");
-            $list.empty();
-            for (const accountId in BRS.contacts) {
-                $list.append("<li><a href='#' data-contact='" + String(accountId).escapeHTML() + "'>" + String(BRS.contacts[accountId].name).escapeHTML() + "</a></li>");
-            }
-        });
-        $(document).on("click", ".recipient_selector_multi_out ul li a", function(e) {
-            e.preventDefault();
-            // ugly hack - serious jquery cancer
-            $(this).parent().parent().parent().parent().find(".multi-out-recipient").val($(this).data("contact"));
-        });
-
+        $("span.recipient_selector").on("click", "button", BRS.evSpanRecipientSelectorClickButton);
+        $("span.recipient_selector").on("click", "ul li a", BRS.evSpanRecipientSelectorClickUlLiA);
         // from brs.assetexchange.js
         $("#asset_exchange_bookmark_this_asset").on("click", function() {
                 BRS.saveAssetBookmarks([BRS.currentAsset], function() {
@@ -221,7 +164,7 @@
         });
         $("#asset_exchange_bid_orders_table tbody, #asset_exchange_ask_orders_table tbody").on("click", "td", BRS.evAssetExchangeOrdersTableClick);
         $("#sell_automatic_price, #buy_automatic_price").on("click", BRS.evSellBuyAutomaticPriceClick);
-        $("#buy_asset_quantity, #buy_asset_price, #sell_asset_quantity, #sell_asset_price, #buy_asset_fee, #sell_asset_fee").keydown(BRS.evAssetExchangeQuantityPriceKeydown);
+        $("#buy_asset_quantity, #buy_asset_price, #sell_asset_quantity, #sell_asset_price").keydown(BRS.evAssetExchangeQuantityPriceKeydown);
         $("#sell_asset_quantity, #sell_asset_price, #buy_asset_quantity, #buy_asset_price").keyup(BRS.evCalculatePricePreviewKeyup);
         $("#asset_order_modal").on("show.bs.modal", BRS.evAssetOrderModalOnShowBsModal);
         $("#asset_exchange_sidebar_group_context").on("click", "a", function(e) {
@@ -401,20 +344,10 @@
             const target = $(e.target).attr("href");
             $(target).scrollTop(0);
         });
-        // hide multi-out
-        $(".hide").hide();
-        $(".multi-out").hide();
-        $(".multi-out-same").hide();
-        $(".multi-out-recipients").append($("#additional_multi_out_recipient").html());
-        $(".multi-out-recipients").append($("#additional_multi_out_recipient").html());
-        $(".multi-out-same-recipients").append($("#additional_multi_out_same_recipient").html());
-        $(".multi-out-same-recipients").append($("#additional_multi_out_same_recipient").html());
-        $(".multi-out .remove_recipient").each(function() {
-            $(this).remove();
-        });
+        BRS.resetModalMultiOut()
         $(".ordinary-nav a").on("click", function(e) {
-            $(".multi-out").hide();
-            $(".ordinary").fadeIn();
+            $("#send_multi_out").hide();
+            $("#send_ordinary").fadeIn();
             if (!$(".ordinary-nav").hasClass("active")) {
                 $(".ordinary-nav").addClass("active");
             }
@@ -423,8 +356,8 @@
             }
         });
         $(".multi-out-nav a").on("click", function(e) {
-            $(".ordinary").hide();
-            $(".multi-out").fadeIn();
+            $("#send_ordinary").hide();
+            $("#send_multi_out").fadeIn();
             if ($(".ordinary-nav").hasClass("active")) {
                 $(".ordinary-nav").removeClass("active");
             }
@@ -432,13 +365,9 @@
                 $(".multi-out-nav").addClass("active");
             }
         });
-        $(".add_recipients").on("click", BRS.evAddRecipientsClick);
-        $(document).on("click", ".remove_recipient .remove_recipient_button", BRS.evDocumentOnClickRemoveRecipient);
-        $(document).on("change remove", ".multi-out-amount", BRS.evDocumentOnChangeMultiOutAmount);
-        $("#multi-out-same-amount").on("change", BRS.evMultiOutSameAmountChange);
-        $(".same_out_checkbox").on("change", BRS.evSameOutCheckboxChange);
+        $("#multi_out_same_amount").on("change", BRS.evMultiOutSameAmountChange);
+        $("#send_money_same_out_checkbox").on("change", BRS.evSameOutCheckboxChange);
         $("#multi_out_fee").on("change", BRS.evMultiOutFeeChange);
-        $("#multi-out-submit").on("click", BRS.evMultiOutSubmitClick);
         $(".transfer-asset-nav a").on("click", function(e) {
             $(".multi-transfer").hide();
             $(".transfer-asset").fadeIn();
@@ -459,6 +388,7 @@
                 $(".multi-transfer-nav").addClass("active");
             }
         });
+        $(".add_recipients").on("click", BRS.evAddRecipientsClick);
         $(".add_message").on("change", function(e) {
             if ($(this).is(":checked")) {
                 $(this).closest("form").find(".optional_message").fadeIn();
@@ -499,7 +429,7 @@
         });
 
         // from brs.modals.account.js
-        $("#blocks_table, #blocks_forged_table, #contacts_table, #transactions_table, #dashboard_transactions_table, #asset_account, #asset_exchange_ask_orders_table, #transfer_history_table, #asset_exchange_bid_orders_table, #alias_info_table, .dgs_page_contents, .modal-content, #register_alias_modal").on("click", "a[data-user]", function(e) {
+        $("#blocks_table, #blocks_forged_table, #contacts_table, #transactions_table, #dashboard_transactions_table, #asset_account, #asset_exchange_ask_orders_table, #transfer_history_table, #asset_exchange_bid_orders_table, #alias_info_table, .dgs_page_contents, .modal-content, #register_alias_modal, #block_info_table, #search_results_ul_container").on("click", "a[data-user]", function(e) {
             e.preventDefault();
             const account = $(this).data("user");
             BRS.showAccountModal(account);
@@ -688,6 +618,7 @@
         });
 
         // from brs.modals.signmessage.js
+        $("#sign_message_modal_button").click(BRS.forms.signModalButtonClicked);
         $("#sign_message_modal").on("show.bs.modal", function(e) {
             $("#sign_message_output, #verify_message_output").html("").hide();
             $("#sign_message_modal_sign_message").show();
@@ -721,35 +652,8 @@
             BRS.showSubscriptionCancelModal(subscriptionId);
         });
 
-        // from brs.modals.token.js
-        $("#token_modal").on("show.bs.modal", function(e) {
-            $("#generate_token_output, #decode_token_output").html("").hide();
-            $("#token_modal_generate_token").show();
-            $("#token_modal_button").text($.t("generate")).data("form", "generate_token_form");
-        });
-        $("#token_modal ul.nav li").click(function(e) {
-            e.preventDefault();
-            const tab = $(this).data("tab");
-            $(this).siblings().removeClass("active");
-            $(this).addClass("active");
-            $(".token_modal_content").hide();
-            const content = $("#token_modal_" + tab);
-            if (tab == "generate_token") {
-                $("#token_modal_button").text($.t("generate")).data("form", "generate_token_form");
-            } else {
-                $("#token_modal_button").text($.t("validate")).data("form", "validate_token_form");
-            }
-            $("#token_modal .error_message").hide();
-            content.show();
-        });
-        $("#token_modal").on("hidden.bs.modal", function(e) {
-            $(this).find(".token_modal_content").hide();
-            $(this).find("ul.nav li.active").removeClass("active");
-            $("#generate_token_nav").addClass("active");
-        });
-
         // from brs.modals.transaction.js
-        $("#transactions_table, #dashboard_transactions_table, #transfer_history_table, #asset_exchange_trade_history_table").on("click", "a[data-transaction]", function(e) {
+        $("#transactions_table, #dashboard_transactions_table, #transfer_history_table, #asset_exchange_trade_history_table, #block_info_table, #block_info_transactions_table, #user_info_modal_transactions_table").on("click", "a[data-transaction]", function(e) {
             e.preventDefault();
             const transactionId = $(this).data("transaction");
             BRS.showTransactionModal(transactionId);
@@ -762,7 +666,7 @@
             BRS.showFeeSuggestions("#commitment_fee", "#suggested_fee_response_commitment");
         });
         $('#send_money_modal').on('hide.bs.modal', function (e) {
-                $("#total_amount_multi_out").html('0.1 Signa');
+            $("#total_amount_multi_out").html('?');
         });
         $("#suggested_fee_ordinary").on("click", function(e) {
             e.preventDefault();
@@ -778,29 +682,37 @@
         });
 
         // from brs.utils.js
-        $("body").on(".description_toggle", "click", function(e) {
-            e.preventDefault();
-            if ($(this).closest(".description").hasClass("open")) {
-                BRS.showPartialDescription();
-            } else {
-                BRS.showFullDescription();
-            }
-        });
-        $("#offcanvas_toggle").on("click", function(e) {
-            e.preventDefault();
-            //If window is small enough, enable sidebar push menu
-            if ($(window).width() <= 992) {
-                $('.row-offcanvas').toggleClass('active');
-                $('.left-side').removeClass("collapse-left");
-                $(".right-side").removeClass("strech");
-                $('.row-offcanvas').toggleClass("relative");
-            } else {
-                //Else, enable content streching
-                $('.left-side').toggleClass("collapse-left");
-                $(".right-side").toggleClass("strech");
-            }
-        });
         $.fn.tree = BRS.FnTree;
+
+        // from brs.blocks.js
+        $("#block_info_latest_block").on("click", function(e) {
+            e.preventDefault();
+            BRS.blocksInfoLoad(BRS.blocks[0].height.toString());
+        });
+        $("#block_info_search").on("click", function(e) {
+            const userInput = $("#block_info_input_block").val()
+            const currentBlock = Number(userInput)
+            if (isNaN(currentBlock) || currentBlock < 0) {
+                $.notify($.t('invalid_blockheight'), { type: 'danger' })
+            }
+            BRS.blocksInfoLoad($("#block_info_input_block").val());
+        });
+        $("#block_info_previous_block").on("click", function(e) {
+            const userInput = $("#block_info_input_block").val()
+            const currentBlock = Number(userInput)
+            if (isNaN(currentBlock) || currentBlock <= 0) {
+                $.notify($.t('invalid_blockheight'), { type: 'danger' })
+            }
+            BRS.blocksInfoLoad(currentBlock - 1);
+        });
+        $("#block_info_next_block").on("click", function(e) {
+            const userInput = $("#block_info_input_block").val()
+            const currentBlock = Number(userInput)
+            if (isNaN(currentBlock) || currentBlock < 0) {
+                $.notify($.t('invalid_blockheight'), { type: 'danger' })
+            }
+            BRS.blocksInfoLoad(currentBlock + 1);
+        });
     }
 
     return BRS;

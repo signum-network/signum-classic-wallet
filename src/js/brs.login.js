@@ -144,16 +144,6 @@ var BRS = (function(BRS, $, undefined) {
 
         BRS.unlock();
 
-        if (BRS.isOutdated) {
-            $.notify($.t("brs_update_available"), {
-                type: 'danger',
-        offset: {
-            x: 5,
-            y: 60
-            }
-            });
-        }
-
         if (!BRS.downloadingBlockchain) {
             BRS.checkIfOnAFork();
         }
@@ -172,10 +162,7 @@ var BRS = (function(BRS, $, undefined) {
     BRS.loginWithAccount = function(account) {
         account = account.trim();
         if (!account.length) {
-            $.notify($.t("error_account_required_login"), {
-                type: 'danger',
-                offset: 10
-            });
+            $.notify($.t("error_account_required_login"), { type: 'danger' });
             return;
         }
 
@@ -183,10 +170,7 @@ var BRS = (function(BRS, $, undefined) {
 
         BRS.sendRequest("getBlockchainStatus", function(response) {
             if (response.errorCode) {
-                $.notify($.t("error_server_connect"), {
-                    type: 'danger',
-                    offset: 10
-                });
+                $.notify($.t("error_server_connect"), { type: 'danger' });
                 return;
             }
 
@@ -202,7 +186,7 @@ var BRS = (function(BRS, $, undefined) {
             if (!login) {
                 $.notify(
                     $.t("name_not_in_contacts", { name: account }),
-                    { type: 'danger', offset: 10 }
+                    { type: 'danger' }
                 );
                 return
             }
@@ -213,17 +197,13 @@ var BRS = (function(BRS, $, undefined) {
             }, function(response) {
                 if (response.errorCode) {
                     if (BRS.rsRegEx.test(login) || BRS.idRegEx.test(login)) {
-                        $.notify($.t("error_account_unknow_watch_only"), {
-                            type: 'danger',
-                            offset: { x: 5, y: 60 }
-                        });
+                        $.notify($.t("error_account_unknow_watch_only"), { type: 'danger' });
                         return;
                     }
                     // Otherwise, show an error.  The address is in the right format perhaps, but
                     // an address does not exist on the blockchain so there's nothing to see.
                     $.notify("<strong>" + $.t("warning") + "</strong>: " + response.errorDescription, {
-                        type: 'danger',
-                        offset: { x: 5, y: 60 }
+                        type: 'danger'
                     });
                     return;
                 }
@@ -238,10 +218,7 @@ var BRS = (function(BRS, $, undefined) {
 
                 $("#login_password, #login_account, #registration_password, #registration_password_repeat").val("");
                 $("#login_check_password_length").val(1);
-                $.notify($.t("success_login_watch_only"), {
-                    type: 'success',
-                    offset: { x: 5, y: 60 }
-                });
+                $.notify($.t("success_login_watch_only"), { type: 'success' });
                 $("#account_id").html(String(BRS.accountRS).escapeHTML());
 
                 BRS.loginCommon();
@@ -252,10 +229,7 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.loginWithPassphrase = function(passphrase) {
         if (!passphrase.length) {
-            $.notify($.t("error_passphrase_required_login"), {
-                type: 'danger',
-                offset: 10
-            });
+            $.notify($.t("error_passphrase_required_login"), { type: 'danger' });
             return;
         }
 
@@ -272,10 +246,7 @@ var BRS = (function(BRS, $, undefined) {
 
         BRS.sendRequest("getBlockchainStatus", function(response) {
             if (response.errorCode) {
-                $.notify($.t("error_server_connect"), {
-                    type: 'danger',
-                    offset: 10
-                });
+                $.notify($.t("error_server_connect"), { type: 'danger' });
                 return;
             }
 
@@ -297,10 +268,7 @@ var BRS = (function(BRS, $, undefined) {
                     "account": BRS.account
                 }, function(response) {
                     if (response && response.publicKey && response.publicKey !== BRS.publicKey) {
-                        $.notify($.t("error_account_taken"), {
-                            type: 'danger',
-                            offset: 10
-                        });
+                        $.notify($.t("error_account_taken"), { type: 'danger' });
                         return;
                     }
 
@@ -312,8 +280,7 @@ var BRS = (function(BRS, $, undefined) {
                     }
                     if (passwordNotice) {
                         $.notify("<strong>" + $.t("warning") + "</strong>: " + passwordNotice, {
-                            type: 'danger',
-                            offset: { x: 5, y: 60 }
+                            type: 'danger'
                         });
                     }
 

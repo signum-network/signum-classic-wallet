@@ -401,13 +401,13 @@ var BRS = (function(BRS, $, undefined) {
                     const RSAddress = nxtAddress.toString()
                     const amountEach = BRS.formatAmount(recipient[1]) + ' ' + BRS.valueSuffix
                     if (recipient[0] === viewingAccount) {
-                        recipientHTML += `<strong>${RSAddress}: ${amountEach}</strong>`
+                        recipientHTML += `<strong class="mono-font">${RSAddress}: ${amountEach}</strong>`
                         toFromViewer = true;
                         senderOrRecipientOrMultiple = "sender"
                         amountToFromViewer = recipient[1];
                         amountToFromViewerHTML = BRS.formatAmount(amountToFromViewer) + " " + BRS.valueSuffix
                     } else {
-                        recipientHTML += `${RSAddress}: ${amountEach}`
+                        recipientHTML += `<span class="mono-font">${RSAddress}</span>: ${amountEach}`
                     }
                     recipientHTML += '<br />'
                 }
@@ -426,13 +426,13 @@ var BRS = (function(BRS, $, undefined) {
                     nxtAddress.set(recipient)
                     const address = nxtAddress.toString()
                     if (recipient === viewingAccount) {
-                        recipientHTML += '<strong>' + address + '</strong>'
+                        recipientHTML += '<strong class="mono-font">' + address + '</strong>'
                         toFromViewer = true;
                         senderOrRecipientOrMultiple = "sender"
                         amountToFromViewer = amountEach;
                         amountToFromViewerHTML = BRS.formatAmount(amountToFromViewer) + " " + BRS.valueSuffix
                     } else {
-                        recipientHTML += address
+                        recipientHTML += `<span class="mono-font">${address}</span>`
                     }
                     recipientHTML += '<br />'
                 }

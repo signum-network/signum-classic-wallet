@@ -392,11 +392,9 @@ BRS = (function (BRS, $, undefined) {
         }
     };
 
-    BRS.forms.sellAlias = function ($modal) {
-        var data = BRS.getFormData($modal.find("form:first"));
-
-        var successMessage = "";
-        var errorMessage = "";
+    BRS.forms.sellAlias = function (data) {
+        let successMessage = "";
+        let errorMessage = "";
 
         if (data.modal === "cancel_alias_sale") {
             data.priceNXT = "0";
@@ -524,33 +522,18 @@ BRS = (function (BRS, $, undefined) {
             if (response.errorCode) {
                 e.preventDefault();
                 $.notify($.t("error_alias_not_found"), {
-                    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                    type: 'danger' });
             }
             else {
                 if (!("priceNQT" in response)) {
                     e.preventDefault();
                     $.notify($.t("error_alias_not_for_sale"), {
-                        type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                    });
+                        type: 'danger' });
                 }
                 else if (typeof response.buyer !== "undefined" && response.buyer !== BRS.account) {
                     e.preventDefault();
                     $.notify($.t("error_alias_sale_different_account"), {
-                        type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                    });
+                        type: 'danger' });
                 }
                 else {
                     $modal.find("input[name=recipient]").val(String(response.accountRS).escapeHTML());
@@ -598,16 +581,11 @@ BRS = (function (BRS, $, undefined) {
             BRS.sendRequest("getAlias", {
                 "aliasName": alias
             }, function (response) {
+                BRS.fetchingModalData = false;
                 if (response.errorCode) {
                     e.preventDefault();
                     $.notify($.t("error_alias_not_found"), {
-                        type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                    });
-                    BRS.fetchingModalData = false;
+                        type: 'danger' });
                 }
                 else {
                     var aliasURI;
@@ -656,15 +634,13 @@ BRS = (function (BRS, $, undefined) {
         }
     };
 
-    BRS.forms.setAlias = function ($modal) {
-        var data = BRS.getFormData($modal.find("form:first"));
-
+    BRS.forms.setAlias = function (data) {
         data.aliasURI = $.trim(data.aliasURI).toLowerCase();
 
         if (data.type === "account") {
             if (!(/acct:(.*)@burst/.test(data.aliasURI)) && !(/nacc:(.*)/.test(data.aliasURI))) {
-                if (/^(BURST\-)/i.test(data.aliasURI) || /^(S\-)/i.test(data.aliasURI)) {
-                    var address = new NxtAddress();
+                if (BRS.rsRegEx.test(data.aliasURI.toUpperCase())) {
+                    const address = new NxtAddress(BRS.prefix);
 
                     if (!address.set(data.aliasURI)) {
                         return {
@@ -675,7 +651,7 @@ BRS = (function (BRS, $, undefined) {
                         data.aliasURI = "acct:" + data.aliasURI + "@burst";
                     }
                 }
-                else if (/^\d+$/.test(data.aliasURI)) {
+                else if (BRS.idRegEx.test(data.aliasURI)) {
                     data.aliasURI = "acct:" + data.aliasURI + "@burst";
                 }
                 else {
@@ -697,7 +673,6 @@ BRS = (function (BRS, $, undefined) {
         $("#register_alias_type").val(type);
 
         if (type == "uri") {
-            $("#register_alias_uri.masked").trigger("unmask", true);
             $("#register_alias_uri_label").html($.t("uri"));
             $("#register_alias_uri").prop("placeholder", $.t("uri"));
             var keyword = "https?:\/\/";
@@ -721,7 +696,7 @@ BRS = (function (BRS, $, undefined) {
         else if (type === "account") {
             $("#register_alias_uri_label").html($.t("account_id"));
             $("#register_alias_uri").prop("placeholder", $.t("account_id"));
-            $("#register_alias_uri").val("").mask("S-****-****-****-*****");
+            $("#register_alias_uri").val("");
 
             if (uri) {
                 var match = uri.match(/acct:(.*)@burst/i);
@@ -757,7 +732,6 @@ BRS = (function (BRS, $, undefined) {
             $("#register_alias_help").html($.t("alias_account_help")).show();
         }
         else {
-            $("#register_alias_uri.masked").trigger("unmask", true);
             $("#register_alias_uri_label").html($.t("data"));
             $("#register_alias_uri").prop("placeholder", $.t("data"));
             if (uri) {
@@ -847,12 +821,7 @@ BRS = (function (BRS, $, undefined) {
                 }
 
                 $.notify($.t("success_alias_update"), {
-                    type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                    type: 'success' });
             }
             else {
                 var $rows = $table.find("tr");
@@ -884,12 +853,7 @@ BRS = (function (BRS, $, undefined) {
                 }
 
                 $.notify($.t("success_alias_register"), {
-                    type: 'success',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                    type: 'success' });
             }
         }
     };
@@ -913,12 +877,7 @@ BRS = (function (BRS, $, undefined) {
                     + " <a href='#' data-toggle='modal' data-target='#register_alias_modal' data-prefill-alias='"
                     + String(alias).escapeHTML() + "'>"
                     + $.t("register_q") + "</a>", {
-                    type: 'danger',
-                    offset: {
-                        x: 5,
-                        y: 60
-                        }
-                });
+                    type: 'danger' });
                 BRS.fetchingModalData = false;
                 return
             }

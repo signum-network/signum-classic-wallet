@@ -58,7 +58,13 @@
     <li><a href="#" data-page="contacts"><i class="fas fa-address-book"></i> <span data-i18n="contacts">Contacts</span></a></li>
     <li><a href="#" data-page="messages"><i class="fas fa-inbox"></i> <span data-i18n="messages">Messages</span></a></li>
     <li><a href="#" data-page="aliases"><i class="fas fa-address-card"></i> <span data-i18n="aliases">Aliases</span></a></li>
-    <li><a href="#" data-page="blocks"><i class="fas fa-link"></i> <span data-i18n="blockchain">blockchain</span></a></li>
+    <li class="treeview" id="sidebar_blockchain">
+      <a href="#" data-page="keep"><i class="fas fa-link"></i> <span data-i18n="blockchain">blockchain</span><i class="fa pull-right fa-angle-right" style="padding-top:3px"></i></a>
+      <ul class="treeview-menu" style="display: none;">
+          <li><a href="#" data-page="blocks"><span data-i18n="latest_blocks">latest_blocks</span></a></li>
+          <li><a href="#" data-page="block_info"><span data-i18n="block_info">block_info</span></a></li>
+      </ul>
+    </li>
     <li><a href="#" data-page="peers"><i class="fab fa-connectdevelop"></i> <span data-i18n="peers">Peers</span></a></li>
   </ul>
 </section>

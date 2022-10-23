@@ -3,20 +3,19 @@
  */
 var BRS = (function(BRS, $, undefined) {
     BRS.automaticallyCheckRecipient = function() {
-        var $recipientFields = $("#add_contact_account_id, #update_contact_account_id, #buy_alias_recipient, #escrow_create_recipient, #inline_message_recipient, #lease_balance_recipient, #reward_recipient, #sell_alias_recipient, #send_message_recipient, #send_money_recipient, #subscription_cancel_recipient, #subscription_create_recipient, #transfer_alias_recipient, #transfer_asset_recipient");
+        var $recipientFields = $("#add_contact_account_id, #update_contact_account_id, #buy_alias_recipient, #escrow_create_recipient, #inline_message_recipient, #reward_recipient, #sell_alias_recipient, #send_message_recipient, #send_money_recipient, #subscription_cancel_recipient, #subscription_create_recipient, #transfer_alias_recipient, #transfer_asset_recipient, #transfer_asset_multi_recipient");
 
         $recipientFields.on("blur", function() {
             $(this).trigger("checkRecipient");
         });
 
         $recipientFields.on("checkRecipient", function() {
-            var value = $(this).val();
-            var modal = $(this).closest(".modal");
-
-            if (value && value != "BURST-____-____-____-_____" && value != "S-____-____-____-_____") {
-                BRS.checkRecipient(value, modal);
+            const value = $(this).val();
+            const form = $(this).closest("form");
+            if (value) {
+                BRS.checkRecipient(value, form);
             } else {
-                modal.find(".account_info").hide();
+                form.find(".account_info").hide();
             }
         });
 
@@ -49,21 +48,127 @@ var BRS = (function(BRS, $, undefined) {
     BRS.forms.sendMoneyComplete = function(response, data) {
         if (!(data._extra && data._extra.convertedAccount) && !(data.recipient in BRS.contacts)) {
             $.notify($.t("success_send_money", {"valueSuffix": BRS.valueSuffix}) + " <a href='#' data-account='" + BRS.getAccountFormatted(data, "recipient") + "' data-toggle='modal' data-target='#add_contact_modal' style='text-decoration:underline'>" + $.t("add_recipient_to_contacts_q") + "</a>", {
-                type: 'success',
-                offset: {
-                    x: 5,
-                    y: 60
-                }
+                type: 'success'
             });
         } else {
-            $.notify($.t("success_send_money", {"valueSuffix": BRS.valueSuffix}), {
-                type: 'success',
-                offset: {
-                    x: 5,
-                    y: 60
-                }
-            });
+            $.notify($.t("success_send_money", {"valueSuffix": BRS.valueSuffix}), { type: 'success' });
         }
+    };
+
+    /** converts a recipient to accountId.
+     * On error, returns ''. It means invalid rsAddress, or name not found in contacts
+     */
+    function recipientToId(recipient) {
+        let accountId = ''
+        if (BRS.rsRegEx.test(recipient)) {
+            accountId = BRS.convertRSAccountToNumeric(recipient)
+        } else if (BRS.idRegEx.test(recipient)) {
+            accountId = BigInt(recipient).toString(10)
+        } else {
+            const foundContact = BRS.getContactByName(recipient)
+            if (foundContact) {
+                accountId = foundContact.account
+            }
+        }
+        return accountId
+    }
+
+    BRS.forms.sendMoneyMulti = function(data) {
+        data['recipients'] = ''
+        let items = 0;
+        let biTotalAmount = 0n;
+        let rowAmountNQT
+
+        let requestType = 'sendMoneyMulti'
+        if (data.same_out_checkbox === '1') {
+            requestType = 'sendMoneyMultiSame'
+            try {
+                rowAmountNQT = BRS.convertToNQT(data.amount_multi_out_same)
+            } catch (e) {
+                return { "error": "Invalid amount" };
+            }
+            data['amountNXT'] = data.amount_multi_out_same
+            for (const recipient of data.recipient_multi_out_same) {
+                if (recipient === '') continue
+                const accountId = recipientToId(recipient)
+                if (accountId === '') {
+                    return {
+                        "error": $.t("name_not_in_contacts", { name: recipient })
+                    };
+                }
+                if (items > 0) {
+                    data.recipients += ';'
+                }
+                items++
+                if (items === 64) {
+                    return { "error": $.t("error_max_recipients", { max: items }) };
+                }
+                data.recipients += accountId
+                biTotalAmount += BigInt(rowAmountNQT)
+            }
+        } else {
+            for (let i = 0; i < data.recipient_multi_out.length; i++) {
+                if (data.recipient_multi_out[i] === '' ||
+                    data.amount_multi_out[i] === '' ) {
+                    continue
+                }
+                const accountId = recipientToId(data.recipient_multi_out[i])
+                if (accountId === '') {
+                    return {
+                        "error": $.t("name_not_in_contacts", { name: data.recipient_multi_out[i] })
+                    };
+                }
+                rowAmountNQT
+                try {
+                    rowAmountNQT = BRS.convertToNQT(data.amount_multi_out[i])
+                } catch (e) {
+                    return { "error": "Invalid amount" };
+                }
+                if (rowAmountNQT === '0') {
+                    return { "error": "Invalid amount" };
+                }
+                if (items > 0) {
+                    data.recipients += ';'
+                }
+                items++
+                if (items === 128) {
+                    return { "error": $.t("error_max_recipients", { max: items }) };
+                }
+                data.recipients += accountId + ':' + rowAmountNQT
+                biTotalAmount += BigInt(rowAmountNQT)
+            }
+        }
+        if (items < 2) {
+            return { "error": $.t("error_multi_out_minimum_recipients") };
+        }
+        const singleRecipients = new Set(data.recipients.split(';').map(item => item.split(':')[0]))
+        if (singleRecipients.size !== items) {
+            return { "error": $.t("error_multi_out_duplicate_recipient") };
+        }
+        if (
+            !BRS.showedFormWarning &&
+            Number(BRS.settings.amount_warning) !== 0 &&
+            biTotalAmount >= BigInt(BRS.settings.amount_warning)
+        ) {
+            BRS.showedFormWarning = true;
+            return {
+                "error": $.t("error_max_amount_warning", {
+                    "burst": BRS.formatAmount(BRS.settings.amount_warning),
+                    "valueSuffix": BRS.valueSuffix
+                })
+            }
+        }
+
+        delete data.same_out_checkbox
+        delete data.amount_multi_out
+        delete data.amount_multi_out_same
+        delete data.recipient_multi_out
+        delete data.recipient_multi_out_same
+
+        return {
+            requestType,
+            "data": data
+        };
     };
 
     BRS.sendMoneyShowAccountInformation = function(accountId) {
