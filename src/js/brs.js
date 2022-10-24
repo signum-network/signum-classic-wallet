@@ -1017,11 +1017,33 @@ var BRS = (function(BRS, $, undefined) {
         if (BRS.currentPage !== "search_results") {
             BRS.goToPage("search_results")
         }
-        let items = ''
+        let items = '<ul>'
         for (const account of accountsList) {
             const accountRS = BRS.convertNumericToRSAccountFormat(account)
             items += `<li><a href="#" data-user="${accountRS}" class="user-info">${accountRS}</a></li>`
         }
+        items += '</ul>'
+        $("#search_results_ul_container").html(items)
+    }
+
+    function showAssetSearchResults(assets) {
+        if (BRS.currentPage !== "search_results") {
+            BRS.goToPage("search_results")
+        }
+        let items = '<table class="table table-striped">' +
+            '<thead><tr>' +
+            `<th>${$.t('name')}</th>` +
+            `<th>${$.t('asset_id')}</th>` +
+            `<th>${$.t('issuer')}</th>` +
+            `<th>${$.t('description')}</th>` +
+            '</tr></thead><tbody>'
+        for (const asset of assets) {
+            items += `<tr><td>${asset.name}</td>`
+            items += `<td><a href="#" data-goto-asset="${asset.asset}">${asset.asset}</a></td>`
+            items += `<td><a href="#" data-user="${asset.accountRS}" class="user-info">${asset.accountRS}</a></td>`
+            items += `<td>${String(asset.description).escapeHTML()}</td></tr>`
+        }
+        items += '</tbody></table>'
         $("#search_results_ul_container").html(items)
     }
 
@@ -1133,6 +1155,17 @@ var BRS = (function(BRS, $, undefined) {
                 showAccountSearchResults(response.accounts)
             });
             return;
+        case 'token':
+            BRS.sendRequest("getAssetsByName", {
+                "name": splitted[1].trim()
+            }, function(response) {
+                if (response.errorCode || !response.assets ||  response.assets.length === 0) {
+                    $.notify($.t("error_search_no_results"), { type: 'danger' })
+                    return
+                }
+                showAssetSearchResults(response.assets)
+            });
+            return
         default:
             $.notify($.t("error_search_invalid"), { type: 'danger' });
         }
