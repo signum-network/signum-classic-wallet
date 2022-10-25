@@ -304,6 +304,35 @@ var BRS = (function(BRS, $, undefined) {
         $("#asset_exchange_sidebar").height($(window).height() - 120);
     };
 
+
+    function createBookmarkSidebarHTMLItem(asset, quantityHTML) {
+        return `<h4 class='list-group-item-heading'>${asset.name}</h4>
+            <p class='list-group-item-text'>${$.t('quantity_abbr')}: ${quantityHTML}</p>`
+    }
+
+    /** It does not redraw, it only updates values */
+    function updateQuantitiesInAssetExchangeSidebarContent () {
+        $("#asset_exchange_sidebar_content a").each(function () {
+            const assetId = $(this).data('asset')
+            if (!assetId) {
+                return
+            }
+            const asset = BRS.getAssetDetails(assetId)
+            if (!asset) {
+                return;
+            }
+            const accountAsset = BRS.accountInfo.assetBalances?.find((Obj) => Obj.asset === asset.asset)
+            const userAssetQuantity = accountAsset === undefined ? "0" : BRS.formatQuantity(accountAsset.balanceQNT, asset.decimals)
+
+            $(this).html(createBookmarkSidebarHTMLItem(asset, userAssetQuantity))
+            if (userAssetQuantity === "0") {
+                $(this).addClass("not_owns_asset").removeClass("owns_asset");
+            } else {    
+                $(this).addClass("owns_asset").removeClass("not_owns_asset");
+            }
+        })
+    }
+
     //called on opening the asset exchange page and automatic refresh
     BRS.loadAssetExchangeSidebar = function(callback) {
         const bookmarkedAssets = BRS.assets.filter(token => token.bookmarked === true);
@@ -378,28 +407,18 @@ var BRS = (function(BRS, $, undefined) {
                 lastGroup = asset.groupName;
             }
 
-            var ownsAsset = false;
-
-            if (BRS.accountInfo.assetBalances) {
-                $.each(BRS.accountInfo.assetBalances, function(key, assetBalance) {
-                    if (assetBalance.asset == asset.asset && assetBalance.balanceQNT != "0") {
-                        ownsAsset = true;
-                        return false;
-                    }
-                });
-            }
-
             const accountAsset = BRS.accountInfo.assetBalances?.find((Obj) => Obj.asset === asset.asset)
             const userAssetQuantity = accountAsset === undefined ? "0" : BRS.formatQuantity(accountAsset.balanceQNT, asset.decimals)
             rows += "<a href='#' class='list-group-item list-group-item-"
                 + (ungrouped ? "ungrouped" : "grouped")
-                + (ownsAsset ? " owns_asset" : " not_owns_asset")
+                + (userAssetQuantity === "0" ? " not_owns_asset" : " owns_asset")
                 + "' data-asset='" + String(asset.asset).escapeHTML() + "'"
                 + (!ungrouped ? " data-groupname='" + asset.groupName.escapeHTML() + "'" : "")
                 + (isClosedGroup ? " style='display:none'" : "")
                 + " data-closed='" + isClosedGroup
-                + "'><h4 class='list-group-item-heading'>" + asset.name.escapeHTML()
-                + "</h4><p class='list-group-item-text'>qty: " + userAssetQuantity + "</p></a>";
+                + "'>"
+            rows += createBookmarkSidebarHTMLItem(asset, userAssetQuantity)
+            rows += "</a>";
         }
 
         var active = $("#asset_exchange_sidebar a.active");
@@ -453,18 +472,8 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.incoming.asset_exchange = function() {
-        BRS.loadAsset(BRS.currentAsset.asset, true, true);
-
-        //update assets owned (colored)
-        $("#asset_exchange_sidebar a.list-group-item.owns_asset").removeClass("owns_asset").addClass("not_owns_asset");
-
-        if (BRS.accountInfo.assetBalances) {
-            $.each(BRS.accountInfo.assetBalances, function(key, assetBalance) {
-                if (assetBalance.balanceQNT != "0") {
-                    $("#asset_exchange_sidebar a.list-group-item[data-asset=" + assetBalance.asset + "]").addClass("owns_asset").removeClass("not_owns_asset");
-                }
-            });
-        }
+        BRS.loadAsset(BRS.currentAsset, false, true);
+        updateQuantitiesInAssetExchangeSidebarContent()
     };
 
     BRS.evAssetExchangeSidebarClick = function(e, data) {
