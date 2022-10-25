@@ -604,7 +604,7 @@
     "purchase_not_delivered_in_time": "購買未按時交付。",
     "purchase_refunded": "該購買已退款。",
     "put_for_sale": "出售",
-    "qty": "數量",
+    "quantity_abbr": "數量",
     "quantity": "數量",
     "raw_transaction_details": "原始交易詳情",
     "recent_blocks": "最新的區塊",

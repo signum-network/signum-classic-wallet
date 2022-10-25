@@ -598,7 +598,7 @@
     "purchase_not_delivered_in_time": "Ostosta ei toimitettu ajoissa.",
     "purchase_refunded": "Tämän ostoksen hinta on palautettu.",
     "put_for_sale": "Aseta myyntiin",
-    "qty": "Määrä",
+    "quantity_abbr": "Määrä",
     "quantity": "Määrä",
     "raw_transaction_details": "Transaktion tiedot",
     "recent_blocks": "Viimeiset lohkot",

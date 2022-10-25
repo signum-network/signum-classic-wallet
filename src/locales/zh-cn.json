@@ -603,7 +603,7 @@
     "purchase_not_delivered_in_time": "购买未按时交付。",
     "purchase_refunded": "该购买已退款。",
     "put_for_sale": "出售",
-    "qty": "数量",
+    "quantity_abbr": "数量",
     "quantity": "数量",
     "raw_transaction_details": "原始交易详情",
     "recent_blocks": "最新的区块",

@@ -1,4 +1,5 @@
 {
+    "asset_issuer": "Asset issuer",
     "issuer": "Issuer",
     "user_no_smartcontract": "This account is not a smart contract.",
     "creator_r_s": "Creator",
@@ -735,7 +736,7 @@
     "purchase_not_delivered_in_time": "The purchase was not delivered in time.",
     "purchase_refunded": "This purchase has been refunded.",
     "put_for_sale": "Put For Sale",
-    "qty": "QTY",
+    "quantity_abbr": "QTY",
     "quantity": "Quantity",
     "quantity_circulating": "Circulating Quantity",
     "quantity_to_you": "Quantity to you",

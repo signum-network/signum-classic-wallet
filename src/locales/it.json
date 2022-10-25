@@ -533,7 +533,7 @@
     "purchase_not_delivered_in_time": "L'acquisto non è stato consegnato in tempo.",
     "purchase_refunded": "Questo acquisto è stato rimborsato.",
     "put_for_sale": "Metti in vendita",
-    "qty": "Q. TÀ",
+    "quantity_abbr": "Q. TÀ",
     "quantity": "Quantità",
     "raw_transaction_details": "Dettagli sulla transazione non processata",
     "recent_blocks": "Blocchi recenti",

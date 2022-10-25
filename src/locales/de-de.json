@@ -612,7 +612,7 @@
     "purchase_not_delivered_in_time": "Der Kauf wurde nicht rechtzeitig geliefert.",
     "purchase_refunded": "Dieser Kauf wurde zurückerstattet.",
     "put_for_sale": "Anbieten",
-    "qty": "Menge",
+    "quantity_abbr": "Menge",
     "quantity": "Menge",
     "raw_transaction_details": "Alle Details zur Transaktion",
     "recent_blocks": "Letzte Blöcke",

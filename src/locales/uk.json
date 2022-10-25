@@ -619,7 +619,7 @@
     "purchase_not_delivered_in_time": "Покупки не були доставлені вчасно.",
     "purchase_refunded": "Ця покупка була відшкодована.",
     "put_for_sale": "Виставлений на продаж",
-    "qty": "Кількість",
+    "quantity_abbr": "Кількість",
     "quantity": "Кількість",
     "raw_transaction_details": "RAW деталі транзакції",
     "recent_blocks": "Останні блокі",

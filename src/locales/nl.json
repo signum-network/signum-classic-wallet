@@ -602,7 +602,7 @@
     "purchase_not_delivered_in_time": "De aankoop werd niet op tijd geleverd.",
     "purchase_refunded": "Deze aankoop is terugbetaald.",
     "put_for_sale": "Neergezet voor Verkoop",
-    "qty": "Aantal",
+    "quantity_abbr": "Aantal",
     "quantity": "Hoeveelheid",
     "raw_transaction_details": "Ruwe transactiedetails",
     "recent_blocks": "Recente blokken",

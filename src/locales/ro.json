@@ -604,7 +604,7 @@
     "purchase_not_delivered_in_time": "Cumpărătura nu a fost livrată la timp.",
     "purchase_refunded": "Această achiziţie a fost rambursată.",
     "put_for_sale": "Pune de vânzare",
-    "qty": "CANTIT",
+    "quantity_abbr": "CANTIT",
     "raw_transaction_details": "Detalii tranzacție neprocesată",
     "recent_blocks": "Blocuri recente",
     "recent_transactions": "Tranzacţii recente",

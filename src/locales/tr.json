@@ -388,7 +388,7 @@
     "purchase_not_delivered_in_time": "Satınalma zamanında teslim edilmedi.",
     "purchase_refunded": "Satın alma, geri iade edildi.",
     "put_for_sale": "Satışa sür",
-    "qty": "MİKTAR",
+    "quantity_abbr": "MİKTAR",
     "raw_transaction_details": "Ham işlem ayrıntıları",
     "recent_blocks": "Son bloklar",
     "recent_transactions": "Son işlemler",

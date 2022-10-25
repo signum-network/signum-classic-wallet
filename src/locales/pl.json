@@ -624,7 +624,7 @@
     "purchase_not_delivered_in_time": "Zakup nie został dostarczony na czas.",
     "purchase_refunded": "Zakup został zwrócony.",
     "put_for_sale": "Wystaw na sprzedaż",
-    "qty": "Ilość",
+    "quantity_abbr": "Ilość",
     "quantity": "Ilość",
     "raw_transaction_details": "Nieobrobione dane transakcji",
     "recent_blocks": "Ostatnie bloki",

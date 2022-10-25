@@ -614,7 +614,7 @@
     "purchase_not_delivered_in_time": "Nákup nebol doručený včas.",
     "purchase_refunded": "Tento nákup vám bol vrátený.",
     "put_for_sale": "Na predaj",
-    "qty": "Množ.",
+    "quantity_abbr": "Množ.",
     "quantity": "Množstvo",
     "raw_transaction_details": "Surové detaily transakcie",
     "recent_blocks": "Posledné bloky",

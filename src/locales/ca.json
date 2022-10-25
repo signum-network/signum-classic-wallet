@@ -605,7 +605,7 @@
     "purchase_not_delivered_in_time": "La compra no s'ha lliurat a temps.",
     "purchase_refunded": "Aquesta compra ha estat reemborsada.",
     "put_for_sale": "Posar a la venda",
-    "qty": "Qtat",
+    "quantity_abbr": "Qtat",
     "raw_transaction_details": "Detalls de la transacció sense processar",
     "recent_blocks": "Darrers blocs",
     "recent_transactions": "Transaccions Recents",

@@ -478,7 +478,7 @@
     "purchase_delivered": "यह खरीद मिल चुकी है.",
     "purchase_failed": "खरीद में विफल रहा।",
     "put_for_sale": "बिक्री के लिए रखा",
-    "qty": "मात्रा",
+    "quantity_abbr": "मात्रा",
     "raw_transaction_details": "कच्चे हस्तांतरण विवरण",
     "recent_blocks": "हाल ही में ब्लॉक",
     "recent_transactions": "हाल ही में लेन-देन",

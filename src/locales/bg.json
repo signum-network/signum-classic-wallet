@@ -608,7 +608,7 @@
     "purchase_not_delivered_in_time": "Покупката не е доставена навреме.",
     "purchase_refunded": "Тази покупка е била върната.",
     "put_for_sale": "За продажба",
-    "qty": "К-во",
+    "quantity_abbr": "К-во",
     "raw_transaction_details": "Данни за необработена сделка",
     "recent_blocks": "Последни блока",
     "recent_transactions": "Последни сделки",

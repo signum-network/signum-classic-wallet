@@ -585,7 +585,7 @@
     "purchase_not_delivered_in_time": "Nákup nebyl doručen včas.",
     "purchase_refunded": "Tento nákup byl refundován.",
     "put_for_sale": "Vystavit k prodeji",
-    "qty": "Množ.",
+    "quantity_abbr": "Množ.",
     "recent_transactions": "Poslední transakce",
     "recipient": "Příjemce",
     "recipient_account": "Účet příjemce",

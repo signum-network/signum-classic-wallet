@@ -602,7 +602,7 @@
     "purchase_not_delivered_in_time": "購入が時間内に配信されませんでした。",
     "purchase_refunded": "この購入は払い戻しされました。",
     "put_for_sale": "販売にする",
-    "qty": "数量",
+    "quantity_abbr": "数量",
     "quantity": "数量",
     "raw_transaction_details": "未処理トランザクションの詳細",
     "recent_blocks": "最近のブロック",

@@ -534,7 +534,7 @@
     "purchase_not_delivered_in_time": "A compra non foi enviada a tempo.",
     "purchase_refunded": "Esta compra foi reembolsada.",
     "put_for_sale": "Pór á venda",
-    "qty": "Cant.",
+    "quantity_abbr": "Cant.",
     "quantity": "Cantidade",
     "raw_transaction_details": "Datos sen procesar da transacción",
     "recent_blocks": "Bloques recentes",

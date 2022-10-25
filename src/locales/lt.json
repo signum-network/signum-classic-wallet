@@ -611,7 +611,7 @@
     "purchase_not_delivered_in_time": "Pirkimas nebuvo pristatytas laiku.",
     "purchase_refunded": "Šis pirkinys buvo apmokėtas.",
     "put_for_sale": "Pateikti pardavimui",
-    "qty": "KIEKIS",
+    "quantity_abbr": "KIEKIS",
     "quantity": "Kiekis",
     "raw_transaction_details": "Transakcijos išsami informacija",
     "recent_blocks": "Paskutiniai blokai",

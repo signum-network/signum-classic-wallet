@@ -618,7 +618,7 @@
     "purchase_not_delivered_in_time": "Покупки не были доставлены вовремя.",
     "purchase_refunded": "Эта покупка была возмещена.",
     "put_for_sale": "Выставлен на продажу",
-    "qty": "Кол-во",
+    "quantity_abbr": "Кол-во",
     "quantity": "Количество",
     "raw_transaction_details": "Детали необработанной транзакции",
     "recent_blocks": "Последние блоки",
