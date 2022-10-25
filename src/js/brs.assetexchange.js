@@ -648,8 +648,8 @@ var BRS = (function(BRS, $, undefined) {
             $("#your_asset_balance").html("0");
         }
 
-        BRS.loadAssetOrders("ask", assetId, refreshHTML);
-        BRS.loadAssetOrders("bid", assetId, refreshHTML);
+        BRS.loadAssetOrders("ask", assetId, refreshHTML | refreshAsset);
+        BRS.loadAssetOrders("bid", assetId, refreshHTML | refreshAsset);
 
         BRS.updateMiniTradeHistory();
 
@@ -712,6 +712,10 @@ var BRS = (function(BRS, $, undefined) {
             if (!orders) {
                 orders = [];
             }
+            let typeAction = "buy"
+            if (type === "ask") {
+                typeAction = "sell"
+            }
 
             if (BRS.unconfirmedTransactions.length) {
                 var added = false;
@@ -739,36 +743,57 @@ var BRS = (function(BRS, $, undefined) {
                 }
             }
 
-            if (orders.length) {
-                $("#" + (type == "ask" ? "sell" : "buy") + "_orders_count").html("(" + orders.length + (orders.length == 50 ? "+" : "") + ")");
-
-                var rows = "";
-                for (i = 0; i < orders.length; i++) {
-                    var order = orders[i];
-
-                    order.priceNQT = new BigInteger(order.priceNQT);
-                    order.quantityQNT = new BigInteger(order.quantityQNT);
-                    order.totalNQT = new BigInteger(BRS.calculateOrderTotalNQT(order.quantityQNT, order.priceNQT));
-
-                    if (i === 0 && !refresh) {
-                        $("#" + (type == "ask" ? "buy" : "sell") + "_asset_price").val(BRS.calculateOrderPricePerWholeQNT(order.priceNQT, BRS.currentAsset.decimals));
-                    }
-
-                    var className = (order.account == BRS.account ? "your-order" : "") + (order.unconfirmed ? " tentative" : (BRS.isUserCancelledOrder(order) ? " tentative tentative-crossed" : ""));
-
-                    rows += "<tr class='" + className + "' data-transaction='" + String(order.order).escapeHTML() + "' data-quantity='" + order.quantityQNT.toString().escapeHTML() + "' data-price='" + order.priceNQT.toString().escapeHTML() + "'><td>" + (order.unconfirmed ? "You - <strong>Pending</strong>" : (order.account == BRS.account ? "<strong>You</strong>" : "<a href='#' data-user='" + BRS.getAccountFormatted(order, "account") + "' class='user_info'>" + (order.account == BRS.currentAsset.account ? "Asset Issuer" : BRS.getAccountTitle(order, "account")) + "</a>")) + "</td><td>" + BRS.formatQuantity(order.quantityQNT, BRS.currentAsset.decimals) + "</td><td>" + BRS.formatOrderPricePerWholeQNT(order.priceNQT, BRS.currentAsset.decimals) + "</td><td>" + BRS.formatAmount(order.totalNQT) + "</tr>";
-                }
-
-                $("#asset_exchange_" + type + "_orders_table tbody").empty().append(rows);
-            } else {
-                $("#asset_exchange_" + type + "_orders_table tbody").empty();
+            if (orders.length === 0) {
+                $(`#asset_exchange_${type}_orders_table tbody`).empty();
                 if (!refresh) {
-                    $("#" + (type == "ask" ? "buy" : "sell") + "_asset_price").val("0");
+                    $(`#${typeAction}_asset_price`).val("0");
                 }
-                $("#" + (type == "ask" ? "sell" : "buy") + "_orders_count").html("");
+                $(`#${typeAction}_orders_count`).html("");
+                BRS.dataLoadFinished($(`#asset_exchange_${type}_orders_table`), !refresh);
+                return
+            }
+            $(`#${typeAction}_orders_count`).html("(" + orders.length + (orders.length == 50 ? "+" : "") + ")");
+
+            let rows = "";
+            let first = true;
+            for (const order of orders) {
+                order.priceNQT = new BigInteger(order.priceNQT);
+                order.quantityQNT = new BigInteger(order.quantityQNT);
+                order.totalNQT = new BigInteger(BRS.calculateOrderTotalNQT(order.quantityQNT, order.priceNQT));
+
+                if (first && !refresh) {
+                    $(`#${typeAction}_asset_price`).val(BRS.calculateOrderPricePerWholeQNT(order.priceNQT, BRS.currentAsset.decimals));
+                }
+
+                const className = (order.account == BRS.account ? "your-order" : "") + (order.unconfirmed ? " tentative" : (BRS.isUserCancelledOrder(order) ? " tentative tentative-crossed" : ""));
+
+                let accountHTML = ''
+                if (order.unconfirmed) {
+                    accountHTML = `${BRS.pendingTransactionHTML} <strong>${$.t("you")}</strong>`
+                } else if (order.account === BRS.account) {
+                    accountHTML = `<strong>${$.t("you")}</strong>`
+                } else {
+                    accountHTML = "<a href='#' data-user='" + BRS.getAccountFormatted(order, "account") + "' class='user_info'>"
+                    if  (order.account == BRS.currentAsset.account) {
+                        accountHTML += $.t("asset_issuer")
+                    } else {
+                        accountHTML += BRS.getAccountTitle(order, "account")
+                    }
+                    accountHTML += "</a>"
+                }
+
+                rows += `<tr class='${className}' data-transaction='${order.order}' data-quantity='${order.quantityQNT.toString()}' data-price='${order.priceNQT.toString()}'>`
+                rows += `<td>${accountHTML}</td>`
+                rows += "<td>" + BRS.formatQuantity(order.quantityQNT, BRS.currentAsset.decimals) + "</td>"
+                rows += "<td>" + BRS.formatOrderPricePerWholeQNT(order.priceNQT, BRS.currentAsset.decimals) + "</td>"
+                rows += "<td>" + BRS.formatAmount(order.totalNQT) + "</td>"
+                rows += "</tr>";
+                first = false;
             }
 
-            BRS.dataLoadFinished($("#asset_exchange_" + type + "_orders_table"), !refresh);
+            $(`#asset_exchange_${type}_orders_table tbody`).html(rows);
+
+            BRS.dataLoadFinished($(`#asset_exchange_${type}_orders_table`), !refresh);
         });
     };
 
@@ -1102,30 +1127,35 @@ var BRS = (function(BRS, $, undefined) {
         if (response.alreadyProcessed) {
             return;
         }
-        var $table;
+        let $table;
         if (data.requestType == "placeBidOrder") {
             $table = $("#asset_exchange_bid_orders_table tbody");
         } else {
             $table = $("#asset_exchange_ask_orders_table tbody");
         }
 
-        if ($table.find("tr[data-transaction='" + String(response.transaction).escapeHTML() + "']").length) {
+        if ($table.find(`tr[data-transaction='${response.transaction}']`).length) {
             return;
         }
 
-        var $rows = $table.find("tr");
+        const $rows = $table.find("tr");
 
         data.quantityQNT = new BigInteger(data.quantityQNT);
         data.priceNQT = new BigInteger(data.priceNQT);
         data.totalNQT = new BigInteger(BRS.calculateOrderTotalNQT(data.quantityQNT, data.priceNQT));
 
-        var rowToAdd = "<tr class='tentative' data-transaction='" + String(response.transaction).escapeHTML() + "' data-quantity='" + data.quantityQNT.toString().escapeHTML() + "' data-price='" + data.priceNQT.toString().escapeHTML() + "'><td>You - <strong>Pending</strong></td><td>" + BRS.formatQuantity(data.quantityQNT, BRS.currentAsset.decimals) + "</td><td>" + BRS.formatOrderPricePerWholeQNT(data.priceNQT, BRS.currentAsset.decimals) + "</td><td>" + BRS.formatAmount(data.totalNQT) + "</td></tr>";
+        let rowToAdd = `<tr class='tentative' data-transaction='${response.transaction}' data-quantity='${data.quantityQNT.toString()}' data-price='${data.priceNQT.toString()}'>`
+        rowToAdd += `<td>${BRS.pendingTransactionHTML} <strong>${$.t("you")}</strong></td>`
+        rowToAdd += "<td>" + BRS.formatQuantity(data.quantityQNT, BRS.currentAsset.decimals) + "</td>"
+        rowToAdd += "<td>" + BRS.formatOrderPricePerWholeQNT(data.priceNQT, BRS.currentAsset.decimals) + "</td>"
+        rowToAdd += "<td>" + BRS.formatAmount(data.totalNQT) + "</td>"
+        rowToAdd += "</tr>";
 
-        var rowAdded = false;
+        let rowAdded = false;
 
         if ($rows.length) {
             $rows.each(function() {
-                var rowPrice = new BigInteger(String($(this).data("price")));
+                const rowPrice = new BigInteger(String($(this).data("price")));
 
                 if (data.requestType == "placeBidOrder" && data.priceNQT.compareTo(rowPrice) > 0) {
                     $(this).before(rowToAdd);
