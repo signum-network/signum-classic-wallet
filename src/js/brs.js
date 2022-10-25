@@ -1049,7 +1049,16 @@ var BRS = (function(BRS, $, undefined) {
 
     BRS.evIdSearchSubmit = function(e) {
         e.preventDefault();
-        const searchText = $.trim($("#id_search input[name=q]").val());
+        const userInput = $.trim($("#id_search input[name=q]").val())
+        let searchText = userInput
+        if (searchText.startsWith("-")) {
+            try {
+                // signed to unsigned conversion
+                searchText = (BigInt(userInput) + (1n << 64n)).toString(10)
+            } catch (_e) {
+                searchText = userInput
+            }
+        }
         if (BRS.rsRegEx.test(searchText)) {
             BRS.sendRequest("getAccount", {
                 "account": searchText
