@@ -71,7 +71,7 @@ var BRS = (function(BRS, $, undefined) {
     BRS.assetTableKeys = [];
 
     BRS.loadingDotsHTML = "<span>.</span><span>.</span><span>.</span>"
-    BRS.pendingTransactionHTML = '<i class="fas fa-spinner fa-spin"></i>'
+    BRS.pendingTransactionHTML = '<i class="fas fa-spinner my-fa-spin"></i>'
     BRS.minimumFeeNumber = 0.01;
 
     var stateInterval;
