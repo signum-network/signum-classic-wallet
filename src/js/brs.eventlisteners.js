@@ -125,6 +125,14 @@
         $("span.asset_selector").on("click", "ul li a", BRS.evTransferAssetModalOnShowBsModal);
         $("span.recipient_selector").on("click", "button", BRS.evSpanRecipientSelectorClickButton);
         $("span.recipient_selector").on("click", "ul li a", BRS.evSpanRecipientSelectorClickUlLiA);
+
+        // from brs.transactions.js
+        $("input[type=radio][name=transactions_from_account]").on("click", function () {
+            BRS.pageNumber = 1;
+            BRS.hasMorePages = false;
+            BRS.loadPage("transactions");
+        });
+
         // from brs.assetexchange.js
         $("#asset_exchange_bookmark_this_asset").on("click", function() {
                 BRS.saveAssetBookmarks([BRS.currentAsset], function() {

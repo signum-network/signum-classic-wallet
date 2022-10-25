@@ -298,15 +298,41 @@ var BRS = (function(BRS, $, undefined) {
     };
 
     BRS.pages.transactions = function() {
+        function getFrom () {
+            const from = $('input[name=transactions_from_account]:checked').val()
+            if (from === 'me') {
+                return BRS.account
+            }
+            // from 'others'
+            const fromWho = $("#transaction_from_account_account").val().trim()
+            if (BRS.rsRegEx.test(fromWho) || BRS.idRegEx.test(fromWho)) {
+                return fromWho
+            }
+            const foundContact = BRS.getContactByName(fromWho)
+            if (foundContact) {
+                return foundContact.accountRS
+            }
+            return ''
+        }
+
+        const account = getFrom()
+        if (!account) {
+            $.notify(
+                $.t("name_not_in_contacts", { name: account }),
+                { type: 'danger' }
+            );
+            return;
+        }
+
         if (BRS.transactionsPageType == "unconfirmed") {
-            BRS.displayUnconfirmedTransactions();
+            BRS.displayUnconfirmedTransactions(account);
             return;
         }
 
         let rows = "";
         let unconfirmedTransactions;
         const params = {
-            "account": BRS.account,
+            account,
             "firstIndex": BRS.pageSize * (BRS.pageNumber - 1),
             "lastIndex": BRS.pageSize * BRS.pageNumber,
             "includeIndirect": true
@@ -321,7 +347,7 @@ var BRS = (function(BRS, $, undefined) {
         }
 
         if (unconfirmedTransactions && BRS.pageNumber == 1) {
-            rows = unconfirmedTransactions.reduce((prev, currTr) => prev + getTransactionRowHTML(currTr), '')
+            rows = unconfirmedTransactions.reduce((prev, currTr) => prev + getTransactionRowHTML(currTr, account), '')
         }
 
         BRS.sendRequest("getAccountTransactions+", params, (response) => {
@@ -330,7 +356,7 @@ var BRS = (function(BRS, $, undefined) {
                     BRS.hasMorePages = true;
                     response.transactions.pop();
                 }
-                rows += response.transactions.reduce((prev, currTr) => prev + getTransactionRowHTML(currTr), '')
+                rows += response.transactions.reduce((prev, currTr) => prev + getTransactionRowHTML(currTr, account), '')
             }
             BRS.dataLoaded(rows);
         });
@@ -340,12 +366,12 @@ var BRS = (function(BRS, $, undefined) {
         BRS.loadPage("transactions");
     };
 
-    BRS.displayUnconfirmedTransactions = function() {
+    BRS.displayUnconfirmedTransactions = function(viewAccount) {
         BRS.sendRequest("getUnconfirmedTransactions", function(response) {
             let rows = ''
             
             if (response.unconfirmedTransactions && response.unconfirmedTransactions.length) {
-                rows = response.unconfirmedTransactions.reduce((prev, currTr) => prev + getTransactionRowHTML(currTr), '')
+                rows = response.unconfirmedTransactions.reduce((prev, currTr) => prev + getTransactionRowHTML(currTr, viewAccount), '')
             }
 
             BRS.dataLoaded(rows);
@@ -705,8 +731,8 @@ var BRS = (function(BRS, $, undefined) {
         return rowStr;
     }
 
-    function getTransactionRowHTML(transaction) {
-        const details = BRS.getTransactionDetails(transaction);
+    function getTransactionRowHTML(transaction, viewAccount) {
+        const details = BRS.getTransactionDetails(transaction, viewAccount);
 
         let confirmationHTML = BRS.formatAmount(transaction.confirmations)
         if (transaction.unconfirmed) {

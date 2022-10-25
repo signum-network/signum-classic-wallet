@@ -1,7 +1,19 @@
 <div id="transactions_page" class="page paginated">
-  <section class="content-header">
+  <section class="content-header" style="display: flex; justify-content: space-between;">
     <h1 data-i18n="transactions">Transactions</h1>
-    <div style="position:absolute;top:9px;right:9px;">
+    <div style="display: flex; justify-content: flex-end; gap: 1em; align-items: center; flex-wrap: wrap">
+      <label style="margin: 0; font-weight: normal;"><input type="radio" name="transactions_from_account" value="me" checked>
+         <span data-i18n="you">you</span>
+      </label>
+      |
+      <input type="radio" name="transactions_from_account" value="others">
+      <div class="input-group" style="width: 33ch;">
+        <input type="text" class="form-control" name="recipient" id="transaction_from_account_account" placeholder="account" data-i18n="[placeholder]account">
+        <span class="input-group-btn btn-group recipient_selector">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span></button>
+        <ul class="dropdown-menu scrollable-menu" role="menu" style="right:0;left:auto;"></ul>
+        </span>
+      </div>
       <div class="btn-group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
         <span class="text" data-i18n="all_transactions">All Transactions</span> <span class="caret"></span>
