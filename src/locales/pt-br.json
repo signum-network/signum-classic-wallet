@@ -1,4 +1,5 @@
 {
+    "filled": "Executada",
     "asset_issuer": "Emissor do ativo",
     "issuer": "Emissor",
     "user_no_smartcontract": "Esta conta não é um contrato inteligente",

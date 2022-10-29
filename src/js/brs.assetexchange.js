@@ -1791,150 +1791,87 @@ var BRS = (function(BRS, $, undefined) {
 
     /* OPEN ORDERS PAGE */
     BRS.pages.open_orders = function() {
-        var loaded = 0;
-
-        BRS.getOpenOrders("ask", function() {
+        let loaded = 0;
+        function allLoaded() {
             loaded++;
             if (loaded == 2) {
                 BRS.pageLoaded();
             }
-        });
-
-        BRS.getOpenOrders("bid", function() {
-            loaded++;
-            if (loaded == 2) {
-                BRS.pageLoaded();
-            }
-        });
+        }
+        getOpenOrders("ask", allLoaded );
+        getOpenOrders("bid", allLoaded);
     };
 
-    BRS.getOpenOrders = function(type, callback) {
-        var uppercase = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
-        var lowercase = type.toLowerCase();
+    function getOpenOrders (type, callback) {
+        const capitalizedType = type.charAt(0).toUpperCase() + type.slice(1);
 
-        var getCurrentOrderIds = "getAccountCurrent" + uppercase + "OrderIds+";
-        var orderIds = lowercase + "OrderIds";
-        var getOrder = "get" + uppercase + "Order+";
+        const getCurrentOrderIds = `getAccountCurrent${capitalizedType}OrderIds+`;
+        const orderIds = `${type}OrderIds`;
+        const getOrder = `get${capitalizedType}Order+`;
 
-        var orders = [];
+        const orders = [];
+
+        function allOrdersLoaded() {
+            if (BRS.currentPage !== "open_orders") {
+                return;
+            }
+            openOrdersLoaded(orders.concat(getUnconfirmedOrders(type)), type, callback);
+        }
 
         BRS.sendRequest(getCurrentOrderIds, {
             "account": BRS.account
         }, function(response) {
-            if (response[orderIds] && response[orderIds].length) {
-                var nr_orders = 0;
-
-                for (var i = 0; i < response[orderIds].length; i++) {
-                    BRS.sendRequest(getOrder, {
-                        "order": response[orderIds][i]
-                    }, function(order, input) {
-                        if (BRS.currentPage != "open_orders") {
-                            return;
+            if (response[orderIds] === undefined || response[orderIds].length === 0) {
+                allOrdersLoaded()
+                return
+            }
+            let nr_orders = 0;
+            for (const eachOrder of response[orderIds]) {
+                BRS.sendRequest(getOrder, {
+                    "order": eachOrder
+                }, function(order) {
+                    BRS.sendRequest('getTransaction', {
+                        transaction: eachOrder
+                    }, function (originalOrder) {
+                        if (originalOrder.errorCode === undefined) {
+                            order.originalQuantityQNT = originalOrder.attachment.quantityQNT
                         }
-
-                        order.order = input.order;
                         orders.push(order);
-
                         nr_orders++;
-
-                        if (nr_orders == response[orderIds].length) {
-                            var nr_orders_complete = 0;
-
-                            for (var i = 0; i < nr_orders; i++) {
-                                order = orders[i];
-
-                                BRS.sendRequest("getAsset+", {
-                                    "asset": order.asset,
-                                    "_extra": {
-                                        "id": i
-                                    }
-                                }, function(asset, input) {
-                                    if (BRS.currentPage != "open_orders") {
-                                        return;
-                                    }
-
-                                    orders[input._extra.id].assetName = asset.name;
-                                    orders[input._extra.id].decimals = asset.decimals;
-
-                                    nr_orders_complete++;
-
-                                    if (nr_orders_complete == nr_orders) {
-                                        BRS.getUnconfirmedOrders(type, function(unconfirmedOrders) {
-                                            BRS.openOrdersLoaded(orders.concat(unconfirmedOrders), lowercase, callback);
-                                        });
-                                    }
-                                });
-
-                                if (BRS.currentPage != "open_orders") {
-                                    return;
-                                }
-                            }
+                        if (nr_orders === response[orderIds].length) {
+                            allOrdersLoaded()
                         }
-                    });
-
-                    if (BRS.currentPage != "open_orders") {
-                        return;
-                    }
-                }
-            } else {
-                BRS.getUnconfirmedOrders(type, function(unconfirmedOrders) {
-                    BRS.openOrdersLoaded(unconfirmedOrders, lowercase, callback);
+                    })
                 });
+                if (BRS.currentPage != "open_orders") {
+                    return;
+                }
             }
         });
     };
 
-    BRS.getUnconfirmedOrders = function(type, callback) {
-        if (BRS.unconfirmedTransactions.length) {
-            var unconfirmedOrders = [];
-
-            for (var i = 0; i < BRS.unconfirmedTransactions.length; i++) {
-                var unconfirmedTransaction = BRS.unconfirmedTransactions[i];
-
-                if (unconfirmedTransaction.type == 2 && unconfirmedTransaction.subtype == (type == "ask" ? 2 : 3)) {
-                    unconfirmedOrders.push({
-                        "account": unconfirmedTransaction.sender,
-                        "asset": unconfirmedTransaction.attachment.asset,
-                        "assetName": "",
-                        "decimals": 0,
-                        "height": 0,
-                        "order": unconfirmedTransaction.transaction,
-                        "priceNQT": unconfirmedTransaction.attachment.priceNQT,
-                        "quantityQNT": unconfirmedTransaction.attachment.quantityQNT,
-                        "tentative": true
-                    });
-                }
+    function getUnconfirmedOrders(type) {
+        const unconfirmedOrders = [];
+        for (const unconfirmedTransaction of BRS.unconfirmedTransactions) {
+            if (unconfirmedTransaction.type == 2 && unconfirmedTransaction.subtype == (type == "ask" ? 2 : 3)) {
+                unconfirmedOrders.push({
+                    "account": unconfirmedTransaction.sender,
+                    "asset": unconfirmedTransaction.attachment.asset,
+                    "assetName": "",
+                    "decimals": 0,
+                    "height": 0,
+                    "order": unconfirmedTransaction.transaction,
+                    "priceNQT": unconfirmedTransaction.attachment.priceNQT,
+                    "quantityQNT": unconfirmedTransaction.attachment.quantityQNT,
+                    "originalQuantityQNT": unconfirmedTransaction.attachment.quantityQNT,
+                    "tentative": true
+                });
             }
-
-            if (unconfirmedOrders.length === 0) {
-                callback([]);
-            } else {
-                var nr_orders = 0;
-
-                for (i = 0; i < unconfirmedOrders.length; i++) {
-                    BRS.sendRequest("getAsset+", {
-                        "asset": unconfirmedOrders[i].asset,
-                        "_extra": {
-                            "id": i
-                        }
-                    }, function(asset, input) {
-                        unconfirmedOrders[input._extra.id].assetName = asset.name;
-                        unconfirmedOrders[input._extra.id].decimals = asset.decimals;
-
-                        nr_orders++;
-
-                        if (nr_orders == unconfirmedOrders.length) {
-                            callback(unconfirmedOrders);
-                        }
-                    });
-                }
-            }
-        } else {
-            callback([]);
         }
+        return unconfirmedOrders;
     };
 
-    BRS.openOrdersLoaded = function(orders, type, callback) {
+    function openOrdersLoaded(orders, type, callback) {
         if (!orders.length) {
             $("#open_" + type + "_orders_table tbody").empty();
             BRS.dataLoadFinished($("#open_" + type + "_orders_table"));
@@ -1944,6 +1881,16 @@ var BRS = (function(BRS, $, undefined) {
             return;
         }
 
+        orders.forEach(obj => {
+            const assetDetails = BRS.getAssetDetails(obj.asset)
+            if (assetDetails) {
+                obj.assetName = assetDetails.name
+                obj.assetDecimals = assetDetails.decimals
+            } else {
+                obj.assetName = 'undefined'
+                obj.assetDecimals = 0
+            }
+        })
         orders.sort(function(a, b) {
             if (a.assetName.toLowerCase() > b.assetName.toLowerCase()) {
                 return 1;
@@ -1960,29 +1907,46 @@ var BRS = (function(BRS, $, undefined) {
             }
         });
 
-        var rows = "";
+        let rows = "";
 
-        for (var i = 0; i < orders.length; i++) {
-            var completeOrder = orders[i];
-
-            var cancelled = false;
-
-            if (BRS.unconfirmedTransactions.length) {
-                for (var j = 0; j < BRS.unconfirmedTransactions.length; j++) {
-                    var unconfirmedTransaction = BRS.unconfirmedTransactions[j];
-
-                    if (unconfirmedTransaction.type == 2 && unconfirmedTransaction.subtype == (type == "ask" ? 4 : 5) && unconfirmedTransaction.attachment.order == completeOrder.order) {
-                        cancelled = true;
-                        break;
-                    }
+        for (const completeOrder of orders) {
+            let cancelled = false;
+            for (const unconfirmedTransaction of BRS.unconfirmedTransactions) {
+                if (unconfirmedTransaction.type == 2 &&
+                    unconfirmedTransaction.subtype == (type == "ask" ? 4 : 5) &&
+                    unconfirmedTransaction.attachment.order == completeOrder.order) {
+                    cancelled = true;
+                    break;
                 }
             }
 
             completeOrder.priceNQT = new BigInteger(completeOrder.priceNQT);
             completeOrder.quantityQNT = new BigInteger(completeOrder.quantityQNT);
             completeOrder.totalNQT = new BigInteger(BRS.calculateOrderTotalNQT(completeOrder.quantityQNT, completeOrder.priceNQT));
+            completeOrder.originalQuantityQNT = new BigInteger(completeOrder.originalQuantityQNT);
+            const filled = new BigInteger("100").subtract(completeOrder.quantityQNT.multiply(new BigInteger("100")).divide(completeOrder.originalQuantityQNT)).toString() + "%"
 
-            rows += "<tr data-order='" + String(completeOrder.order).escapeHTML() + "'" + (cancelled ? " class='tentative tentative-crossed'" : (completeOrder.tentative ? " class='tentative'" : "")) + "><td><a href='#' data-goto-asset='" + String(completeOrder.asset).escapeHTML() + "'>" + completeOrder.assetName.escapeHTML() + "</a></td><td>" + BRS.formatQuantity(completeOrder.quantityQNT, completeOrder.decimals) + "</td><td>" + BRS.formatOrderPricePerWholeQNT(completeOrder.priceNQT, completeOrder.decimals) + "</td><td>" + BRS.formatAmount(completeOrder.totalNQT) + "</td><td class='cancel'>" + (cancelled || completeOrder.tentative ? "/" : "<a href='#' data-toggle='modal' data-target='#cancel_order_modal' data-order='" + String(completeOrder.order).escapeHTML() + "' data-type='" + type + "'>" + $.t("cancel") + "</a>") + "</td></tr>";
+            let rowClass = ''
+            if (cancelled) {
+                rowClass = "class='tentative tentative-crossed'"
+            } else {
+                if (completeOrder.tentative) {
+                    rowClass = "class='tentative'"
+                }
+            }
+            let cancelText = ''
+            if (rowClass === '') {
+                cancelText = `<a href='#' data-toggle='modal' data-target='#cancel_order_modal' data-order='${completeOrder.order}' data-type='${type}'><i class="fas fa-trash"></i></a>`
+            }
+
+            rows += `<tr data-order='${completeOrder.order}' ${rowClass}>`
+            rows += `<td><a href='#' data-goto-asset='${completeOrder.asset}'>${completeOrder.assetName}</a></td>`
+            rows += `<td>${BRS.formatQuantity(completeOrder.originalQuantityQNT, completeOrder.assetDecimals)}</td>`
+            rows += `<td>${filled}</td>`
+            rows += `<td>${BRS.formatOrderPricePerWholeQNT(completeOrder.priceNQT, completeOrder.assetDecimals)}</td>`
+            rows += `<td>${BRS.formatAmount(completeOrder.totalNQT)}</td>`
+            rows += `<td class='cancel'>${cancelText}</td>`
+            rows += '</tr>';
         }
 
         $("#open_" + type + "_orders_table tbody").empty().append(rows);

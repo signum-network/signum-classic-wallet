@@ -1,4 +1,5 @@
 {
+    "filled": "Filled",
     "asset_issuer": "Asset issuer",
     "issuer": "Issuer",
     "user_no_smartcontract": "This account is not a smart contract.",
