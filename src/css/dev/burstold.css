@@ -568,3 +568,9 @@ background-color:#FFFAF0!important
 .my-fa-spin {
     animation: a 1s steps(8) infinite;
 }
+.green-asset {
+    color: #48AB6C;
+}
+.red-asset {
+    color: #ED4348;
+}

@@ -792,10 +792,17 @@ var BRS = (function(BRS, $, undefined) {
                 }
 
                 rows += `<tr class='${className}' data-transaction='${order.order}' data-quantity='${order.quantityQNT.toString()}' data-price='${order.priceNQT.toString()}'>`
-                rows += `<td>${accountHTML}</td>`
-                rows += "<td>" + BRS.formatQuantity(order.quantityQNT, BRS.currentAsset.decimals) + "</td>"
-                rows += "<td>" + BRS.formatOrderPricePerWholeQNT(order.priceNQT, BRS.currentAsset.decimals) + "</td>"
-                rows += "<td>" + BRS.formatAmount(order.totalNQT) + "</td>"
+                if (type === 'ask') {
+                    rows += "<td class='bold red-asset'>" + BRS.formatOrderPricePerWholeQNT(order.priceNQT, BRS.currentAsset.decimals) + "</td>"
+                    rows += "<td>" + BRS.formatQuantity(order.quantityQNT, BRS.currentAsset.decimals) + "</td>"
+                    rows += "<td>" + BRS.formatAmount(order.totalNQT) + "</td>"
+                    rows += `<td>${accountHTML}</td>`
+                } else {
+                    rows += `<td>${accountHTML}</td>`
+                    rows += "<td>" + BRS.formatAmount(order.totalNQT) + "</td>"
+                    rows += "<td>" + BRS.formatQuantity(order.quantityQNT, BRS.currentAsset.decimals) + "</td>"
+                    rows += "<td class='bold green-asset'>" + BRS.formatOrderPricePerWholeQNT(order.priceNQT, BRS.currentAsset.decimals) + "</td>"
+                }
                 rows += "</tr>";
                 first = false;
             }
@@ -1154,10 +1161,17 @@ var BRS = (function(BRS, $, undefined) {
         data.totalNQT = new BigInteger(BRS.calculateOrderTotalNQT(data.quantityQNT, data.priceNQT));
 
         let rowToAdd = `<tr class='tentative' data-transaction='${response.transaction}' data-quantity='${data.quantityQNT.toString()}' data-price='${data.priceNQT.toString()}'>`
-        rowToAdd += `<td>${BRS.pendingTransactionHTML} <strong>${$.t("you")}</strong></td>`
-        rowToAdd += "<td>" + BRS.formatQuantity(data.quantityQNT, BRS.currentAsset.decimals) + "</td>"
-        rowToAdd += "<td>" + BRS.formatOrderPricePerWholeQNT(data.priceNQT, BRS.currentAsset.decimals) + "</td>"
-        rowToAdd += "<td>" + BRS.formatAmount(data.totalNQT) + "</td>"
+        if (data.requestType == "placeBidOrder") {
+            rowToAdd += `<td>${BRS.pendingTransactionHTML} <strong>${$.t("you")}</strong></td>`
+            rowToAdd += "<td>" + BRS.formatAmount(data.totalNQT) + "</td>"
+            rowToAdd += "<td>" + BRS.formatQuantity(data.quantityQNT, BRS.currentAsset.decimals) + "</td>"
+            rowToAdd += "<td>" + BRS.formatOrderPricePerWholeQNT(data.priceNQT, BRS.currentAsset.decimals) + "</td>"
+        } else {
+            rowToAdd += "<td>" + BRS.formatOrderPricePerWholeQNT(data.priceNQT, BRS.currentAsset.decimals) + "</td>"
+            rowToAdd += "<td>" + BRS.formatQuantity(data.quantityQNT, BRS.currentAsset.decimals) + "</td>"
+            rowToAdd += "<td>" + BRS.formatAmount(data.totalNQT) + "</td>"
+            rowToAdd += `<td>${BRS.pendingTransactionHTML} <strong>${$.t("you")}</strong></td>`
+        }
         rowToAdd += "</tr>";
 
         let rowAdded = false;
