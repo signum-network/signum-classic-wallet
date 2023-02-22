@@ -81,7 +81,7 @@ var BRS = (function(BRS, $, undefined) {
     BRS.nodes = [
         // First must be localhost mainnet!
         { address: 'http://localhost:8125', testnet: false },
-        { address: 'https://uk.signum.network', testnet: false },
+        { address: 'https://ru.signum.network', testnet: false },
         { address: 'https://latam.signum.network', testnet: false },
         { address: 'https://us-east.signum.network', testnet: false },
         { address: 'https://singapore.signum.network', testnet: false },
