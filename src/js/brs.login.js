@@ -39,14 +39,6 @@ var BRS = (function(BRS, $, undefined) {
         $("#welcome_panel").show();
     };
 
-    BRS.registerUserDefinedAccount = function() {
-        $("#account_phrase_generator_panel, #login_panel, #welcome_panel, #custom_passphrase_link").hide();
-        $("#account_phrase_custom_panel :input:not(:button):not([type=submit])").val("");
-        $("#account_phrase_generator_panel :input:not(:button):not([type=submit])").val("");
-        $("#account_phrase_custom_panel").show();
-        $("#registration_password").focus();
-    };
-
     BRS.registerAccount = function() {
         $("#login_panel, #welcome_panel").hide();
         $("#account_phrase_generator_panel").show();
