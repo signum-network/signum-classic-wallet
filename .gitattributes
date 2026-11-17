@@ -1,0 +1,3 @@
+# Never convert line endings: index.html pins SRI hashes of these files, and a
+# CRLF checkout (e.g. Git on Windows) would change their content and break them.
+* -text
